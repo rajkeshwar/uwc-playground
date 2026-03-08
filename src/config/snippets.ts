@@ -30,7 +30,8 @@ export class MyCounter extends LitElement {
     \`;
   }
 }`,
-    scss: `$primary: #c84b2f;
+    scss: `// Global styles (body, backgrounds)
+$primary: #c84b2f;
 $bg:      #fffdf7;
 $border:  #ddd8cd;
 
@@ -44,51 +45,59 @@ body {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-my-counter {
-  .card {
-    background: $bg;
-    border: 1px solid $border;
-    border-radius: 10px;
-    padding: 2.5rem;
-    min-width: 280px;
-    text-align: center;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-    transition: box-shadow 0.2s;
-    &:hover { box-shadow: 5px 5px 0 $primary; }
-  }
-  .title {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: #9e9488;
-    margin: 0 0 1rem;
-  }
-  .count {
-    font-size: 5rem;
-    font-weight: 700;
-    color: $primary;
-    margin: 0 0 1.5rem;
-    line-height: 1;
-  }
-  .controls { display: flex; gap: 0.5rem; justify-content: center; }
-  button {
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    padding: 0.5em 1.2em;
-    border-radius: 5px;
-    background: transparent;
-    transition: background 0.15s, color 0.15s;
-  }
-  .btn-inc {
-    border: 1px solid $primary; color: $primary;
-    &:hover { background: $primary; color: $bg; }
-  }
-  .btn-rst {
-    border: 1px solid #9e9488; color: #9e9488;
-    &:hover { background: #0e0e0e; color: #f5f0e8; border-color: #0e0e0e; }
-  }
+// Component styles — injected into shadow root via adoptedStyleSheets.
+// Use plain selectors (no "my-counter" wrapper needed inside shadow DOM).
+:host { display: block; }
+
+.card {
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 2.5rem;
+  min-width: 280px;
+  text-align: center;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+  &:hover { box-shadow: 5px 5px 0 $primary; }
+}
+
+.title {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #9e9488;
+  margin: 0 0 1rem;
+}
+
+.count {
+  font-size: 5rem;
+  font-weight: 700;
+  color: $primary;
+  margin: 0 0 1.5rem;
+  line-height: 1;
+}
+
+.controls { display: flex; gap: 0.5rem; justify-content: center; }
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.5em 1.2em;
+  border-radius: 5px;
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-inc {
+  border: 1px solid $primary; color: $primary;
+  &:hover { background: $primary; color: $bg; }
+}
+
+.btn-rst {
+  border: 1px solid #9e9488; color: #9e9488;
+  &:hover { background: #0e0e0e; color: #f5f0e8; border-color: #0e0e0e; }
 }`,
   },
 

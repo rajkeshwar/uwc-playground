@@ -3,9 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UWCPen — Framework Playground</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- ── Primary SEO ── -->
+  <title>UWCPen — Multi-Framework Playground for Lit, React, Vue &amp; Angular</title>
+  <meta name="description" content="UWCPen is a browser-based, offline-capable code playground supporting Lit, React, Vue 3, and Angular 18. Write TypeScript and SCSS, see live output instantly. No install required."/>
+  <meta name="keywords" content="web components playground, Lit playground, React playground, Vue playground, Angular playground, TypeScript playground, online IDE, web development, code editor, SCSS compiler, UWCPen"/>
+  <meta name="author" content="UWCPen"/>
+  <meta name="robots" content="index, follow"/>
+  <link rel="canonical" href="https://uwcpen.dev/"/>
+
+  <!-- ── Open Graph ── -->
+  <meta property="og:type"        content="website"/>
+  <meta property="og:url"         content="https://uwcpen.dev/"/>
+  <meta property="og:title"       content="UWCPen — Multi-Framework Web Playground"/>
+  <meta property="og:description" content="Live TypeScript + SCSS playground for Lit, React, Vue 3 and Angular 18. Works offline via Service Worker. Embeddable via Web Components."/>
+  <meta property="og:image"       content="https://uwcpen.dev/og-image.png"/>
+  <meta property="og:site_name"   content="UWCPen"/>
+
+  <!-- ── Twitter Card ── -->
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:url"         content="https://uwcpen.dev/"/>
+  <meta name="twitter:title"       content="UWCPen — Multi-Framework Web Playground"/>
+  <meta name="twitter:description" content="Live TypeScript + SCSS playground for Lit, React, Vue 3 and Angular 18. Works offline, embeddable anywhere."/>
+  <meta name="twitter:image"       content="https://uwcpen.dev/og-image.png"/>
+
+  <!-- ── JSON-LD Structured Data ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "UWCPen",
+    "description": "Multi-framework browser playground for Lit, React, Vue 3 and Angular 18 with TypeScript and SCSS support.",
+    "url": "https://uwcpen.dev",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": [
+      "Live TypeScript compilation",
+      "SCSS compilation",
+      "Lit Web Components support",
+      "React 18 support",
+      "Vue 3 support",
+      "Angular 18 Zoneless support",
+      "Offline-capable via Service Worker",
+      "Embeddable uwc-playground and uwc-render components",
+      "Form POST API for deep-linking"
+    ]
+  }
+  </script>
+
+  <!-- ── Fonts ── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- ── Global tokens & boot styles ── -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,82 +71,63 @@
       --text:         #9090b8;
       --text-2:       #c0c0d8;
       --text-bright:  #eeeeff;
-
       --accent:       #7c6aff;
       --accent-soft:  rgba(124,106,255,0.15);
       --accent-glow:  rgba(124,106,255,0.35);
-
       --green:  #34d399;
       --amber:  #f59e0b;
       --red:    #f87171;
       --blue:   #60a5fa;
-
       --mono: 'JetBrains Mono', monospace;
       --sans: 'Syne', sans-serif;
       --radius: 7px;
     }
 
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      background: var(--bg);
-      font-family: var(--mono);
-      color: var(--text-bright);
-    }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); font-family: var(--mono); color: var(--text-bright); }
 
-    uwc-playground {
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-    }
+    uwc-playground { display: flex; flex-direction: column; height: 100dvh; }
 
-    /* ── Boot overlay ── */
+    /* Boot overlay */
     #boot-overlay {
-      position: fixed; inset: 0;
-      background: var(--bg);
+      position: fixed; inset: 0; background: var(--bg);
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 16px;
-      z-index: 9999;
-      transition: opacity 0.4s ease;
+      align-items: center; justify-content: center; gap: 16px;
+      z-index: 9999; transition: opacity 0.4s ease;
     }
     #boot-overlay.fade-out { opacity: 0; pointer-events: none; }
-    .boot-logo {
-      font-family: var(--sans);
-      font-size: 28px; font-weight: 800;
-      color: var(--text-bright);
-      letter-spacing: -0.03em;
-    }
+    .boot-logo { font-family: var(--sans); font-size: 28px; font-weight: 800; color: var(--text-bright); letter-spacing: -0.03em; }
     .boot-logo span { color: var(--accent); }
-    .boot-spinner {
-      width: 24px; height: 24px;
-      border: 2px solid var(--border-2);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    .boot-spinner { width: 24px; height: 24px; border: 2px solid var(--border-2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     .boot-msg { font-size: 12px; color: var(--text-dim); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Split.js gutters (global scope; Split appends gutters into light DOM) ── */
-    .gutter {
-      background: var(--border);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 5;
-      transition: background 0.15s;
-    }
-    .gutter::after {
-      content: '';
-      position: absolute; inset: 0;
-      opacity: 0;
-      background: var(--accent);
-      transition: opacity 0.15s;
-    }
+    /* Split.js gutters live in light DOM */
+    .gutter { background: var(--border); flex-shrink: 0; position: relative; z-index: 5; transition: background 0.15s; }
+    .gutter::after { content: ''; position: absolute; inset: 0; opacity: 0; background: var(--accent); transition: opacity 0.15s; }
     .gutter:hover::after, .gutter:active::after { opacity: 1; }
     .gutter.gutter-horizontal { cursor: col-resize; }
     .gutter.gutter-vertical   { cursor: row-resize; }
   </style>
+
+  <!-- ── Google Analytics 4 — replace G-XXXXXXXXXX with your real Measurement ID ── -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX', { anonymize_ip: true });
+  </script>
+
+  <!-- ── Service Worker Registration ── -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(reg => console.log('[UWCPen] SW registered, scope:', reg.scope))
+          .catch(err => console.warn('[UWCPen] SW registration failed:', err));
+      });
+    }
+  </script>
 </head>
 <body>
 

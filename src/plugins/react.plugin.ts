@@ -1,6 +1,6 @@
 import type { FrameworkPlugin }    from './plugin.interface.js';
 import type { ImportMap, TsCompilerOptions } from '../types.js';
-import { importMapTag, escTpl, blobImportScript } from '../engine/iframe-builder.js';
+import { importMapTag, escTpl, blobImportScript, CONSOLE_INTERCEPTOR } from '../engine/iframe-builder.js';
 import { SNIPPETS }           from '../config/snippets.js';
 import { DEFAULT_IMPORTMAPS } from '../config/importmaps.js';
 
@@ -24,8 +24,8 @@ export class ReactPlugin implements FrameworkPlugin {
   }
 
   buildIframe(js: string, css: string, importMap: ImportMap): string {
-    const safeJs     = escTpl(js);
-    const mountCode  = `
+    const safeJs    = escTpl(js);
+    const mountCode = `
       const root = createRoot(document.getElementById('root'));
       root.render(React.createElement(module.default));`;
 
@@ -38,6 +38,7 @@ export class ReactPlugin implements FrameworkPlugin {
 </head>
 <body>
   <div id="root"></div>
+  ${CONSOLE_INTERCEPTOR}
   <script type="module">
 import React from 'react';
 import { createRoot } from 'react-dom/client';

@@ -1,13 +1,16 @@
 {
   "name": "uwc-playground",
-  "version": "0.0.1",
+  "description": "A CodePen-like live playground supporting **Lit**, **React**, **Vue 3**, and **Angular 18** with TypeScript + SCSS. Built with Lit 3, CodeMirror 6, Split.js, and `@web/dev-server`.",
+  "main": "index.js",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "start": "web-dev-server --node-resolve",
     "start:watch": "web-dev-server --node-resolve --watch",
     "test": "web-test-runner test/**/*.test.ts --node-resolve",
     "test:watch": "web-test-runner test/**/*.test.ts --node-resolve --watch",
-    "build": "rollup -c rollup.config.mjs"
+    "build": "rollup -c rollup.config.mjs",
+    "build:tsc": "tsc --noEmit"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
@@ -18,7 +21,6 @@
     "@open-wc/building-rollup": "^3.0.2",
     "@rollup/plugin-typescript": "^12.1.2",
     "@web/dev-server-esbuild": "^1.0.4",
-    "bootstrap-icons": "^1.11.3",
     "codemirror": "^6.0.1",
     "lit": "^3.2.1",
     "rollup-plugin-copy": "^3.5.0",
@@ -29,12 +31,5 @@
     "@web/dev-server": "^0.4.6",
     "@web/dev-server-esbuild": "^1.0.2",
     "typescript": "^5.4.5"
-  },
-  "overrides": {
-    "rollup": "^3.21.0"
-  },
-  "description": "A CodePen-like live playground supporting **Lit**, **React**, **Vue 3**, and **Angular 18** with TypeScript + SCSS. Built with Lit 3, CodeMirror 6, Split.js, and `@web/dev-server`.",
-  "main": "index.js",
-  "author": "",
-  "license": "ISC"
+  }
 }

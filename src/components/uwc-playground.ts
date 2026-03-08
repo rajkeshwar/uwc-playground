@@ -1,184 +1,158 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import type { FrameworkId, LayoutId } from '../types.js';
 import { DEFAULT_IMPORTMAPS } from '../config/importmaps.js';
-import { registry } from '../plugins/index.js';
+import { FrameworkPlugin, registry } from '../plugins/index.js';
 import { CompilerService } from '../engine/compiler.service.js';
 import { WorkspaceService } from '../workspace/workspace.service.js';
 import { EditorService } from '../workspace/editor.service.js';
+import { PANEL_ICONS } from '../config/layouts.js';
 
-// ── Register sub-components ──────────────────────────────────────────────────
 import './uwc-header.js';
 import './uwc-settings.js';
+import './uwc-docs.js';
 
 const LS_KEY_IMPORTMAPS = 'uwcpen_importmaps_v1';
 const LS_KEY_EDITORS    = 'uwcpen_editors_v1';
+const POST_STORE_URL    = '/__uwcpen_post__';
+const VALID_LAYOUTS: LayoutId[] = ['columns','split-left','split-right','editor-only','output-only'];
 
-/**
- * uwc-playground — Full-featured code playground with editors + live preview.
- *
- * Properties let you pre-configure the playground when embedding it:
- *
- * @example
- *   <uwc-playground
- *     framework="react"
- *     view="split-left"
- *     typescript="..."
- *     scss="..."
- *   ></uwc-playground>
- */
+interface ConsoleEntry { level: string; args: string[]; t: number; }
+
 @customElement('uwc-playground')
 export class UwcPlayground extends LitElement {
   static styles = css`
-    :host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-    }
+    :host { display:flex; flex-direction:column; height:100%; overflow:hidden; }
 
-    /* ── Workspace container ── */
-    #workspace {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      display: flex;
-    }
+    #workspace { flex:1; overflow:hidden; position:relative; display:flex; }
 
-    /* ── Panel layout ── */
-    .dp-panel {
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 0;
-    }
+    /* ── Panel ── */
+    .dp-panel { overflow:hidden; display:flex; flex-direction:column; min-width:0; min-height:0; }
     .dp-panel-header {
-      height: 34px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      gap: 8px;
-      flex-shrink: 0;
-      user-select: none;
+      height:36px; background:var(--surface); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; padding:0 14px; gap:8px; flex-shrink:0; user-select:none;
     }
-    .dp-panel-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .dp-panel-dot.ts      { background: var(--blue);   box-shadow: 0 0 5px var(--blue); }
-    .dp-panel-dot.scss    { background: #f472b6;        box-shadow: 0 0 5px #f472b6; }
-    .dp-panel-dot.preview { background: var(--green);  box-shadow: 0 0 5px var(--green); }
+    .dp-panel-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .dp-panel-dot.ts      { background:var(--blue);  box-shadow:0 0 5px var(--blue); }
+    .dp-panel-dot.scss    { background:#f472b6;       box-shadow:0 0 5px #f472b6; }
+    .dp-panel-dot.preview { background:var(--green); box-shadow:0 0 5px var(--green); }
     .dp-panel-label {
-      font-size: 10px; font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-dim);
+      font-size:10.5px; font-weight:600; text-transform:uppercase;
+      letter-spacing:0.13em; color:var(--text-dim);
     }
-    .dp-panel-body {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      min-height: 0;
-    }
+    .dp-panel-body { flex:1; overflow:hidden; position:relative; min-height:0; }
+    .dp-panel-icon { display:flex; align-items:center; flex-shrink:0; }
 
-    /* ── Editors column (split layouts) ── */
-    .dp-editors-col {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-width: 0;
-      min-height: 0;
-    }
+    /* ── Editors column ── */
+    .dp-editors-col { display:flex; flex-direction:column; overflow:hidden; min-width:0; min-height:0; }
 
-    /* ── CodeMirror overrides ── */
-    .cm-editor { height: 100% !important; }
-    .cm-scroller {
-      overflow: auto !important;
-      font-family: var(--mono) !important;
-      font-size: 13px !important;
-      line-height: 1.65 !important;
-    }
-    .cm-editor.cm-focused { outline: none !important; }
+    /* ── CodeMirror ── */
+    .cm-editor { height:100%!important; }
+    .cm-scroller { overflow:auto!important; font-family:var(--mono)!important; font-size:13px!important; line-height:1.65!important; }
+    .cm-editor.cm-focused { outline:none!important; }
 
-    /* ── Preview panel ── */
-    #preview-frame {
-      width: 100%; height: 100%;
-      border: none; display: block;
-      background: white;
+    /* ── Preview panel — split into output + console ── */
+    .preview-body {
+      display:flex; flex-direction:column; height:100%; overflow:hidden; position:relative;
     }
+    #preview-frame { width:100%; border:none; display:block; background:white; flex:1; min-height:0; }
     #error-overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(10, 2, 2, 0.97);
-      border-top: 2px solid var(--red);
-      padding: 10px 14px;
-      font-size: 12px;
-      color: var(--red);
-      font-family: var(--mono);
-      display: none;
-      max-height: 140px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      z-index: 20;
-      line-height: 1.6;
+      position:absolute; bottom:0; left:0; right:0;
+      background:rgba(10,2,2,0.97); border-top:2px solid var(--red);
+      padding:10px 14px; font-size:12px; color:var(--red); font-family:var(--mono);
+      display:none; max-height:140px; overflow-y:auto; white-space:pre-wrap;
+      z-index:20; line-height:1.6;
     }
-    #error-overlay.visible { display: block; }
+    #error-overlay.visible { display:block; }
 
-    /* ── Split.js gutters ── */
-    .gutter {
-      background: var(--border);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 5;
-      transition: background 0.15s;
+    /* ── Console strip ── */
+    .console-strip {
+      flex-shrink:0; border-top:1px solid var(--border);
+      background:var(--surface); display:flex; flex-direction:column;
+      overflow:hidden; transition:height 0.18s ease;
     }
-    .gutter::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      background: var(--accent);
-      transition: opacity 0.15s;
+    .console-strip.open { }
+    .console-tab-bar {
+      display:flex; align-items:center; padding:0 10px; gap:2px;
+      height:32px; flex-shrink:0; border-bottom:1px solid var(--border);
     }
-    .gutter:hover::after, .gutter:active::after { opacity: 1; }
-    .gutter.gutter-horizontal { cursor: col-resize; }
-    .gutter.gutter-vertical   { cursor: row-resize; }
+    .console-tab {
+      display:flex; align-items:center; gap:5px;
+      padding:0 10px; height:24px; border-radius:5px;
+      font-family:var(--mono); font-size:11px; font-weight:500;
+      background:none; border:none; color:var(--text-dim); cursor:pointer;
+      transition:all 0.12s; outline:none; white-space:nowrap;
+    }
+    .console-tab.active { background:var(--surface-3); color:var(--text-bright); }
+    .console-tab:hover  { color:var(--text-2); }
+    .console-badge {
+      min-width:16px; height:15px; padding:0 4px;
+      background:var(--red); border-radius:99px;
+      font-size:9px; font-weight:700; color:white;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .console-badge.warn { background:var(--amber); color:#000; }
+    .console-clear {
+      margin-left:auto; padding:3px 9px; border-radius:5px;
+      font-family:var(--mono); font-size:10px; font-weight:500;
+      background:none; border:1px solid var(--border); color:var(--text-dim);
+      cursor:pointer; transition:all 0.12s; outline:none;
+    }
+    .console-clear:hover { color:var(--red); border-color:var(--red); }
+    .console-entries { flex:1; overflow-y:auto; padding:4px 0; }
+    .console-entry {
+      display:flex; align-items:baseline; gap:8px;
+      padding:3px 12px; font-family:var(--mono); font-size:11.5px; line-height:1.55;
+      border-bottom:1px solid rgba(255,255,255,0.03);
+    }
+    .console-entry.log   { color:var(--text); }
+    .console-entry.info  { color:#60a5fa; }
+    .console-entry.warn  { color:var(--amber); background:rgba(245,158,11,0.04); }
+    .console-entry.error { color:var(--red);   background:rgba(248,113,113,0.05); }
+    .console-entry.debug { color:var(--text-dim); }
+    .entry-time { font-size:9.5px; color:var(--text-dim); flex-shrink:0; }
+    .entry-icon { font-size:11px; flex-shrink:0; }
+    .entry-text { flex:1; white-space:pre-wrap; word-break:break-all; }
+    .no-logs { padding:18px 14px; font-size:12px; color:var(--text-dim); font-family:var(--mono); font-style:italic; }
+
+    /* ── Gutters ── */
+    .gutter { background:var(--border); flex-shrink:0; position:relative; z-index:5; transition:background 0.15s; }
+    .gutter::after { content:''; position:absolute; inset:0; opacity:0; background:var(--accent); transition:opacity 0.15s; }
+    .gutter:hover::after, .gutter:active::after { opacity:1; }
+    .gutter.gutter-horizontal { cursor:col-resize; }
+    .gutter.gutter-vertical   { cursor:row-resize; }
   `;
 
-  // ── Public configurable properties ──────────────────────────────────────────
-  /** Pre-load TypeScript content into the TS editor */
+  // ── Public properties ────────────────────────────────────────────────────────
   @property({ type: String }) typescript = '';
-
-  /** Pre-load SCSS content into the SCSS editor */
-  @property({ type: String }) scss = '';
-
-  /** Initial framework to activate */
+  @property({ type: String }) scss       = '';
   @property({ type: String }) framework: FrameworkId = 'lit';
-
-  /** Initial layout view */
   @property({ type: String }) view: LayoutId = 'columns';
+  @property({ type: String }) importmap  = '';
 
-  /** Custom import map JSON string for the active framework */
-  @property({ type: String }) importmap = '';
-
-  // ── Internal reactive state ──────────────────────────────────────────────────
+  // ── Internal state ───────────────────────────────────────────────────────────
   @state() private _framework: FrameworkId = 'lit';
-  @state() private _layout: LayoutId = 'columns';
-  @state() private _status = 'idle';
-  @state() private _settingsOpen = false;
+  @state() private _layout: LayoutId       = 'columns';
+  @state() private _status                 = 'idle';
+  @state() private _settingsOpen           = false;
+  @state() private _docsOpen               = false;
   @state() private _userImportMaps: Partial<Record<FrameworkId, string>> = {};
+  @state() private _consoleLogs: ConsoleEntry[] = [];
+  @state() private _consoleTab: 'output' | 'console' = 'output';
+  @state() private _consoleUnread = 0;
+  @state() private _consoleOpen   = true;
+
+  /** Frameworks with code supplied via POST (populated in firstUpdated after plugins are registered) */
+  @state() private _activePlugins: FrameworkPlugin[] = [];
 
   // ── Services ─────────────────────────────────────────────────────────────────
   private _compiler!:  CompilerService;
   private _workspace!: WorkspaceService;
   private _editors!:   EditorService;
 
-  // ── Panel DOM refs (live inside shadow root, created imperatively) ───────────
+  // ── Panel DOM refs (live inside shadow root) ──────────────────────────────────
   private _tsPanelEl!:      HTMLElement;
   private _scssPanelEl!:    HTMLElement;
   private _previewPanelEl!: HTMLElement;
@@ -186,9 +160,11 @@ export class UwcPlayground extends LitElement {
   private _scssBodyEl!:     HTMLElement;
   private _previewIframe!:  HTMLIFrameElement;
   private _errorOverlay!:   HTMLElement;
+  private _consoleEntriesEl!: HTMLElement;
 
   private _compileTimer: ReturnType<typeof setTimeout> | null = null;
-  private _propertiesApplied = false;
+  private _propsApplied = false;
+  private _msgHandler!: (e: MessageEvent) => void;
 
   // ──────────────────────────────────────────────────────────────────────────
   // Lifecycle
@@ -200,9 +176,15 @@ export class UwcPlayground extends LitElement {
     this._readQueryString();
   }
 
-  firstUpdated() {
-    // Apply property values (may have been set before firstUpdated via attributes)
+  async firstUpdated() {
+    // By the time firstUpdated runs (first Lit microtask), all synchronous module
+    // top-level code — including registerBuiltinPlugins() in main.ts — has completed.
+    this._activePlugins = registry.getAll();
+
     this._applyExternalProperties();
+
+    // Try to read POST data delivered by service worker
+    await this._loadPostData();
 
     this._compiler  = new CompilerService();
     this._editors   = new EditorService();
@@ -211,17 +193,18 @@ export class UwcPlayground extends LitElement {
     this._workspace = new WorkspaceService(wsEl);
 
     this._buildPanelElements();
-
-    // Layout FIRST — panels must have real pixel sizes before CM mounts
     this._applyLayout();
 
-    // Determine initial editor content (prop > localStorage > plugin default)
-    const savedEditors = this._loadEditors(this._framework);
-    const initTs   = this.typescript  || savedEditors?.ts   || this._currentPlugin.defaultTs;
-    const initScss = this.scss        || savedEditors?.scss || this._currentPlugin.defaultScss;
+    const saved    = this._loadEditors(this._framework);
+    const initTs   = this.typescript  || saved?.ts   || this._currentPlugin.defaultTs;
+    const initScss = this.scss        || saved?.scss || this._currentPlugin.defaultScss;
 
     this._editors.init(this._tsBodyEl, this._scssBodyEl, initTs, initScss);
     this._editors.onContentChange(() => this._scheduleCompile());
+
+    // Console: listen for messages from iframes
+    this._msgHandler = (e: MessageEvent) => this._onIframeMessage(e);
+    window.addEventListener('message', this._msgHandler);
 
     this._scheduleCompile(300);
     this._hideBoot();
@@ -229,38 +212,167 @@ export class UwcPlayground extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this._compiler.destroy();
-    this._editors.destroy();
-    this._workspace.destroy();
+    this._compiler?.destroy();
+    this._editors?.destroy();
+    this._workspace?.destroy();
+    window.removeEventListener('message', this._msgHandler);
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Property change reactions
-  // ──────────────────────────────────────────────────────────────────────────
-
   updated(changed: Map<string, unknown>) {
-    if (!this._propertiesApplied) return; // firstUpdated not yet done
-
-    if (changed.has('framework') && this.framework !== this._framework) {
+    if (!this._propsApplied) return;
+    if (changed.has('framework') && this.framework !== this._framework)
       this._switchFramework(this.framework as FrameworkId);
-    }
-    if (changed.has('view') && this.view !== this._layout) {
+    if (changed.has('view') && VALID_LAYOUTS.includes(this.view as LayoutId) && this.view !== this._layout) {
       this._layout = this.view as LayoutId;
       this._applyLayout();
     }
-    if (changed.has('typescript') && this.typescript && this._editors) {
+    if (changed.has('typescript') && this.typescript && this._editors)
       this._editors.setTsValue(this.typescript);
-    }
-    if (changed.has('scss') && this.scss && this._editors) {
+    if (changed.has('scss') && this.scss && this._editors)
       this._editors.setScssValue(this.scss);
-    }
   }
 
-  private _applyExternalProperties() {
-    if (this.framework && registry.has(this.framework)) this._framework = this.framework;
-    const validLayouts: LayoutId[] = ['columns','split-left','split-right','editor-only','output-only'];
-    if (this.view && validLayouts.includes(this.view as LayoutId)) this._layout = this.view as LayoutId;
-    this._propertiesApplied = true;
+  // ──────────────────────────────────────────────────────────────────────────
+  // POST data loading
+  // ──────────────────────────────────────────────────────────────────────────
+
+  private async _loadPostData() {
+    try {
+      const res  = await fetch(POST_STORE_URL);
+      const data = await res.json();
+      if (!data || typeof data !== 'object') return;
+
+      const fw = data['framework'] as FrameworkId;
+      const vw = data['view'] as LayoutId;
+      if (fw && registry.has(fw)) this._framework = fw;
+      if (vw && VALID_LAYOUTS.includes(vw)) this._layout = vw;
+
+      // Collect which frameworks have content supplied
+      const fwIds: FrameworkId[] = ['lit', 'react', 'vue', 'angular'];
+      const suppliedFws = fwIds.filter(id =>
+        data[`${id}_typescript`] || data[`${id}_scss`]
+      );
+      if (suppliedFws.length > 0) {
+        // Only show framework buttons for supplied frameworks
+        this._activePlugins = registry.getAll().filter(p => suppliedFws.includes(p.id as FrameworkId));
+        if (this._activePlugins.length > 0 && !suppliedFws.includes(this._framework)) {
+          this._framework = this._activePlugins[0].id as FrameworkId;
+        }
+      }
+
+      // Store all framework content for use when switching
+      const stored: Record<string, { ts: string; scss: string }> = {};
+      fwIds.forEach(id => {
+        const ts   = data[`${id}_typescript`];
+        const scss = data[`${id}_scss`];
+        if (ts || scss) {
+          stored[id] = { ts: ts ?? '', scss: scss ?? '' };
+        }
+      });
+      if (Object.keys(stored).length > 0) {
+        try {
+          localStorage.setItem(LS_KEY_EDITORS, JSON.stringify(stored));
+        } catch { /* noop */ }
+      }
+
+      // Override importmaps
+      fwIds.forEach(id => {
+        const im = data[`${id}_importmap`];
+        if (im) {
+          try {
+            JSON.parse(im); // validate
+            this._userImportMaps = { ...this._userImportMaps, [id]: im };
+          } catch { /* ignore invalid */ }
+        }
+      });
+
+      // Override typescript/scss props if supplied for active framework
+      if (data[`${this._framework}_typescript`]) this.typescript = data[`${this._framework}_typescript`];
+      if (data[`${this._framework}_scss`])       this.scss       = data[`${this._framework}_scss`];
+
+    } catch { /* no POST data or SW not installed yet */ }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Console message handling
+  // ──────────────────────────────────────────────────────────────────────────
+
+  private _onIframeMessage(e: MessageEvent) {
+    const d = e.data;
+    if (!d || !d.__uwc_console) return;
+    const entry: ConsoleEntry = { level: d.level || 'log', args: d.args || [], t: d.t || Date.now() };
+    this._consoleLogs = [...this._consoleLogs, entry];
+    if (this._consoleTab === 'output') {
+      if (entry.level === 'error') this._consoleUnread++;
+      else if (entry.level === 'warn' && this._consoleUnread === 0) this._consoleUnread++;
+      else if (this._consoleUnread === 0) this._consoleUnread++;
+    }
+    this._renderConsoleEntries();
+  }
+
+  private _renderConsoleEntries() {
+    if (!this._consoleEntriesEl) return;
+    const iconMap: Record<string, string> = {
+      log: '›', info: 'ℹ', warn: '⚠', error: '✕', debug: '·'
+    };
+    const frag = document.createDocumentFragment();
+    if (this._consoleLogs.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'no-logs';
+      empty.textContent = 'No console output yet.';
+      frag.appendChild(empty);
+    } else {
+      this._consoleLogs.forEach(entry => {
+        const row = document.createElement('div');
+        row.className = `console-entry ${entry.level}`;
+        const t = new Date(entry.t);
+        const timeStr = `${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}:${t.getSeconds().toString().padStart(2,'0')}`;
+        row.innerHTML = `<span class="entry-time">${timeStr}</span><span class="entry-icon">${iconMap[entry.level] ?? '›'}</span><span class="entry-text">${entry.args.join(' ')}</span>`;
+        frag.appendChild(row);
+      });
+    }
+    this._consoleEntriesEl.innerHTML = '';
+    this._consoleEntriesEl.appendChild(frag);
+    this._consoleEntriesEl.scrollTop = this._consoleEntriesEl.scrollHeight;
+  }
+
+  private _switchConsoleTab(tab: 'output' | 'console') {
+    this._consoleTab = tab;
+    if (tab === 'console') {
+      this._consoleUnread = 0;
+      this._updateConsolePanelVisibility();
+      this._renderConsoleEntries();
+    } else {
+      this._updateConsolePanelVisibility();
+    }
+    this._updateTabBadge();
+  }
+
+  private _updateConsolePanelVisibility() {
+    if (!this._consoleEntriesEl) return;
+    const strip = this._consoleEntriesEl.closest('.console-strip') as HTMLElement;
+    if (!strip) return;
+    const body = this._previewPanelEl?.querySelector('.preview-body') as HTMLElement;
+    if (!body) return;
+    if (this._consoleTab === 'console') {
+      this._previewIframe.style.flex = '1';
+      strip.style.height = '180px';
+      this._consoleEntriesEl.style.display = 'block';
+    } else {
+      this._consoleEntriesEl.style.display = 'none';
+      strip.style.height = '32px'; // just the tab bar
+    }
+    requestAnimationFrame(() => this._editors?.refreshLayout());
+  }
+
+  private _updateTabBadge() {
+    const badge = this._previewPanelEl?.querySelector('.console-badge') as HTMLElement;
+    if (!badge) return;
+    badge.textContent = String(this._consoleLogs.length);
+    badge.style.display = this._consoleLogs.length > 0 ? 'flex' : 'none';
+    if (this._consoleLogs.some(e => e.level === 'error')) badge.className = 'console-badge';
+    else if (this._consoleLogs.some(e => e.level === 'warn')) badge.className = 'console-badge warn';
+    else badge.className = 'console-badge';
   }
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -273,10 +385,11 @@ export class UwcPlayground extends LitElement {
         .framework=${this._framework}
         .layout=${this._layout}
         .status=${this._status}
-        .plugins=${registry.getAll()}
+        .plugins=${this._activePlugins}
         @framework-change=${(e: CustomEvent) => this._onFrameworkChange(e.detail)}
         @layout-change=${(e: CustomEvent) => this._onLayoutChange(e.detail)}
         @settings-open=${() => { this._settingsOpen = true; }}
+        @docs-open=${() => { this._docsOpen = true; }}
       ></uwc-header>
 
       <div id="workspace"></div>
@@ -289,54 +402,120 @@ export class UwcPlayground extends LitElement {
         @save-importmap=${(e: CustomEvent) => this._onSaveImportmap(e.detail)}
         @reset-importmap=${(e: CustomEvent) => this._onResetImportmap(e.detail)}
       ></uwc-settings>
+
+      <uwc-docs
+        ?open=${this._docsOpen}
+        @close-docs=${() => { this._docsOpen = false; }}
+      ></uwc-docs>
     `;
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // Panel DOM construction
+  // Panel construction
   // ──────────────────────────────────────────────────────────────────────────
 
   private _buildPanelElements() {
     this._tsPanelEl      = this._makePanel('ts',      'TypeScript', 'ts');
     this._scssPanelEl    = this._makePanel('scss',    'SCSS',       'scss');
-    this._previewPanelEl = this._makePanel('preview', 'Output',     'preview');
+    this._previewPanelEl = this._makePreviewPanel();
 
     this._tsBodyEl   = this._tsPanelEl.querySelector('.dp-panel-body')!  as HTMLElement;
     this._scssBodyEl = this._scssPanelEl.querySelector('.dp-panel-body')! as HTMLElement;
-
-    const previewBody = this._previewPanelEl.querySelector('.dp-panel-body')! as HTMLElement;
-    previewBody.style.position = 'relative';
-
-    this._previewIframe = document.createElement('iframe');
-    this._previewIframe.id = 'preview-frame';
-
-    this._errorOverlay = document.createElement('div');
-    this._errorOverlay.id = 'error-overlay';
-
-    previewBody.append(this._previewIframe, this._errorOverlay);
   }
 
   private _makePanel(type: string, label: string, dotClass: string): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'dp-panel';
-    wrap.dataset.panel = type;
+    wrap.className = 'dp-panel'; wrap.dataset.panel = type;
 
     const hdr = document.createElement('div');
     hdr.className = 'dp-panel-header';
 
-    const dot = document.createElement('div');
-    dot.className = `dp-panel-dot ${dotClass}`;
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'dp-panel-icon';
+    iconSpan.innerHTML = PANEL_ICONS[dotClass] ?? '';
 
     const lbl = document.createElement('div');
-    lbl.className = 'dp-panel-label';
-    lbl.textContent = label;
+    lbl.className = 'dp-panel-label'; lbl.textContent = label;
+    hdr.append(iconSpan, lbl);
 
-    hdr.append(dot, lbl);
+    const body = document.createElement('div');
+    body.className = 'dp-panel-body';
+    body.style.cssText = 'flex:1;overflow:hidden;min-height:0;';
+    wrap.append(hdr, body);
+    return wrap;
+  }
+
+  private _makePreviewPanel(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'dp-panel'; wrap.dataset.panel = 'preview';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'dp-panel-header';
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'dp-panel-icon';
+    iconSpan.innerHTML = PANEL_ICONS['preview'] ?? '';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'dp-panel-label'; lbl.textContent = 'Output';
+    hdr.append(iconSpan, lbl);
 
     const body = document.createElement('div');
     body.className = 'dp-panel-body';
     body.style.cssText = 'flex:1;overflow:hidden;min-height:0;';
 
+    // Preview area + error overlay + console strip
+    const previewBody = document.createElement('div');
+    previewBody.className = 'preview-body';
+
+    this._previewIframe = document.createElement('iframe');
+    this._previewIframe.id = 'preview-frame';
+    this._previewIframe.style.flex = '1';
+
+    this._errorOverlay = document.createElement('div');
+    this._errorOverlay.id = 'error-overlay';
+
+    // Console strip
+    const strip = document.createElement('div');
+    strip.className = 'console-strip';
+    strip.style.height = '32px';
+
+    const tabBar = document.createElement('div');
+    tabBar.className = 'console-tab-bar';
+
+    const outputTab = document.createElement('button');
+    outputTab.className = 'console-tab active'; outputTab.textContent = 'Output';
+    outputTab.addEventListener('click', () => this._switchConsoleTab('output'));
+
+    const consoleTab = document.createElement('button');
+    consoleTab.className = 'console-tab';
+
+    const consoleLbl = document.createElement('span'); consoleLbl.textContent = 'Console';
+    const badge = document.createElement('span');
+    badge.className = 'console-badge'; badge.style.display = 'none';
+
+    consoleTab.append(consoleLbl, badge);
+    consoleTab.addEventListener('click', () => this._switchConsoleTab('console'));
+
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'console-clear'; clearBtn.textContent = 'Clear';
+    clearBtn.addEventListener('click', () => {
+      this._consoleLogs = [];
+      this._consoleUnread = 0;
+      this._renderConsoleEntries();
+      this._updateTabBadge();
+    });
+
+    tabBar.append(outputTab, consoleTab, clearBtn);
+
+    this._consoleEntriesEl = document.createElement('div');
+    this._consoleEntriesEl.className = 'console-entries';
+    this._consoleEntriesEl.style.display = 'none';
+
+    strip.append(tabBar, this._consoleEntriesEl);
+
+    previewBody.append(this._previewIframe, this._errorOverlay, strip);
+    body.append(previewBody);
     wrap.append(hdr, body);
     return wrap;
   }
@@ -367,6 +546,12 @@ export class UwcPlayground extends LitElement {
   private _compile() {
     const plugin = this._currentPlugin;
 
+    // Clear console for fresh compile
+    this._consoleLogs = [];
+    this._consoleUnread = 0;
+    this._renderConsoleEntries();
+    this._updateTabBadge();
+
     this._compiler.compile(
       this._editors.getTsValue(),
       this._editors.getScssValue(),
@@ -390,7 +575,6 @@ export class UwcPlayground extends LitElement {
   }
 
   private _effectiveImportMap() {
-    // Priority: component importmap prop > user settings > plugin default
     if (this.importmap) {
       try { return JSON.parse(this.importmap); } catch { /* fall through */ }
     }
@@ -412,7 +596,7 @@ export class UwcPlayground extends LitElement {
   }
 
   private _switchFramework(fw: FrameworkId) {
-    if (fw === this._framework) return;
+    if (fw === this._framework || !registry.has(fw)) return;
     this._framework = fw;
     const saved = this._loadEditors(fw);
     this._editors.setTsValue(saved?.ts   ?? this._currentPlugin.defaultTs);
@@ -458,7 +642,13 @@ export class UwcPlayground extends LitElement {
 
   private _loadEditors(fw: FrameworkId): { ts: string; scss: string } | null {
     try {
-      return JSON.parse(localStorage.getItem(LS_KEY_EDITORS) ?? '{}')[fw] ?? null;
+      const stored = JSON.parse(localStorage.getItem(LS_KEY_EDITORS) ?? '{}');
+      const entry = stored[fw] ?? null;
+      if (!entry) return null;
+      // Cache-bust: if the Lit SCSS still has the old `my-counter {` wrapper, discard
+      // it so the user gets the corrected shadow-DOM-compatible default snippet.
+      if (fw === 'lit' && entry.scss && entry.scss.includes('my-counter {')) return null;
+      return entry;
     } catch { return null; }
   }
 
@@ -469,17 +659,15 @@ export class UwcPlayground extends LitElement {
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // URL query-string
+  // URL + helpers
   // ──────────────────────────────────────────────────────────────────────────
 
   private _readQueryString() {
-    const params = new URLSearchParams(location.search);
-    const fw     = params.get('framework') as FrameworkId | null;
-    const view   = params.get('view') as LayoutId | null;
-    const validLayouts: LayoutId[] = ['columns','split-left','split-right','editor-only','output-only'];
-
+    const p = new URLSearchParams(location.search);
+    const fw = p.get('framework') as FrameworkId;
+    const vw = p.get('view') as LayoutId;
     if (fw && registry.has(fw)) this._framework = fw;
-    if (view && validLayouts.includes(view)) this._layout = view;
+    if (vw && VALID_LAYOUTS.includes(vw)) this._layout = vw;
   }
 
   private _updateUrl() {
@@ -491,9 +679,11 @@ export class UwcPlayground extends LitElement {
     } catch { /* noop in embedded contexts */ }
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Helpers
-  // ──────────────────────────────────────────────────────────────────────────
+  private _applyExternalProperties() {
+    if (this.framework && registry.has(this.framework)) this._framework = this.framework;
+    if (this.view && VALID_LAYOUTS.includes(this.view as LayoutId)) this._layout = this.view as LayoutId;
+    this._propsApplied = true;
+  }
 
   private get _currentPlugin() { return registry.get(this._framework); }
 

@@ -1,6 +1,6 @@
 import type { FrameworkPlugin }    from './plugin.interface.js';
 import type { ImportMap, TsCompilerOptions } from '../types.js';
-import { importMapTag, escTpl } from '../engine/iframe-builder.js';
+import { importMapTag, escTpl, CONSOLE_INTERCEPTOR } from '../engine/iframe-builder.js';
 import { SNIPPETS }             from '../config/snippets.js';
 import { DEFAULT_IMPORTMAPS }   from '../config/importmaps.js';
 
@@ -34,6 +34,7 @@ export class AngularPlugin implements FrameworkPlugin {
 </head>
 <body>
   <app-root></app-root>
+  ${CONSOLE_INTERCEPTOR}
   <script type="module">
 import '@angular/compiler';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -50,9 +51,7 @@ import(url).then(function(mod) {
   var Comp = Object.values(mod).find(function(v) {
     return v && typeof v === 'function' && v.ɵcmp;
   });
-  if (!Comp) {
-    throw new Error('No Angular standalone component found. Ensure your class has @Component and is exported.');
-  }
+  if (!Comp) throw new Error('No Angular standalone component found. Ensure @Component is applied and the class is exported.');
   return bootstrapApplication(Comp, {
     providers: [provideExperimentalZonelessChangeDetection()]
   });

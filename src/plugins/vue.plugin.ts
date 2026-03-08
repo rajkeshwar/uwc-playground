@@ -1,6 +1,6 @@
 import type { FrameworkPlugin }    from './plugin.interface.js';
 import type { ImportMap, TsCompilerOptions } from '../types.js';
-import { importMapTag, escTpl, blobImportScript } from '../engine/iframe-builder.js';
+import { importMapTag, escTpl, blobImportScript, CONSOLE_INTERCEPTOR } from '../engine/iframe-builder.js';
 import { SNIPPETS }           from '../config/snippets.js';
 import { DEFAULT_IMPORTMAPS } from '../config/importmaps.js';
 
@@ -25,7 +25,6 @@ export class VuePlugin implements FrameworkPlugin {
     const safeJs    = escTpl(js);
     const mountCode = `
   var config = module.default || {};
-  // Ensure the config is treated as options API (not accidentally as a render fn)
   if (typeof config === 'object') {
     createApp(config).mount('#app');
   } else {
@@ -41,6 +40,7 @@ export class VuePlugin implements FrameworkPlugin {
 </head>
 <body>
   <div id="app"></div>
+  ${CONSOLE_INTERCEPTOR}
   <script type="module">
 import { createApp } from 'vue';
 ${blobImportScript(safeJs, mountCode)}
