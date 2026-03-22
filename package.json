@@ -3,6 +3,7 @@
   "description": "A CodePen-like live playground supporting **Lit**, **React**, **Vue 3**, and **Angular 18** with TypeScript + SCSS. Built with Lit 3, CodeMirror 6, Split.js, and `@web/dev-server`.",
   "main": "index.js",
   "version": "0.0.2",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "start": "web-dev-server --node-resolve",
