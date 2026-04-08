@@ -55,7 +55,6 @@
   <!-- ── Fonts ── -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <script type="module" src="https://localhost:4000/js/uwc.bundle.js"></script>
 
   <!-- ── Global tokens & boot styles ── -->
   <style>
@@ -141,5 +140,17 @@
 <uwc-playground></uwc-playground>
 
 <script type="module" src="/src/main.ts"></script>
+<script>
+  (function() {
+    var __UWC_BUNDLE_URL__ = localStorage.getItem('__UWC_BUNDLE_URL__');
+    if (__UWC_BUNDLE_URL__ !== null) {
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = __UWC_BUNDLE_URL__;
+      // Placing it in the head as early as possible
+      document.head.appendChild(s);
+    }
+  })();
+</script>
 </body>
 </html>
