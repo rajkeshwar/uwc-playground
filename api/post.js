@@ -9,14 +9,29 @@
  *                                            (stores data in sessionStorage)
  *                                            →  window.location.replace('/')
  *                                            →  playground reads sessionStorage
- *
- * Vercel auto-parses application/x-www-form-urlencoded into req.body.
- * The HTML bridge approach avoids cookie size limits and external storage.
  */
-export function POST(req, res) {
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).end('Method Not Allowed');
+    return;
+  }
 
-  // req.body is auto-parsed by Vercel for application/x-www-form-urlencoded
-  const data = req.body ?? {};
+  // Read and parse the raw body — Vercel does NOT auto-parse
+  // application/x-www-form-urlencoded for plain API functions.
+  const raw = await readBody(req);
+  const ct  = (req.headers['content-type'] || '').toLowerCase();
+
+  let data = {};
+  try {
+    if (ct.includes('application/json')) {
+      data = JSON.parse(raw);
+    } else {
+      // application/x-www-form-urlencoded (default HTML form encoding)
+      data = Object.fromEntries(new URLSearchParams(raw).entries());
+    }
+  } catch {
+    // malformed body — proceed with empty data so redirect still works
+  }
 
   // Safely embed the JSON into the page — JSON.stringify produces valid JS string literal.
   const json = JSON.stringify(JSON.stringify(data));
@@ -25,7 +40,7 @@ export function POST(req, res) {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Loading UWCPen…</title>
+  <title>Loading UWCPen\u2026</title>
 </head>
 <body>
 <script>
@@ -42,4 +57,13 @@ window.location.replace('/');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.status(200).send(html);
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(Buffer.from(chunk)));
+    req.on('end',  ()    => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('error', reject);
+  });
 }
