@@ -66,7 +66,7 @@ export class MyCounter extends LitElement {
   render() {
     return html\`
       <div class="wrap">
-        <h2>Lit — ON/OFF</h2>
+        <h2>Lit — Rajkeshwar Prasad</h2>
         <button
           class=\${this.on ? 'on' : 'off'}
           @click=\${() => { this.on = !this.on; }}
@@ -95,7 +95,7 @@ export default function App() {
   const [on, setOn] = useState(false);
   return (
     <div className="wrap">
-      <h2>React — ON/OFF</h2>
+      <h2>React — Rajkeshwar Prasad</h2>
       <button className={on ? 'on' : 'off'} onClick={() => setOn(v => !v)}>
         {on ? 'ON' : 'OFF'}
       </button>
@@ -116,7 +116,7 @@ ${BUTTON_SCSS}`,
   data() { return { on: false }; },
   template: \`
     <div class="wrap">
-      <h2>Vue — ON/OFF</h2>
+      <h2>Vue — Ranjan Das</h2>
       <button :class="on ? 'on' : 'off'" @click="on = !on">
         {{ on ? 'ON' : 'OFF' }}
       </button>
@@ -140,7 +140,7 @@ ${BUTTON_SCSS}`,
   standalone: true,
   template: \`
     <div class="wrap">
-      <h2>Angular — ON/OFF</h2>
+      <h2>Angular — Rakesh Kumar Ray</h2>
       <button [class]="on() ? 'on' : 'off'" (click)="on.set(!on())">
         {{ on() ? 'ON' : 'OFF' }}
       </button>
@@ -174,6 +174,12 @@ function field(name, value) {
 field('framework', 'lit');
 field('view',      'columns');
 Object.entries(CODE).forEach(([k, v]) => field(k, v));
+
+const formData = new FormData(form);
+const data = Object.fromEntries(formData.entries());
+console.log('Form data:', data);
+
+
 </script>
 </body>
 </html>
