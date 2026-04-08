@@ -680,8 +680,14 @@ export class UwcPlayground extends LitElement {
   }
 
   private _applyExternalProperties() {
-    if (this.framework && registry.has(this.framework)) this._framework = this.framework;
-    if (this.view && VALID_LAYOUTS.includes(this.view as LayoutId)) this._layout = this.view as LayoutId;
+    // Only override the query-string-derived values when the attribute is
+    // explicitly present on the element.  Without this guard, Lit's default
+    // property values (framework='lit', view='columns') would silently stomp
+    // whatever _readQueryString() set moments earlier in connectedCallback.
+    if (this.hasAttribute('framework') && registry.has(this.framework))
+      this._framework = this.framework;
+    if (this.hasAttribute('view') && VALID_LAYOUTS.includes(this.view as LayoutId))
+      this._layout = this.view as LayoutId;
     this._propsApplied = true;
   }
 

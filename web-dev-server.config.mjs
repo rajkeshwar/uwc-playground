@@ -1,5 +1,24 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 
+/**
+ * In-memory store for the most recent POST payload.
+ * Cleared after being read once so a page refresh doesn't re-apply old data.
+ * The Service Worker handles this path in production; this middleware fills
+ * the same role during local development (including cross-origin POSTs from
+ * remote.html running on a different port).
+ */
+let postStore = null;
+
+/** Read the raw request body as a UTF-8 string. */
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(Buffer.from(chunk)));
+    req.on('end',  ()    => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('error', reject);
+  });
+}
+
 export default {
   port: 8080,
   open: true,
@@ -21,22 +40,55 @@ export default {
       return next();
     },
 
-    // ── Handle POST requests in dev mode (SW not yet installed on first hit) ──
+    // ── Handle POST to root ───────────────────────────────────────────────────
+    // Parses the form body, stores it in postStore, then redirects to GET /.
+    // Works for both same-origin navigation and cross-origin form POSTs (e.g.
+    // from remote.html running on a different port).
     async function postMiddleware(ctx, next) {
       if (ctx.method === 'POST' && (ctx.path === '/' || ctx.path === '')) {
-        // Redirect to GET — the SW will handle subsequent POSTs once installed.
-        // For the very first POST, data is lost, but the SW installs on redirect load.
+        try {
+          const body = await readBody(ctx.req);
+          const ct   = (ctx.get('content-type') || '').toLowerCase();
+
+          if (ct.includes('application/json')) {
+            postStore = JSON.parse(body);
+          } else {
+            // application/x-www-form-urlencoded (default HTML form encoding)
+            postStore = Object.fromEntries(new URLSearchParams(body).entries());
+          }
+        } catch (e) {
+          console.warn('[dev] Failed to parse POST body:', e.message);
+        }
+        ctx.set('Access-Control-Allow-Origin', '*');
         ctx.redirect('/');
         return;
       }
       return next();
     },
 
-    // ── Dev: serve /__uwcpen_post__ (SW handles this in production) ────────────
+    // ── Serve stored POST data to the app ────────────────────────────────────
+    // The app fetches /__uwcpen_post__ on every load. Return the stored payload
+    // once (then clear it) so a subsequent plain refresh shows default content.
     function postDataMiddleware(ctx, next) {
       if (ctx.path === '/__uwcpen_post__') {
-        ctx.body = 'null';
-        ctx.type = 'application/json';
+        const data = postStore;
+        postStore  = null;           // consume once
+        ctx.body   = JSON.stringify(data);
+        ctx.type   = 'application/json';
+        ctx.set('Cache-Control', 'no-store');
+        ctx.set('Access-Control-Allow-Origin', '*');
+        return;
+      }
+      return next();
+    },
+
+    // ── OPTIONS preflight for cross-origin requests ───────────────────────────
+    function corsMiddleware(ctx, next) {
+      if (ctx.method === 'OPTIONS') {
+        ctx.set('Access-Control-Allow-Origin',  '*');
+        ctx.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        ctx.set('Access-Control-Allow-Headers', 'Content-Type');
+        ctx.status = 204;
         return;
       }
       return next();

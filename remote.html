@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>UWCPen Remote</title>
+  <style>
+    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f0f0f5; gap: 12px; }
+    h1  { margin: 0; font-size: 1.4rem; }
+    p   { margin: 0; color: #666; font-size: 0.9rem; }
+    button[type="submit"] { padding: 12px 36px; font-size: 1rem; font-weight: 700; background: #7c6aff; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    button[type="submit"]:hover { filter: brightness(1.12); }
+  </style>
+</head>
+<body>
+  <h1>UWCPen Remote POST</h1>
+  <p>Sends an ON/OFF toggle demo for <strong>Lit · React · Vue · Angular</strong> to localhost:8080</p>
+
+  <form id="f" method="post" action="http://localhost:8080/" target="_blank"></form>
+  <button type="submit" form="f">Open in Playground →</button>
+
+<script>
+// ── Shared base SCSS (body centering) ─────────────────────────────────────────
+const BASE_SCSS = `
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f5f5f5;
+  font-family: sans-serif;
+}`;
+
+const BUTTON_SCSS = `
+.wrap {
+  text-align: center;
+  padding: 40px;
+}
+
+button {
+  padding: 14px 48px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.on  { background: #4ade80; }
+.off { background: #f87171; }`;
+
+// ── Code for each framework ───────────────────────────────────────────────────
+const CODE = {
+
+  // NOTE: Lit plugin hardcodes <my-counter> in the iframe body,
+  // so the custom element selector MUST be 'my-counter'.
+  lit_typescript: `import { LitElement, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+
+@customElement('my-counter')
+export class MyCounter extends LitElement {
+  @state() on = false;
+
+  render() {
+    return html\`
+      <div class="wrap">
+        <h2>Lit — ON/OFF</h2>
+        <button
+          class=\${this.on ? 'on' : 'off'}
+          @click=\${() => { this.on = !this.on; }}
+        >\${this.on ? 'ON' : 'OFF'}</button>
+      </div>
+    \`;
+  }
+}`,
+
+  // Lit uses Shadow DOM — styles injected via adoptedStyleSheets.
+  // Use :host for the element itself; plain selectors target shadow-root children.
+  lit_scss: `${BASE_SCSS}
+
+:host { display: block; }
+
+h2 {
+  color: #c84b2f;
+  margin: 0 0 20px;
+}
+${BUTTON_SCSS}`,
+
+  // ── React ──────────────────────────────────────────────────────────────────
+  react_typescript: `import React, { useState } from 'react';
+
+export default function App() {
+  const [on, setOn] = useState(false);
+  return (
+    <div className="wrap">
+      <h2>React — ON/OFF</h2>
+      <button className={on ? 'on' : 'off'} onClick={() => setOn(v => !v)}>
+        {on ? 'ON' : 'OFF'}
+      </button>
+    </div>
+  );
+}`,
+
+  react_scss: `${BASE_SCSS}
+
+h2 {
+  color: #61dafb;
+  margin: 0 0 20px;
+}
+${BUTTON_SCSS}`,
+
+  // ── Vue ────────────────────────────────────────────────────────────────────
+  vue_typescript: `export default {
+  data() { return { on: false }; },
+  template: \`
+    <div class="wrap">
+      <h2>Vue — ON/OFF</h2>
+      <button :class="on ? 'on' : 'off'" @click="on = !on">
+        {{ on ? 'ON' : 'OFF' }}
+      </button>
+    </div>
+  \`
+};`,
+
+  vue_scss: `${BASE_SCSS}
+
+h2 {
+  color: #42b883;
+  margin: 0 0 20px;
+}
+${BUTTON_SCSS}`,
+
+  // ── Angular ────────────────────────────────────────────────────────────────
+  angular_typescript: `import { Component, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  template: \`
+    <div class="wrap">
+      <h2>Angular — ON/OFF</h2>
+      <button [class]="on() ? 'on' : 'off'" (click)="on.set(!on())">
+        {{ on() ? 'ON' : 'OFF' }}
+      </button>
+    </div>
+  \`
+})
+export class AppComponent {
+  on = signal(false);
+}`,
+
+  angular_scss: `${BASE_SCSS}
+
+h2 {
+  color: #dd0031;
+  margin: 0 0 20px;
+}
+${BUTTON_SCSS}`,
+};
+
+// ── Build hidden form fields ──────────────────────────────────────────────────
+const form = document.getElementById('f');
+
+function field(name, value) {
+  const el = document.createElement('input');
+  el.type  = 'hidden';
+  el.name  = name;
+  el.value = value;
+  form.appendChild(el);
+}
+
+field('framework', 'lit');
+field('view',      'columns');
+Object.entries(CODE).forEach(([k, v]) => field(k, v));
+</script>
+</body>
+</html>
