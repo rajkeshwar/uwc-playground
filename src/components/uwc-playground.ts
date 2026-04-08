@@ -238,8 +238,18 @@ export class UwcPlayground extends LitElement {
 
   private async _loadPostData() {
     try {
-      const res  = await fetch(POST_STORE_URL);
-      const data = await res.json();
+      // sessionStorage is populated by the Vercel API bridge (api/post.js) when the
+      // form POST comes from a cross-origin page. Fall back to fetching from the SW
+      // cache, which handles the local dev case via web-dev-server middleware.
+      let data: unknown;
+      const ssRaw = sessionStorage.getItem('uwcpen_post');
+      if (ssRaw) {
+        sessionStorage.removeItem('uwcpen_post');
+        data = JSON.parse(ssRaw);
+      } else {
+        const res = await fetch(POST_STORE_URL);
+        data = await res.json();
+      }
       if (!data || typeof data !== 'object') return;
 
       const fw = data['framework'] as FrameworkId;
