@@ -1,6 +1,6 @@
 import type { FrameworkPlugin }    from './plugin.interface.js';
 import type { ImportMap, TsCompilerOptions } from '../types.js';
-import { importMapTag, escTpl, CONSOLE_INTERCEPTOR } from '../engine/iframe-builder.js';
+import { importMapTag, escTpl, CONSOLE_INTERCEPTOR, BUNDLE_LOADER } from '../engine/iframe-builder.js';
 import { SNIPPETS }             from '../config/snippets.js';
 import { DEFAULT_IMPORTMAPS }   from '../config/importmaps.js';
 
@@ -35,6 +35,7 @@ export class AngularPlugin implements FrameworkPlugin {
 <body>
   <app-root></app-root>
   ${CONSOLE_INTERCEPTOR}
+  ${BUNDLE_LOADER}
   <script type="module">
 import '@angular/compiler';
 import { bootstrapApplication } from '@angular/platform-browser';

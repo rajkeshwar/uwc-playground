@@ -1,6 +1,6 @@
 import type { FrameworkPlugin }    from './plugin.interface.js';
 import type { ImportMap, TsCompilerOptions } from '../types.js';
-import { importMapTag, escTpl, CONSOLE_INTERCEPTOR } from '../engine/iframe-builder.js';
+import { importMapTag, escTpl, CONSOLE_INTERCEPTOR, BUNDLE_LOADER } from '../engine/iframe-builder.js';
 import { SNIPPETS }                 from '../config/snippets.js';
 import { DEFAULT_IMPORTMAPS }       from '../config/importmaps.js';
 
@@ -37,6 +37,7 @@ export class LitPlugin implements FrameworkPlugin {
 <body>
   <my-counter label="Clicks"></my-counter>
   ${CONSOLE_INTERCEPTOR}
+  ${BUNDLE_LOADER}
   <script>
   // Inject user CSS into Lit shadow roots via adoptedStyleSheets
   (function() {

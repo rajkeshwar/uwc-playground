@@ -140,17 +140,5 @@
 <uwc-playground></uwc-playground>
 
 <script type="module" src="/src/main.ts"></script>
-<script>
-  (function() {
-    var __UWC_BUNDLE_URL__ = localStorage.getItem('__UWC_BUNDLE_URL__');
-    if (__UWC_BUNDLE_URL__ !== null) {
-      const s = document.createElement('script');
-      s.type = 'module';
-      s.src = __UWC_BUNDLE_URL__;
-      // Placing it in the head as early as possible
-      document.head.appendChild(s);
-    }
-  })();
-</script>
 </body>
 </html>
