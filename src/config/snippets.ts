@@ -23,8 +23,8 @@ export class MyCounter extends LitElement {
         <h1 class="title">\${this.label}</h1>
         <p class="count">\${this.count}</p>
         <div class="controls">
-          <button class="btn-inc" @click=\${this.increment}>+ Increment</button>
-          <button class="btn-rst" @click=\${this.reset}>↺ Reset</button>
+          <uwc-button icon="plus-lg"  @click=\${this.increment} label="Increment"></uwc-button>
+          <uwc-button icon="dash-lg"  outline @click=\${this.reset} label="Reset"></uwc-button>
         </div>
       </div>
     \`;
@@ -45,8 +45,6 @@ body {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-// Component styles — injected into shadow root via adoptedStyleSheets.
-// Use plain selectors (no "my-counter" wrapper needed inside shadow DOM).
 :host { display: block; }
 
 .card {
@@ -61,14 +59,6 @@ body {
   &:hover { box-shadow: 5px 5px 0 $primary; }
 }
 
-.title {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #9e9488;
-  margin: 0 0 1rem;
-}
-
 .count {
   font-size: 5rem;
   font-weight: 700;
@@ -77,28 +67,7 @@ body {
   line-height: 1;
 }
 
-.controls { display: flex; gap: 0.5rem; justify-content: center; }
-
-button {
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  padding: 0.5em 1.2em;
-  border-radius: 5px;
-  background: transparent;
-  transition: background 0.15s, color 0.15s;
-}
-
-.btn-inc {
-  border: 1px solid $primary; color: $primary;
-  &:hover { background: $primary; color: $bg; }
-}
-
-.btn-rst {
-  border: 1px solid #9e9488; color: #9e9488;
-  &:hover { background: #0e0e0e; color: #f5f0e8; border-color: #0e0e0e; }
-}`,
+.controls { display: flex; gap: 0.5rem; justify-content: center; }`,
   },
 
   // ── React ────────────────────────────────────────────────────────────────
@@ -111,14 +80,14 @@ export default function App() {
 
   return (
     <div className={\`card \${theme}\`}>
-      <button className="theme-toggle" onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}>
+      <uwc-button className="theme-toggle" onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}>
         {theme === 'light' ? '🌙' : '☀️'}
-      </button>
+      </uwc-button>
       <h1>Hello React!</h1>
       <p>TypeScript + hooks demo</p>
-      <button className="count-btn" onClick={() => setCount(c => c + 1)}>
+      <uwc-button icon="plus-lg" onClick={() => setCount(c => c + 1)}>
         Clicked {count} {count === 1 ? 'time' : 'times'}
-      </button>
+      </uwc-button>
     </div>
   );
 }`,
@@ -187,8 +156,8 @@ body {
         <span v-if="count > 4"> 🎉 Over 4!</span>
       </p>
       <div class="actions">
-        <button @click="increment">+ Add</button>
-        <button @click="reset" class="secondary">Reset</button>
+        <uwc-button icon="plus-lg" @click="increment" label="Increment"></uwc-button>
+        <uwc-button icon="arrow-counterclockwise" @click="reset" outline label="Reset"></uwc-button>
       </div>
     </div>
   \`,
@@ -273,8 +242,8 @@ body {
       <div class="counter-display">{{ count() }}</div>
       <p class="status">{{ statusMessage() }}</p>
       <div class="btn-row">
-        <button (click)="increment()">＋ Increment</button>
-        <button class="secondary" (click)="reset()">↺ Reset</button>
+        <uwc-button icon="plus-lg" (click)="increment()" label="Increment"></uwc-button>
+        <uwc-button icon="arrow-counterclockwise" outline (click)="reset()" label="Reset"></uwc-button>
       </div>
     </div>
   \`

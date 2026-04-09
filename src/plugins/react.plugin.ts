@@ -1,6 +1,6 @@
 import type { FrameworkPlugin }    from './plugin.interface.js';
 import type { ImportMap, TsCompilerOptions } from '../types.js';
-import { importMapTag, escTpl, blobImportScript, CONSOLE_INTERCEPTOR } from '../engine/iframe-builder.js';
+import { importMapTag, escTpl, blobImportScript, CONSOLE_INTERCEPTOR, BUNDLE_LOADER } from '../engine/iframe-builder.js';
 import { SNIPPETS }           from '../config/snippets.js';
 import { DEFAULT_IMPORTMAPS } from '../config/importmaps.js';
 
@@ -39,6 +39,7 @@ export class ReactPlugin implements FrameworkPlugin {
 <body>
   <div id="root"></div>
   ${CONSOLE_INTERCEPTOR}
+  ${BUNDLE_LOADER}
   <script type="module">
 import React from 'react';
 import { createRoot } from 'react-dom/client';

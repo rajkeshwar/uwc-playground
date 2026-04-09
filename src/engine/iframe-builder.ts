@@ -52,6 +52,23 @@ export const CONSOLE_INTERCEPTOR = `
 <\/script>`;
 
 /**
+ * Bundle loader script — injected into every iframe.
+ * Reads __UWC_BUNDLE_URL__ from localStorage and appends it as a module script.
+ */
+export const BUNDLE_LOADER = `
+<script>
+(function() {
+  var __UWC_BUNDLE_URL__ = localStorage.getItem('__UWC_BUNDLE_URL__');
+  var s = document.createElement('script');
+  s.type = 'module';
+  s.src = __UWC_BUNDLE_URL__ === null 
+    ? '/assets/js/uwc.bundle.js' 
+    : __UWC_BUNDLE_URL__ + '/js/uwc.bundle.js';
+  document.head.appendChild(s);
+})();
+<\/script>`;
+
+/**
  * Wraps user JS in a blob URL dynamic import pattern.
  * Used by React, Vue and Angular where the component is imported at runtime.
  */
