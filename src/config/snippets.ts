@@ -85,9 +85,8 @@ export default function App() {
       </uwc-button>
       <h1>Hello React!</h1>
       <p>TypeScript + hooks demo</p>
-      <uwc-button icon="plus-lg" onClick={() => setCount(c => c + 1)}>
-        Clicked {count} {count === 1 ? 'time' : 'times'}
-      </uwc-button>
+      <uwc-button icon="plus-lg" onClick={() => setCount(c => c + 1)} label="Increment"></uwc-button>
+      <p>Clicked {count} {count === 1 ? 'time' : 'times'}</p>
     </div>
   );
 }`,
