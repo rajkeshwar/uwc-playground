@@ -15,17 +15,8 @@ const JSX_MAP = {
 self.onmessage = function(e) {
   const { id, tsCode, scssCode, framework, compilerOptions } = e.data;
 
-  // 1. Compile SCSS → CSS
-  Sass.compile(scssCode, function(sassResult) {
-    if (sassResult.status !== 0) {
-      self.postMessage({
-        id,
-        success: false,
-        error: 'SCSS Error\\n' + sassResult.message
-      });
-      return;
-    }
-
+  // 1. Compile SCSS → CSS (skip compilation when scss is empty)
+  function compileTs(css) {
     // 2. Transpile TypeScript → ESM
     try {
       const opts = {
@@ -49,7 +40,7 @@ self.onmessage = function(e) {
         id,
         success: true,
         js:  result.outputText,
-        css: sassResult.text,
+        css: css,
       });
     } catch(err) {
       self.postMessage({
@@ -58,6 +49,23 @@ self.onmessage = function(e) {
         error: 'TypeScript Error\\n' + (err.message || err)
       });
     }
+  }
+
+  if (!scssCode || !scssCode.trim()) {
+    compileTs('');
+    return;
+  }
+
+  Sass.compile(scssCode, function(sassResult) {
+    if (sassResult.status !== 0) {
+      self.postMessage({
+        id,
+        success: false,
+        error: 'SCSS Error\\n' + sassResult.message
+      });
+      return;
+    }
+    compileTs(sassResult.text);
   });
 };
 `;

@@ -25,6 +25,11 @@ export class AngularPlugin implements FrameworkPlugin {
     const safeJs  = escTpl(js);
     const safeCss = escTpl(css);
 
+    // Dynamically extract the component selector from the compiled JS.
+    // Matches: selector: 'app-root' or selector: "app-root"
+    const selectorMatch = js.match(/selector:\s*['"]([^'"]+)['"]/);
+    const selector = selectorMatch ? selectorMatch[1] : 'app-root';
+
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -33,7 +38,7 @@ export class AngularPlugin implements FrameworkPlugin {
   ${importMapTag(importMap)}
 </head>
 <body>
-  <app-root></app-root>
+  <${selector}></${selector}>
   ${CONSOLE_INTERCEPTOR}
   ${BUNDLE_LOADER}
   <script type="module">

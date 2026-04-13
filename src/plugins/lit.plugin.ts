@@ -24,6 +24,11 @@ export class LitPlugin implements FrameworkPlugin {
   buildIframe(js: string, css: string, importMap: ImportMap): string {
     const safeCss = escTpl(css);
 
+    // Dynamically extract the custom element tag name from the compiled JS.
+    // @customElement('my-counter') compiles to customElement('my-counter')
+    const tagMatch = js.match(/customElement\(\s*['"]([^'"]+)['"]\s*\)/);
+    const tagName = tagMatch ? tagMatch[1] : 'my-counter';
+
     // Lit uses Shadow DOM — global <style> tags cannot penetrate shadow roots.
     // Solution: keep global styles (body, etc.) in <head>, AND adopt the same
     // stylesheet into every shadow root as it mounts, using the CSSStyleSheet API.
@@ -35,7 +40,7 @@ export class LitPlugin implements FrameworkPlugin {
   ${importMapTag(importMap)}
 </head>
 <body>
-  <my-counter label="Clicks"></my-counter>
+  <${tagName}></${tagName}>
   ${CONSOLE_INTERCEPTOR}
   ${BUNDLE_LOADER}
   <script>

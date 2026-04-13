@@ -15,7 +15,7 @@
   <h1>UWCPen Remote POST</h1>
   <p>Sends an ON/OFF toggle demo for <strong>Lit · React · Vue · Angular</strong> to localhost:8080</p>
 
-  <form id="f" method="post" action="https://uwc-playground.vercel.app/" target="_blank"></form>
+  <form id="f" method="post" action="http://localhost:8080/" target="_blank"></form>
   <button type="submit" form="f">Open in Playground →</button>
 
 <script>
@@ -35,21 +35,7 @@ const BUTTON_SCSS = `
 .wrap {
   text-align: center;
   padding: 40px;
-}
-
-button {
-  padding: 14px 48px;
-  font-size: 1.4rem;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  border-radius: 10px;
-  color: #fff;
-  transition: background 0.2s;
-}
-
-.on  { background: #4ade80; }
-.off { background: #f87171; }`;
+}`;
 
 // ── Code for each framework ───────────────────────────────────────────────────
 const CODE = {
@@ -59,18 +45,20 @@ const CODE = {
   lit_typescript: `import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-@customElement('my-counter')
+@customElement('the-counter')
 export class MyCounter extends LitElement {
   @state() on = false;
 
   render() {
     return html\`
       <div class="wrap">
-        <h2>Lit — Rajkeshwar Prasad</h2>
-        <button
-          class=\${this.on ? 'on' : 'off'}
-          @click=\${() => { this.on = !this.on; }}
-        >\${this.on ? 'ON' : 'OFF'}</button>
+        <h2>Lit — ON/OFF Toggle</h2>
+        <uwc-button icon="\${this.on ? 'dash' : 'plus'}-lg"  
+          @click=\${() => { this.on = !this.on; }} 
+          label=\${this.on ? 'OFF' : 'ON'}
+          ?outline=\${this.on}
+          >
+        </uwc-button>
       </div>
     \`;
   }
@@ -95,10 +83,14 @@ export default function App() {
   const [on, setOn] = useState(false);
   return (
     <div className="wrap">
-      <h2>React — Rajkeshwar Prasad</h2>
-      <button className={on ? 'on' : 'off'} onClick={() => setOn(v => !v)}>
-        {on ? 'ON' : 'OFF'}
-      </button>
+      <h2>React — ON/OFF Toggle</h2>
+      <uwc-button
+        icon={on ? "dash-lg" : "plus-lg"}
+        label={on ? "OFF" : "ON"}
+        outline={on || undefined}
+        onClick={() => setOn(!on)}
+      >
+      </uwc-button>
     </div>
   );
 }`,
@@ -116,10 +108,13 @@ ${BUTTON_SCSS}`,
   data() { return { on: false }; },
   template: \`
     <div class="wrap">
-      <h2>Vue — Ranjan Das</h2>
-      <button :class="on ? 'on' : 'off'" @click="on = !on">
-        {{ on ? 'ON' : 'OFF' }}
-      </button>
+      <h2>Vue — ON/OFF Toggle</h2>
+      <uwc-button
+        :icon="on ? 'dash-lg' : 'plus-lg'"
+        :label="on ? 'OFF' : 'ON'"
+        :outline="on || undefined"
+        @click="on = !on"
+      />
     </div>
   \`
 };`,
@@ -136,19 +131,26 @@ ${BUTTON_SCSS}`,
   angular_typescript: `import { Component, signal } from '@angular/core';
 
 @Component({
-  selector: 'app-root',
+  selector: 'angular-root',
   standalone: true,
   template: \`
     <div class="wrap">
-      <h2>Angular — Rakesh Kumar Ray</h2>
-      <button [class]="on() ? 'on' : 'off'" (click)="on.set(!on())">
-        {{ on() ? 'ON' : 'OFF' }}
-      </button>
+      <h2>Angular — ON/OFF Toggle</h2>
+      <uwc-button
+        [attr.icon]="on() ? 'dash-lg' : 'plus-lg'"
+        [attr.label]="on() ? 'OFF' : 'ON'"
+        [attr.outline]="on() ? '' : null"
+        (click)="toggle()"
+      ></uwc-button>
     </div>
   \`
 })
 export class AppComponent {
   on = signal(false);
+
+  toggle() {
+    this.on.set(!this.on());
+  }
 }`,
 
   angular_scss: `${BASE_SCSS}
