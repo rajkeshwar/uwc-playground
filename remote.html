@@ -78,20 +78,18 @@ ${BUTTON_SCSS}`,
 
   // ── React ──────────────────────────────────────────────────────────────────
   react_typescript: `import React, { useState } from 'react';
+import { UwcDatepicker } from '@uwc/components/react';
 
 export default function App() {
-  const [on, setOn] = useState(false);
+  const [value, setValue] = useState(null);
   return (
-    <div className="wrap">
-      <h2>React — ON/OFF Toggle</h2>
-      <uwc-button
-        icon={on ? "dash-lg" : "plus-lg"}
-        label={on ? "OFF" : "ON"}
-        outline={on || undefined}
-        onClick={() => setOn(!on)}
-      >
-      </uwc-button>
-    </div>
+    <>
+      <UwcDatepicker
+        placeholder="Pick a date"
+        onUwcDateSelect={(e) => setValue(e.detail.value)}
+      />
+      <p>Selected: <strong>{value ? value.toLocaleDateString() : 'none'}</strong></p>
+    </>
   );
 }`,
 

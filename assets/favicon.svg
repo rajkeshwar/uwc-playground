@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="#0a0a0f"/>
+
+  <!-- Subtle accent glow behind the U -->
+  <ellipse cx="16" cy="17" rx="10" ry="9" fill="#7c6aff" opacity="0.12"/>
+
+  <!-- "U" letterform (bold, brand-white) -->
+  <!-- Left stem -->
+  <rect x="6" y="7" width="4" height="13" rx="2" fill="#eeeeff"/>
+  <!-- Right stem -->
+  <rect x="22" y="7" width="4" height="13" rx="2" fill="#eeeeff"/>
+  <!-- Rounded bottom bowl -->
+  <path d="M10 18 Q10 26 16 26 Q22 26 22 18" fill="#eeeeff"/>
+
+  <!-- Pen nib accent (accent purple) — sits inside the U bowl -->
+  <polygon points="16,21 14,25.5 16,24.5 18,25.5" fill="#7c6aff"/>
+  <rect x="14.5" y="18" width="3" height="3.5" rx="1" fill="#7c6aff"/>
+</svg>

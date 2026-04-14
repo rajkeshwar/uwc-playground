@@ -1,4 +1,6 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
+import { readFile } from 'fs/promises';
+import path from 'path';
 
 /**
  * In-memory store for the most recent POST payload.
@@ -31,6 +33,42 @@ export default {
     }),
   ],
   middleware: [
+    // ── Serve files from public/ directory ───────────────────────────────────
+    async function publicDirMiddleware(ctx, next) {
+      await next();
+      if (ctx.status === 404) {
+        const filePath = path.join(process.cwd(), 'public', ctx.path);
+        try {
+          ctx.body = await readFile(filePath);
+          ctx.status = 200;
+          // let koa set the type from the extension
+          ctx.type = path.extname(ctx.path).slice(1) || 'bin';
+        } catch {
+          // not in public/ either — leave 404
+        }
+      }
+    },
+
+    // ── Serve assets/js/ vendor files directly (bypass nodeResolve) ──────────
+    // Vendor bundles like uwc.bundle.react.js contain bare specifiers (e.g.
+    // @lit/react) that are resolved at runtime via the browser importmap.
+    // nodeResolve would try to rewrite them to node_modules paths, which fails
+    // because these packages are not installed locally.
+    async function vendorAssetsMiddleware(ctx, next) {
+      if (ctx.path.startsWith('/assets/js/') && ctx.path.endsWith('.js')) {
+        try {
+          const filePath = path.join(process.cwd(), ctx.path);
+          ctx.body = await readFile(filePath, 'utf8');
+          ctx.type = 'application/javascript';
+          ctx.set('Cache-Control', 'no-store');
+          return;
+        } catch {
+          // file not found — fall through to normal handling
+        }
+      }
+      return next();
+    },
+
     // ── Serve sw.js from project root with no-cache headers ──────────────────
     function swMiddleware(ctx, next) {
       if (ctx.path === '/sw.js') {
