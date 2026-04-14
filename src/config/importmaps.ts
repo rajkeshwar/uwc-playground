@@ -13,6 +13,8 @@ export const DEFAULT_IMPORTMAPS: Record<FrameworkId, ImportMap> = {
     imports: {
       'react':            'https://esm.sh/react@18',
       'react-dom/client': 'https://esm.sh/react-dom@18/client',
+      '@lit/react':       'https://esm.sh/@lit/react@1?bundle-deps',
+      '@uwc/components/react':       '/assets/js/uwc.bundle.react.js',
     },
   },
 

@@ -9,6 +9,10 @@ var __decorateClass = (decorators, target, key, kind) => {
   return result;
 };
 
+// src/button/react.ts
+import { createComponent } from "@lit/react";
+import React from "react";
+
 // node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (void 0 === t.ShadyCSS || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
@@ -1135,6 +1139,22 @@ __decorateClass([
   n4({ type: Boolean })
 ], UwcButton.prototype, "autofocus", 2);
 
+// src/button/react.ts
+var UwcButton2 = createComponent({
+  tagName: "uwc-button",
+  elementClass: UwcButton,
+  react: React,
+  events: {
+    onUwcClick: "uwc-click",
+    onUwcFocus: "uwc-focus",
+    onUwcBlur: "uwc-blur"
+  }
+});
+
+// src/checkbox/react.ts
+import { createComponent as createComponent2 } from "@lit/react";
+import React2 from "react";
+
 // src/checkbox/styles.ts
 var styles_default2 = [
   hostReset,
@@ -1320,6 +1340,20 @@ __decorateClass([
 __decorateClass([
   n4({ reflect: true })
 ], UwcCheckbox.prototype, "variant", 2);
+
+// src/checkbox/react.ts
+var UwcCheckbox2 = createComponent2({
+  tagName: "uwc-checkbox",
+  elementClass: UwcCheckbox,
+  react: React2,
+  events: {
+    onUwcChange: "uwc-change"
+  }
+});
+
+// src/colorpicker/react.ts
+import { createComponent as createComponent3 } from "@lit/react";
+import React3 from "react";
 
 // node_modules/lit-html/directives/style-map.js
 var n5 = "important";
@@ -2266,6 +2300,20 @@ __decorateClass([
 __decorateClass([
   e5(".uwc-cp__alpha-track")
 ], UwcColorPicker.prototype, "_alphaEl", 2);
+
+// src/colorpicker/react.ts
+var UwcColorPicker2 = createComponent3({
+  tagName: "uwc-colorpicker",
+  elementClass: UwcColorPicker,
+  react: React3,
+  events: {
+    onUwcChange: "uwc-change"
+  }
+});
+
+// src/datatable/react.ts
+import { createComponent as createComponent4 } from "@lit/react";
+import React4 from "react";
 
 // src/datatable/styles.ts
 var styles_default4 = [
@@ -3508,6 +3556,28 @@ __decorateClass([
 __decorateClass([
   r5()
 ], UwcDatatable.prototype, "_resizeStartW", 2);
+
+// src/datatable/react.ts
+var UwcDatatable2 = createComponent4({
+  tagName: "uwc-datatable",
+  elementClass: UwcDatatable,
+  react: React4,
+  events: {
+    onUwcFilter: "uwc-filter",
+    onUwcSelectionChange: "uwc-selection-change",
+    onUwcCellEdit: "uwc-cell-edit",
+    onUwcExport: "uwc-export",
+    onUwcPage: "uwc-page",
+    onUwcRowEdit: "uwc-row-edit",
+    onUwcRowDuplicate: "uwc-row-duplicate",
+    onUwcRowLink: "uwc-row-link",
+    onUwcRowDelete: "uwc-row-delete"
+  }
+});
+
+// src/datepicker/react.ts
+import { createComponent as createComponent5 } from "@lit/react";
+import React5 from "react";
 
 // src/datepicker/styles.ts
 var styles_default5 = [
@@ -4779,6 +4849,26 @@ __decorateClass([
   e5("#panel")
 ], UwcDatepicker.prototype, "_panel", 2);
 
+// src/datepicker/react.ts
+var UwcDatepicker2 = createComponent5({
+  tagName: "uwc-datepicker",
+  elementClass: UwcDatepicker,
+  react: React5,
+  events: {
+    onUwcDateSelect: "uwc-date-select",
+    onUwcMonthChange: "uwc-month-change",
+    onUwcClear: "uwc-clear",
+    onUwcShow: "uwc-show",
+    onUwcHide: "uwc-hide",
+    onUwcFocus: "uwc-focus",
+    onUwcBlur: "uwc-blur"
+  }
+});
+
+// src/dropdown/react.ts
+import { createComponent as createComponent6 } from "@lit/react";
+import React6 from "react";
+
 // src/dropdown/styles.ts
 var styles_default6 = [
   hostReset,
@@ -5432,6 +5522,26 @@ __decorateClass([
   e5("#options-list")
 ], UwcDropdown.prototype, "_optionsList", 2);
 
+// src/dropdown/react.ts
+var UwcDropdown2 = createComponent6({
+  tagName: "uwc-dropdown",
+  elementClass: UwcDropdown,
+  react: React6,
+  events: {
+    onUwcChange: "uwc-change",
+    onUwcFilter: "uwc-filter",
+    onUwcClear: "uwc-clear",
+    onUwcFocus: "uwc-focus",
+    onUwcBlur: "uwc-blur",
+    onUwcShow: "uwc-show",
+    onUwcHide: "uwc-hide"
+  }
+});
+
+// src/icon/react.ts
+import { createComponent as createComponent7 } from "@lit/react";
+import React7 from "react";
+
 // node_modules/lit-html/directives/unsafe-html.js
 var e8 = class extends i5 {
   constructor(i8) {
@@ -5655,6 +5765,18 @@ __decorateClass([
   r5()
 ], UwcIcon.prototype, "isLocalIcon", 2);
 
+// src/icon/react.ts
+var UwcIcon2 = createComponent7({
+  tagName: "uwc-icon",
+  elementClass: UwcIcon,
+  react: React7,
+  events: {}
+});
+
+// src/inputtext/react.ts
+import { createComponent as createComponent8 } from "@lit/react";
+import React8 from "react";
+
 // src/inputtext/styles.ts
 var styles_default7 = [
   hostReset,
@@ -5871,6 +5993,23 @@ __decorateClass([
 __decorateClass([
   r5()
 ], UwcInputText.prototype, "_hasSuffix", 2);
+
+// src/inputtext/react.ts
+var UwcInputText2 = createComponent8({
+  tagName: "uwc-inputtext",
+  elementClass: UwcInputText,
+  react: React8,
+  events: {
+    onUwcInput: "uwc-input",
+    onUwcChange: "uwc-change",
+    onUwcFocus: "uwc-focus",
+    onUwcBlur: "uwc-blur"
+  }
+});
+
+// src/listbox/react.ts
+import { createComponent as createComponent9 } from "@lit/react";
+import React9 from "react";
 
 // src/listbox/styles.ts
 var styles_default8 = [
@@ -6207,6 +6346,21 @@ __decorateClass([
 __decorateClass([
   r5()
 ], UwcListbox.prototype, "_focusedIdx", 2);
+
+// src/listbox/react.ts
+var UwcListbox2 = createComponent9({
+  tagName: "uwc-listbox",
+  elementClass: UwcListbox,
+  react: React9,
+  events: {
+    onUwcChange: "uwc-change",
+    onUwcFilter: "uwc-filter"
+  }
+});
+
+// src/menu/react.ts
+import { createComponent as createComponent10 } from "@lit/react";
+import React10 from "react";
 
 // src/menu/styles.ts
 var styles_default9 = [
@@ -6634,6 +6788,22 @@ __decorateClass([
   r5()
 ], UwcMenu.prototype, "_focusedIndex", 2);
 
+// src/menu/react.ts
+var UwcMenu2 = createComponent10({
+  tagName: "uwc-menu",
+  elementClass: UwcMenu,
+  react: React10,
+  events: {
+    onUwcShow: "uwc-show",
+    onUwcHide: "uwc-hide",
+    onUwcItemSelect: "uwc-item-select"
+  }
+});
+
+// src/overlay/react.ts
+import { createComponent as createComponent11 } from "@lit/react";
+import React11 from "react";
+
 // src/overlay/styles.ts
 var styles_default10 = [
   hostReset,
@@ -6793,6 +6963,21 @@ __decorateClass([
 __decorateClass([
   e5("#backdrop")
 ], UwcOverlay.prototype, "_backdrop", 2);
+
+// src/overlay/react.ts
+var UwcOverlay2 = createComponent11({
+  tagName: "uwc-overlay",
+  elementClass: UwcOverlay,
+  react: React11,
+  events: {
+    onUwcShow: "uwc-show",
+    onUwcHide: "uwc-hide"
+  }
+});
+
+// src/paginator/react.ts
+import { createComponent as createComponent12 } from "@lit/react";
+import React12 from "react";
 
 // src/paginator/styles.ts
 var styles_default11 = [
@@ -7301,6 +7486,20 @@ __decorateClass([
   r5()
 ], UwcPaginator.prototype, "_jumpValue", 2);
 
+// src/paginator/react.ts
+var UwcPaginator2 = createComponent12({
+  tagName: "uwc-paginator",
+  elementClass: UwcPaginator,
+  react: React12,
+  events: {
+    onUwcPageChange: "uwc-page-change"
+  }
+});
+
+// src/popover/react.ts
+import { createComponent as createComponent13 } from "@lit/react";
+import React13 from "react";
+
 // src/popover/styles.ts
 var styles_default12 = [
   hostReset,
@@ -7532,6 +7731,22 @@ __decorateClass([
   e5("#arrow")
 ], UwcPopover.prototype, "_arrow", 2);
 
+// src/popover/react.ts
+var UwcPopover2 = createComponent13({
+  tagName: "uwc-popover",
+  elementClass: UwcPopover,
+  react: React13,
+  events: {
+    onUwcShow: "uwc-show",
+    onUwcHide: "uwc-hide",
+    onUwcClose: "uwc-close"
+  }
+});
+
+// src/radiobutton/react.ts
+import { createComponent as createComponent14 } from "@lit/react";
+import React14 from "react";
+
 // src/radiobutton/styles.ts
 var styles_default13 = [
   hostReset,
@@ -7695,6 +7910,20 @@ __decorateClass([
 __decorateClass([
   n4({ reflect: true })
 ], UwcRadioButton.prototype, "variant", 2);
+
+// src/radiobutton/react.ts
+var UwcRadioButton2 = createComponent14({
+  tagName: "uwc-radiobutton",
+  elementClass: UwcRadioButton,
+  react: React14,
+  events: {
+    onUwcChange: "uwc-change"
+  }
+});
+
+// src/togglebutton/react.ts
+import { createComponent as createComponent15 } from "@lit/react";
+import React15 from "react";
 
 // src/togglebutton/styles.ts
 var styles_default14 = [
@@ -7899,6 +8128,20 @@ __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleButton.prototype, "disabled", 2);
 
+// src/togglebutton/react.ts
+var UwcToggleButton2 = createComponent15({
+  tagName: "uwc-togglebutton",
+  elementClass: UwcToggleButton,
+  react: React15,
+  events: {
+    onUwcChange: "uwc-change"
+  }
+});
+
+// src/toggleswitch/react.ts
+import { createComponent as createComponent16 } from "@lit/react";
+import React16 from "react";
+
 // src/toggleswitch/styles.ts
 var styles_default15 = [
   hostReset,
@@ -8054,6 +8297,20 @@ __decorateClass([
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleSwitch.prototype, "invalid", 2);
+
+// src/toggleswitch/react.ts
+var UwcToggleSwitch2 = createComponent16({
+  tagName: "uwc-toggleswitch",
+  elementClass: UwcToggleSwitch,
+  react: React16,
+  events: {
+    onUwcChange: "uwc-change"
+  }
+});
+
+// src/tooltip/react.ts
+import { createComponent as createComponent17 } from "@lit/react";
+import React17 from "react";
 
 // src/tooltip/styles.ts
 var styles_default16 = [
@@ -8314,24 +8571,35 @@ __decorateClass([
   e5("#arrow")
 ], UwcTooltip.prototype, "_arrow", 2);
 
-// src/index.ts
-customElements.define("uwc-button", UwcButton);
-customElements.define("uwc-checkbox", UwcCheckbox);
-customElements.define("uwc-colorpicker", UwcColorPicker);
-customElements.define("uwc-datatable", UwcDatatable);
-customElements.define("uwc-datepicker", UwcDatepicker);
-customElements.define("uwc-dropdown", UwcDropdown);
-customElements.define("uwc-icon", UwcIcon);
-customElements.define("uwc-inputtext", UwcInputText);
-customElements.define("uwc-listbox", UwcListbox);
-customElements.define("uwc-menu", UwcMenu);
-customElements.define("uwc-overlay", UwcOverlay);
-customElements.define("uwc-paginator", UwcPaginator);
-customElements.define("uwc-popover", UwcPopover);
-customElements.define("uwc-radiobutton", UwcRadioButton);
-customElements.define("uwc-togglebutton", UwcToggleButton);
-customElements.define("uwc-toggleswitch", UwcToggleSwitch);
-customElements.define("uwc-tooltip", UwcTooltip);
+// src/tooltip/react.ts
+var UwcTooltip2 = createComponent17({
+  tagName: "uwc-tooltip",
+  elementClass: UwcTooltip,
+  react: React17,
+  events: {
+    onUwcShow: "uwc-show",
+    onUwcHide: "uwc-hide"
+  }
+});
+export {
+  UwcButton2 as UwcButton,
+  UwcCheckbox2 as UwcCheckbox,
+  UwcColorPicker2 as UwcColorPicker,
+  UwcDatatable2 as UwcDatatable,
+  UwcDatepicker2 as UwcDatepicker,
+  UwcDropdown2 as UwcDropdown,
+  UwcIcon2 as UwcIcon,
+  UwcInputText2 as UwcInputText,
+  UwcListbox2 as UwcListbox,
+  UwcMenu2 as UwcMenu,
+  UwcOverlay2 as UwcOverlay,
+  UwcPaginator2 as UwcPaginator,
+  UwcPopover2 as UwcPopover,
+  UwcRadioButton2 as UwcRadioButton,
+  UwcToggleButton2 as UwcToggleButton,
+  UwcToggleSwitch2 as UwcToggleSwitch,
+  UwcTooltip2 as UwcTooltip
+};
 /*! Bundled license information:
 
 @lit/reactive-element/css-tag.js:
@@ -8394,4 +8662,4 @@ lit-html/directives/live.js:
    * SPDX-License-Identifier: BSD-3-Clause
    *)
 */
-//# sourceMappingURL=uwc.bundle.js.map
+//# sourceMappingURL=uwc.bundle.react.js.map
