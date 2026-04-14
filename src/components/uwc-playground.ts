@@ -251,16 +251,17 @@ export class UwcPlayground extends LitElement {
         data = await res.json();
       }
       if (!data || typeof data !== 'object') return;
+      const d = data as Record<string, unknown>;
 
-      const fw = data['framework'] as FrameworkId;
-      const vw = data['view'] as LayoutId;
+      const fw = d['framework'] as FrameworkId;
+      const vw = d['view'] as LayoutId;
       if (fw && registry.has(fw)) this._framework = fw;
       if (vw && VALID_LAYOUTS.includes(vw)) this._layout = vw;
 
       // Collect which frameworks have content supplied
       const fwIds: FrameworkId[] = ['lit', 'react', 'vue', 'angular'];
       const suppliedFws = fwIds.filter(id =>
-        data[`${id}_typescript`] || data[`${id}_scss`]
+        d[`${id}_typescript`] || d[`${id}_scss`]
       );
       if (suppliedFws.length > 0) {
         // Only show framework buttons for supplied frameworks
@@ -273,8 +274,8 @@ export class UwcPlayground extends LitElement {
       // Store all framework content for use when switching
       const stored: Record<string, { ts: string; scss: string }> = {};
       fwIds.forEach(id => {
-        const ts   = data[`${id}_typescript`];
-        const scss = data[`${id}_scss`];
+        const ts   = d[`${id}_typescript`] as string | undefined;
+        const scss = d[`${id}_scss`] as string | undefined;
         if (ts || scss) {
           stored[id] = { ts: ts ?? '', scss: scss ?? '' };
         }
@@ -287,7 +288,7 @@ export class UwcPlayground extends LitElement {
 
       // Override importmaps
       fwIds.forEach(id => {
-        const im = data[`${id}_importmap`];
+        const im = d[`${id}_importmap`] as string | undefined;
         if (im) {
           try {
             JSON.parse(im); // validate
@@ -297,8 +298,8 @@ export class UwcPlayground extends LitElement {
       });
 
       // Override typescript/scss props if supplied for active framework
-      if (data[`${this._framework}_typescript`]) this.typescript = data[`${this._framework}_typescript`];
-      if (data[`${this._framework}_scss`])       this.scss       = data[`${this._framework}_scss`];
+      if (d[`${this._framework}_typescript`]) this.typescript = d[`${this._framework}_typescript`] as string;
+      if (d[`${this._framework}_scss`])       this.scss       = d[`${this._framework}_scss`] as string;
 
     } catch { /* no POST data or SW not installed yet */ }
   }
