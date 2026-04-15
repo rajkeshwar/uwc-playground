@@ -1321,6 +1321,655 @@ __decorateClass([
   n4({ reflect: true })
 ], UwcCheckbox.prototype, "variant", 2);
 
+// src/dialog/styles.ts
+var styles_default3 = [
+  hostReset,
+  i`
+    :host { display: contents; }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Keyframes
+    ══════════════════════════════════════════════════════════════════════ */
+    @keyframes uwc-dlg-in {
+      from { opacity: 0; transform: scale(0.96) translateY(-10px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0);      }
+    }
+    @keyframes uwc-dlg-out {
+      from { opacity: 1; transform: scale(1)    translateY(0);      }
+      to   { opacity: 0; transform: scale(0.96) translateY(-10px);  }
+    }
+    @keyframes uwc-dlg-bd-in  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes uwc-dlg-bd-out { from { opacity: 1; } to { opacity: 0; } }
+
+    /* For bottom-positioned dialogs */
+    @keyframes uwc-dlg-in-up {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0);    }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Native <dialog> resets + base layout
+    ══════════════════════════════════════════════════════════════════════ */
+    dialog.uwc-dlg {
+      /* Reset browser UA styles */
+      border:     none;
+      padding:    0;
+      background: none;
+      color:      inherit;
+      outline:    none;
+      overflow:   visible; /* handled by content area */
+
+      /* Fixed positioning (top layer also uses fixed) */
+      position: fixed;
+      inset:    0;
+      margin:   auto;
+
+      /* Dimensions — set via inline styles in _applyPosition() */
+      width:      50vw;
+      max-width:  calc(100vw - 2rem);
+      max-height: calc(100dvh - 2rem);
+      height:     fit-content;
+
+      /* Visual */
+      background:    var(--uwc-dialog-bg,     ${surface});
+      border:        var(--uwc-dialog-border,  1px solid ${border});
+      border-radius: var(--uwc-dialog-radius,  ${radiusXl});
+      box-shadow:    var(--uwc-dialog-shadow,  ${shadowLg});
+
+      /* closed state: keep browser default display:none intact */
+      overflow: hidden;
+    }
+
+    /* Only apply layout + animations when the dialog is actually open */
+    dialog[open].uwc-dlg {
+      display:        flex;
+      flex-direction: column;
+      overflow:       hidden;
+    }
+
+    /* Entry animation (open, not mid-close) */
+    dialog[open].uwc-dlg:not(.is-closing) {
+      animation: uwc-dlg-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Close animation — dialog still has [open] while animating out */
+    dialog[open].uwc-dlg.is-closing {
+      animation: uwc-dlg-out 180ms ease both;
+    }
+
+    /* ── Backdrop ────────────────────────────────────────────────────────── */
+    dialog[open].uwc-dlg::backdrop {
+      background: var(--uwc-dialog-backdrop, rgba(0, 0, 0, 0.45));
+      animation: uwc-dlg-bd-in 220ms ease both;
+    }
+
+    dialog[open].uwc-dlg.is-closing::backdrop {
+      animation: uwc-dlg-bd-out 180ms ease both;
+    }
+
+    /* No-modal: transparent backdrop */
+    dialog.uwc-dlg.uwc-dlg--no-modal::backdrop {
+      background: transparent;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Positions — inset/margin handled via inline styles in _applyPosition()
+       (inline styles beat the native <dialog> UA stylesheet; CSS classes don't)
+       Only animation-name overrides live here.
+    ══════════════════════════════════════════════════════════════════════ */
+
+    .uwc-dlg--bottom,
+    .uwc-dlg--bottom-left,
+    .uwc-dlg--bottom-right {
+      animation-name: uwc-dlg-in-up;
+    }
+
+    .uwc-dlg--bottom.is-closing,
+    .uwc-dlg--bottom-left.is-closing,
+    .uwc-dlg--bottom-right.is-closing {
+      animation-name: uwc-dlg-out;
+    }
+
+    /* Maximized — visual overrides only; inset/size set via inline styles */
+    .uwc-dlg--maximized {
+      max-width:     100vw;
+      max-height:    100dvh;
+      border-radius: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Header
+    ══════════════════════════════════════════════════════════════════════ */
+    .uwc-dlg__header {
+      display:         flex;
+      align-items:     center;
+      justify-content: space-between;
+      gap:             0.5rem;
+      padding:         0.875rem 1rem 0.875rem 1.25rem;
+      flex-shrink:     0;
+      border-bottom:   1px solid var(--uwc-dialog-header-border, ${borderSubtle});
+      background:      var(--uwc-dialog-header-bg, transparent);
+      user-select:     none;
+    }
+
+    /* Show grab cursor when draggable and not using a button */
+    .uwc-dlg--draggable .uwc-dlg__header { cursor: grab; }
+    .uwc-dlg--dragging  .uwc-dlg__header { cursor: grabbing; }
+
+    .uwc-dlg__title {
+      font-size:   var(--uwc-dialog-title-size, ${fontSizeLg});
+      font-weight: var(--uwc-dialog-title-weight, ${fontWeightSemibold});
+      color:       var(--uwc-dialog-title-color, ${text});
+      line-height: 1.25;
+      flex:        1;
+      min-width:   0;
+      white-space: nowrap;
+      overflow:    hidden;
+      text-overflow: ellipsis;
+    }
+
+    .uwc-dlg__actions {
+      display:     flex;
+      align-items: center;
+      gap:         0.125rem;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Content / body
+    ══════════════════════════════════════════════════════════════════════ */
+    .uwc-dlg__content {
+      flex:       1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding:    var(--uwc-dialog-content-padding, 1.25rem);
+      color:      var(--uwc-dialog-content-color, ${text});
+      line-height: 1.6;
+
+      /* Custom scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: ${border} transparent;
+    }
+    .uwc-dlg__content::-webkit-scrollbar       { width: 5px; }
+    .uwc-dlg__content::-webkit-scrollbar-thumb {
+      background: ${border};
+      border-radius: ${radiusFull};
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Footer
+    ══════════════════════════════════════════════════════════════════════ */
+    .uwc-dlg__footer {
+      display:       flex;
+      align-items:   center;
+      justify-content: flex-end;
+      gap:           0.5rem;
+      padding:       0.875rem 1.25rem;
+      flex-shrink:   0;
+      border-top:    1px solid var(--uwc-dialog-footer-border, ${borderSubtle});
+      background:    var(--uwc-dialog-footer-bg, transparent);
+    }
+
+    .uwc-dlg__footer--hide { display: none; }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Resize handle
+    ══════════════════════════════════════════════════════════════════════ */
+    .uwc-dlg__resize {
+      position:  absolute;
+      right:     0;
+      bottom:    0;
+      width:     1rem;
+      height:    1rem;
+      cursor:    se-resize;
+      /* Visual indicator: two diagonal notch lines */
+      background-image:
+        linear-gradient(
+          135deg,
+          transparent 30%,
+          ${border} 30%, ${border} 45%,
+          transparent 45%, transparent 55%,
+          ${border} 55%, ${border} 70%,
+          transparent 70%
+        );
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Reduced motion
+    ══════════════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      dialog.uwc-dlg,
+      dialog.uwc-dlg.is-closing,
+      dialog.uwc-dlg::backdrop,
+      dialog.uwc-dlg.is-closing::backdrop {
+        animation: none;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       Mobile: full-width on small screens
+    ══════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 480px) {
+      dialog.uwc-dlg:not(.uwc-dlg--maximized) {
+        width:      calc(100vw - 1.5rem) !important;
+        max-height: calc(100dvh - 4rem)  !important;
+        inset:      auto 0 0 0 !important;
+        margin:     0 auto !important;
+        border-bottom-left-radius:  0;
+        border-bottom-right-radius: 0;
+        animation-name: uwc-dlg-in-up;
+      }
+    }
+  `
+];
+
+// src/utils/dom.utils.ts
+function deepQueryById(root, id) {
+  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
+  if (direct) return direct;
+  for (const el of Array.from(root.querySelectorAll("*"))) {
+    if (el.shadowRoot) {
+      const found = deepQueryById(
+        el.shadowRoot,
+        id
+      );
+      if (found) return found;
+    }
+  }
+  return null;
+}
+function computeCoords(tRect, pRect, placement, offset) {
+  const [side, align = "center"] = placement.split("-");
+  let top = 0, left = 0;
+  switch (side) {
+    case "top":
+      top = tRect.top - pRect.height - offset;
+      break;
+    case "bottom":
+      top = tRect.bottom + offset;
+      break;
+    case "left":
+      left = tRect.left - pRect.width - offset;
+      break;
+    case "right":
+      left = tRect.right + offset;
+      break;
+  }
+  if (side === "top" || side === "bottom") {
+    if (align === "start") left = tRect.left;
+    else if (align === "end") left = tRect.right - pRect.width;
+    else left = tRect.left + (tRect.width - pRect.width) / 2;
+  } else {
+    if (align === "start") top = tRect.top;
+    else if (align === "end") top = tRect.bottom - pRect.height;
+    else top = tRect.top + (tRect.height - pRect.height) / 2;
+  }
+  return { top, left };
+}
+function clampToViewport({ top, left }, pRect, margin = 8) {
+  return {
+    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
+    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
+  };
+}
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+function emit(host, name, detail, opts = {}) {
+  const event = new CustomEvent(name, {
+    detail,
+    bubbles: true,
+    composed: true,
+    ...opts
+  });
+  host.dispatchEvent(event);
+  return event;
+}
+
+// src/dialog/index.ts
+var UwcDialog = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.open = false;
+    this.header = "";
+    this.modal = true;
+    this.closeOnEscape = true;
+    this.closeOnOutsideClick = false;
+    this.closable = true;
+    this.draggable = false;
+    this.resizable = false;
+    this.maximizable = false;
+    this.position = "center";
+    this.width = "50vw";
+    this.height = "";
+    this._maximized = false;
+    this._hasFooter = false;
+    this._dragging = false;
+  }
+  // ── Lifecycle ────────────────────────────────────────────────────────────
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("open")) {
+      if (this.open) {
+        this._doOpen();
+      } else {
+        this._doClose();
+      }
+    }
+  }
+  // ── Private helpers ──────────────────────────────────────────────────────
+  _doOpen() {
+    const d3 = this._dialog;
+    if (!d3 || d3.open) return;
+    d3.style.top = "";
+    d3.style.right = "";
+    d3.style.bottom = "";
+    d3.style.left = "";
+    d3.style.margin = "";
+    d3.style.width = "";
+    d3.style.height = "";
+    d3.style.maxHeight = "";
+    d3.showModal();
+    this._applyPosition();
+    emit(this, "uwc-show");
+    requestAnimationFrame(() => {
+      const focusable = d3.querySelector(
+        'uwc-button:not([disabled]), uwc-inputtext, [tabindex]:not([tabindex="-1"])'
+      );
+      focusable?.focus();
+    });
+  }
+  /**
+   * Sets inline top/right/bottom/left/margin on the native <dialog> to achieve
+   * the requested `position`. Inline styles have higher specificity than the
+   * browser UA stylesheet that centres dialogs by default, so this reliably
+   * overrides it regardless of which position variant is requested.
+   */
+  _applyPosition() {
+    const d3 = this._dialog;
+    if (!d3 || this._maximized) return;
+    const G = "2rem";
+    const map = {
+      //                top       right     bottom    left      margin
+      "center": ["", "", "", "", ""],
+      "top": [G, "0", "auto", "0", "0 auto"],
+      "bottom": ["auto", "0", G, "0", "0 auto"],
+      "left": ["0", "auto", "0", G, "auto 0"],
+      "right": ["0", G, "0", "auto", "auto 0"],
+      "top-left": [G, "auto", "auto", G, "0"],
+      "top-right": [G, G, "auto", "auto", "0"],
+      "bottom-left": ["auto", "auto", G, G, "0"],
+      "bottom-right": ["auto", G, G, "auto", "0"]
+    };
+    const [top, right, bottom, left, margin] = map[this.position] ?? map["center"];
+    d3.style.top = top;
+    d3.style.right = right;
+    d3.style.bottom = bottom;
+    d3.style.left = left;
+    d3.style.margin = margin;
+    d3.style.width = this.width || "50vw";
+    d3.style.maxHeight = this.height || "calc(100dvh - 2rem)";
+  }
+  _doClose() {
+    const d3 = this._dialog;
+    if (!d3 || !d3.open) return;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      this._finishClose(d3);
+      return;
+    }
+    d3.classList.add("is-closing");
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      d3.classList.remove("is-closing");
+      this._finishClose(d3);
+    };
+    const onAnimEnd = (e9) => {
+      if (e9.animationName === "uwc-dlg-out") finish();
+    };
+    d3.addEventListener("animationend", onAnimEnd);
+    setTimeout(() => {
+      d3.removeEventListener("animationend", onAnimEnd);
+      finish();
+    }, 220);
+  }
+  _finishClose(d3) {
+    if (d3.open) d3.close();
+    if (this._maximized) this._maximized = false;
+    emit(this, "uwc-hide");
+  }
+  // ── Event handlers ───────────────────────────────────────────────────────
+  _onCancel(e9) {
+    e9.preventDefault();
+    if (this.closeOnEscape) this.hide();
+  }
+  /** Close when the backdrop area of the <dialog> itself is clicked. */
+  _onDialogClick(e9) {
+    if (!this.closeOnOutsideClick) return;
+    if (e9.target === this._dialog) this.hide();
+  }
+  _onMaximize() {
+    this._maximized = !this._maximized;
+    emit(this, this._maximized ? "uwc-maximize" : "uwc-unmaximize");
+    const d3 = this._dialog;
+    if (this._maximized) {
+      d3.style.top = "0";
+      d3.style.right = "0";
+      d3.style.bottom = "0";
+      d3.style.left = "0";
+      d3.style.margin = "0";
+      d3.style.width = "100vw";
+      d3.style.maxWidth = "100vw";
+      d3.style.height = "100dvh";
+      d3.style.maxHeight = "100dvh";
+      d3.style.borderRadius = "0";
+    } else {
+      d3.style.width = "";
+      d3.style.maxWidth = "";
+      d3.style.height = "";
+      d3.style.maxHeight = "";
+      d3.style.borderRadius = "";
+      this._applyPosition();
+    }
+  }
+  _onFooterSlotChange(e9) {
+    const slot = e9.target;
+    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+  // ── Drag ─────────────────────────────────────────────────────────────────
+  _onHeaderMousedown(e9) {
+    if (!this.draggable || this._maximized) return;
+    if (e9.target.closest("uwc-button")) return;
+    e9.preventDefault();
+    const d3 = this._dialog;
+    const rect = d3.getBoundingClientRect();
+    const startX = e9.clientX;
+    const startY = e9.clientY;
+    const origL = rect.left;
+    const origT = rect.top;
+    this._dragging = true;
+    emit(this, "uwc-drag-start");
+    const onMove = (ev) => {
+      const newL = Math.max(0, Math.min(origL + ev.clientX - startX, window.innerWidth - d3.offsetWidth));
+      const newT = Math.max(0, Math.min(origT + ev.clientY - startY, window.innerHeight - d3.offsetHeight));
+      d3.style.left = `${newL}px`;
+      d3.style.top = `${newT}px`;
+      d3.style.right = "auto";
+      d3.style.bottom = "auto";
+      d3.style.margin = "0";
+    };
+    const onUp = () => {
+      this._dragging = false;
+      emit(this, "uwc-drag-end");
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }
+  // ── Resize ────────────────────────────────────────────────────────────────
+  _onResizeMousedown(e9) {
+    if (!this.resizable || this._maximized) return;
+    e9.preventDefault();
+    e9.stopPropagation();
+    const d3 = this._dialog;
+    const rect = d3.getBoundingClientRect();
+    const startX = e9.clientX;
+    const startY = e9.clientY;
+    const startW = rect.width;
+    const startH = rect.height;
+    emit(this, "uwc-resize-start");
+    const onMove = (ev) => {
+      d3.style.width = `${Math.max(240, startW + ev.clientX - startX)}px`;
+      d3.style.height = `${Math.max(120, startH + ev.clientY - startY)}px`;
+    };
+    const onUp = () => {
+      emit(this, "uwc-resize-end");
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  show() {
+    this.open = true;
+  }
+  hide() {
+    this.open = false;
+  }
+  toggle() {
+    this.open = !this.open;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    const posClass = this._maximized ? "uwc-dlg--maximized" : `uwc-dlg--${this.position}`;
+    return b2`
+      <dialog
+        part="dialog"
+        class=${e7({
+      "uwc-dlg": true,
+      [posClass]: true,
+      "uwc-dlg--no-modal": !this.modal,
+      "uwc-dlg--draggable": this.draggable && !this._maximized,
+      "uwc-dlg--resizable": this.resizable && !this._maximized,
+      "uwc-dlg--dragging": this._dragging
+    })}
+        aria-labelledby="uwc-dlg-title"
+        @cancel=${this._onCancel}
+        @click=${this._onDialogClick}
+      >
+        <!-- ── Header ─────────────────────────────────────────────────── -->
+        <div
+          part="header"
+          class="uwc-dlg__header"
+          @mousedown=${this._onHeaderMousedown}
+        >
+          <slot name="header">
+            <span id="uwc-dlg-title" part="title" class="uwc-dlg__title">
+              ${this.header}
+            </span>
+          </slot>
+          <div part="header-actions" class="uwc-dlg__actions">
+            ${this.maximizable ? b2`
+              <uwc-button
+                icon=${this._maximized ? "fullscreen-exit" : "fullscreen"}
+                icon-only text variant="secondary" size="small"
+                aria-label=${this._maximized ? "Restore" : "Maximize"}
+                @uwc-click=${this._onMaximize}
+              ></uwc-button>
+            ` : A}
+            ${this.closable ? b2`
+              <uwc-button
+                icon="x-lg"
+                icon-only text variant="secondary" size="small"
+                aria-label="Close"
+                @uwc-click=${() => this.hide()}
+              ></uwc-button>
+            ` : A}
+          </div>
+        </div>
+
+        <!-- ── Content ────────────────────────────────────────────────── -->
+        <div part="content" class="uwc-dlg__content">
+          <slot></slot>
+        </div>
+
+        <!-- ── Footer ─────────────────────────────────────────────────── -->
+        <div
+          part="footer"
+          class=${e7({
+      "uwc-dlg__footer": true,
+      "uwc-dlg__footer--hide": !this._hasFooter
+    })}
+        >
+          <slot name="footer" @slotchange=${this._onFooterSlotChange}></slot>
+        </div>
+
+        <!-- ── Resize handle ──────────────────────────────────────────── -->
+        ${this.resizable && !this._maximized ? b2`
+          <div
+            class="uwc-dlg__resize"
+            aria-hidden="true"
+            @mousedown=${this._onResizeMousedown}
+          ></div>
+        ` : A}
+      </dialog>
+    `;
+  }
+};
+UwcDialog.styles = [styles_default3];
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDialog.prototype, "open", 2);
+__decorateClass([
+  n4()
+], UwcDialog.prototype, "header", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDialog.prototype, "modal", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "close-on-escape" })
+], UwcDialog.prototype, "closeOnEscape", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "close-on-outside-click" })
+], UwcDialog.prototype, "closeOnOutsideClick", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], UwcDialog.prototype, "closable", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDialog.prototype, "draggable", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDialog.prototype, "resizable", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], UwcDialog.prototype, "maximizable", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcDialog.prototype, "position", 2);
+__decorateClass([
+  n4()
+], UwcDialog.prototype, "width", 2);
+__decorateClass([
+  n4()
+], UwcDialog.prototype, "height", 2);
+__decorateClass([
+  r5()
+], UwcDialog.prototype, "_maximized", 2);
+__decorateClass([
+  r5()
+], UwcDialog.prototype, "_hasFooter", 2);
+__decorateClass([
+  r5()
+], UwcDialog.prototype, "_dragging", 2);
+__decorateClass([
+  e5("dialog")
+], UwcDialog.prototype, "_dialog", 2);
+
 // node_modules/lit-html/directives/style-map.js
 var n5 = "important";
 var i6 = " !" + n5;
@@ -1351,7 +2000,7 @@ var o7 = e6(class extends i5 {
 });
 
 // src/colorpicker/styles.ts
-var styles_default3 = [
+var styles_default4 = [
   hostReset,
   // Panel enters/exits via the floatingPanel mixin — same as dropdown/popover/tooltip
   floatingPanel(".uwc-cp__panel", { durationVar: "--uwc-cp-duration", durationDefault: "140ms" }),
@@ -1599,69 +2248,6 @@ var styles_default3 = [
     }
   `
 ];
-
-// src/utils/dom.utils.ts
-function deepQueryById(root, id) {
-  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
-  if (direct) return direct;
-  for (const el of Array.from(root.querySelectorAll("*"))) {
-    if (el.shadowRoot) {
-      const found = deepQueryById(
-        el.shadowRoot,
-        id
-      );
-      if (found) return found;
-    }
-  }
-  return null;
-}
-function computeCoords(tRect, pRect, placement, offset) {
-  const [side, align = "center"] = placement.split("-");
-  let top = 0, left = 0;
-  switch (side) {
-    case "top":
-      top = tRect.top - pRect.height - offset;
-      break;
-    case "bottom":
-      top = tRect.bottom + offset;
-      break;
-    case "left":
-      left = tRect.left - pRect.width - offset;
-      break;
-    case "right":
-      left = tRect.right + offset;
-      break;
-  }
-  if (side === "top" || side === "bottom") {
-    if (align === "start") left = tRect.left;
-    else if (align === "end") left = tRect.right - pRect.width;
-    else left = tRect.left + (tRect.width - pRect.width) / 2;
-  } else {
-    if (align === "start") top = tRect.top;
-    else if (align === "end") top = tRect.bottom - pRect.height;
-    else top = tRect.top + (tRect.height - pRect.height) / 2;
-  }
-  return { top, left };
-}
-function clampToViewport({ top, left }, pRect, margin = 8) {
-  return {
-    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
-    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
-  };
-}
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-function emit(host, name, detail, opts = {}) {
-  const event = new CustomEvent(name, {
-    detail,
-    bubbles: true,
-    composed: true,
-    ...opts
-  });
-  host.dispatchEvent(event);
-  return event;
-}
 
 // src/utils/placement.controller.ts
 var PlacementController = class {
@@ -2226,7 +2812,7 @@ var UwcColorPicker = class extends i4 {
     `;
   }
 };
-UwcColorPicker.styles = [styles_default3];
+UwcColorPicker.styles = [styles_default4];
 __decorateClass([
   n4({ reflect: true })
 ], UwcColorPicker.prototype, "placement", 2);
@@ -2268,7 +2854,7 @@ __decorateClass([
 ], UwcColorPicker.prototype, "_alphaEl", 2);
 
 // src/datatable/styles.ts
-var styles_default4 = [
+var styles_default5 = [
   hostReset,
   i`
     :host { display: block; }
@@ -3423,7 +4009,7 @@ var UwcDatatable = class extends i4 {
   }
 };
 // ── Styles ────────────────────────────────────────────────────────────────
-UwcDatatable.styles = [styles_default4];
+UwcDatatable.styles = [styles_default5];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatatable.prototype, "data", 2);
@@ -3510,7 +4096,7 @@ __decorateClass([
 ], UwcDatatable.prototype, "_resizeStartW", 2);
 
 // src/datepicker/styles.ts
-var styles_default5 = [
+var styles_default6 = [
   hostReset,
   floatingPanel(".dp-panel", { durationVar: "--uwc-dp-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -4669,7 +5255,7 @@ var UwcDatepicker = class extends i4 {
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
 // ═══════════════════════════════════════════════════════════════════════════
-UwcDatepicker.styles = [styles_default5];
+UwcDatepicker.styles = [styles_default6];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatepicker.prototype, "value", 2);
@@ -4780,7 +5366,7 @@ __decorateClass([
 ], UwcDatepicker.prototype, "_panel", 2);
 
 // src/dropdown/styles.ts
-var styles_default6 = [
+var styles_default7 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-dd-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -5364,7 +5950,7 @@ var UwcDropdown = class extends i4 {
       </div>`;
   }
 };
-UwcDropdown.styles = [styles_default6];
+UwcDropdown.styles = [styles_default7];
 __decorateClass([
   n4({ type: Array })
 ], UwcDropdown.prototype, "options", 2);
@@ -5656,7 +6242,7 @@ __decorateClass([
 ], UwcIcon.prototype, "isLocalIcon", 2);
 
 // src/inputtext/styles.ts
-var styles_default7 = [
+var styles_default8 = [
   hostReset,
   i`
     :host {
@@ -5828,7 +6414,7 @@ var UwcInputText = class extends i4 {
     `;
   }
 };
-UwcInputText.styles = [styles_default7];
+UwcInputText.styles = [styles_default8];
 __decorateClass([
   n4()
 ], UwcInputText.prototype, "value", 2);
@@ -5873,7 +6459,7 @@ __decorateClass([
 ], UwcInputText.prototype, "_hasSuffix", 2);
 
 // src/listbox/styles.ts
-var styles_default8 = [
+var styles_default9 = [
   hostReset,
   i`
     :host {
@@ -6167,7 +6753,7 @@ var UwcListbox = class extends i4 {
     `;
   }
 };
-UwcListbox.styles = [styles_default8];
+UwcListbox.styles = [styles_default9];
 __decorateClass([
   n4({ type: Array })
 ], UwcListbox.prototype, "options", 2);
@@ -6209,7 +6795,7 @@ __decorateClass([
 ], UwcListbox.prototype, "_focusedIdx", 2);
 
 // src/menu/styles.ts
-var styles_default9 = [
+var styles_default10 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-menu-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -6611,7 +7197,7 @@ var UwcMenu = class extends i4 {
       </div>`;
   }
 };
-UwcMenu.styles = [styles_default9];
+UwcMenu.styles = [styles_default10];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcMenu.prototype, "triggerId", 2);
@@ -6635,7 +7221,7 @@ __decorateClass([
 ], UwcMenu.prototype, "_focusedIndex", 2);
 
 // src/overlay/styles.ts
-var styles_default10 = [
+var styles_default11 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-overlay-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -6768,7 +7354,7 @@ var UwcOverlay = class extends i4 {
       </div>`;
   }
 };
-UwcOverlay.styles = [styles_default10];
+UwcOverlay.styles = [styles_default11];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcOverlay.prototype, "triggerId", 2);
@@ -6795,7 +7381,7 @@ __decorateClass([
 ], UwcOverlay.prototype, "_backdrop", 2);
 
 // src/paginator/styles.ts
-var styles_default11 = [
+var styles_default12 = [
   hostReset,
   i`
     :host {
@@ -7257,7 +7843,7 @@ var UwcPaginator = class extends i4 {
     return this.currentPageReportTemplate.replace("{currentPage}", String(cur + 1)).replace("{totalPages}", String(pc)).replace("{first}", String(first)).replace("{last}", String(last)).replace("{totalRecords}", String(this.totalRecords));
   }
 };
-UwcPaginator.styles = styles_default11;
+UwcPaginator.styles = styles_default12;
 __decorateClass([
   n4({ type: Number, reflect: true })
 ], UwcPaginator.prototype, "first", 2);
@@ -7302,7 +7888,7 @@ __decorateClass([
 ], UwcPaginator.prototype, "_jumpValue", 2);
 
 // src/popover/styles.ts
-var styles_default12 = [
+var styles_default13 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-popover-duration", durationDefault: "160ms" }),
   placementOrigins,
@@ -7500,7 +8086,7 @@ var UwcPopover = class extends i4 {
       </div>`;
   }
 };
-UwcPopover.styles = [styles_default12];
+UwcPopover.styles = [styles_default13];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcPopover.prototype, "triggerId", 2);
@@ -7533,7 +8119,7 @@ __decorateClass([
 ], UwcPopover.prototype, "_arrow", 2);
 
 // src/radiobutton/styles.ts
-var styles_default13 = [
+var styles_default14 = [
   hostReset,
   i`
     :host {
@@ -7673,7 +8259,7 @@ var UwcRadioButton = class extends i4 {
     `;
   }
 };
-UwcRadioButton.styles = [styles_default13];
+UwcRadioButton.styles = [styles_default14];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcRadioButton.prototype, "checked", 2);
@@ -7697,7 +8283,7 @@ __decorateClass([
 ], UwcRadioButton.prototype, "variant", 2);
 
 // src/togglebutton/styles.ts
-var styles_default14 = [
+var styles_default15 = [
   hostReset,
   i`
     :host {
@@ -7870,7 +8456,7 @@ var UwcToggleButton = class extends i4 {
     `;
   }
 };
-UwcToggleButton.styles = [styles_default14];
+UwcToggleButton.styles = [styles_default15];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleButton.prototype, "checked", 2);
@@ -7900,7 +8486,7 @@ __decorateClass([
 ], UwcToggleButton.prototype, "disabled", 2);
 
 // src/toggleswitch/styles.ts
-var styles_default15 = [
+var styles_default16 = [
   hostReset,
   i`
     :host {
@@ -8035,7 +8621,7 @@ var UwcToggleSwitch = class extends i4 {
     `;
   }
 };
-UwcToggleSwitch.styles = [styles_default15];
+UwcToggleSwitch.styles = [styles_default16];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleSwitch.prototype, "checked", 2);
@@ -8056,7 +8642,7 @@ __decorateClass([
 ], UwcToggleSwitch.prototype, "invalid", 2);
 
 // src/tooltip/styles.ts
-var styles_default16 = [
+var styles_default17 = [
   hostReset,
   floatingPanel(".panel", {
     scaleFrom: "scale(0.93)",
@@ -8276,7 +8862,7 @@ var UwcTooltip = class extends i4 {
       </div>`;
   }
 };
-UwcTooltip.styles = [styles_default16];
+UwcTooltip.styles = [styles_default17];
 __decorateClass([
   n4({ type: String })
 ], UwcTooltip.prototype, "triggerId", 2);
@@ -8317,6 +8903,7 @@ __decorateClass([
 // src/index.ts
 customElements.define("uwc-button", UwcButton);
 customElements.define("uwc-checkbox", UwcCheckbox);
+customElements.define("uwc-dialog", UwcDialog);
 customElements.define("uwc-colorpicker", UwcColorPicker);
 customElements.define("uwc-datatable", UwcDatatable);
 customElements.define("uwc-datepicker", UwcDatepicker);
