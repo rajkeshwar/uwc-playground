@@ -787,6 +787,14 @@ var placementOriginsExtended = i`
   [data-placement="right-start"] { transform-origin: left top;     }
   [data-placement="right-end"]   { transform-origin: left bottom;  }
 `;
+function focusRing(selector, colorVar = "--uwc-color-primary", colorDefault = "#6366f1") {
+  return i`
+    ${r(selector)}:focus-visible {
+      outline: 2px solid var(${r(colorVar)}, ${r(colorDefault)});
+      outline-offset: 2px;
+    }
+  `;
+}
 
 // src/button/styles.ts
 var styles_default = [
@@ -1135,6 +1143,931 @@ __decorateClass([
   n4({ type: Boolean })
 ], UwcButton.prototype, "autofocus", 2);
 
+// src/card/styles.ts
+var styles_default2 = [
+  hostReset,
+  i`
+    /* ── Host ────────────────────────────────────────────────────────── */
+    :host {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--uwc-card-radius, ${radiusXl});
+      overflow: hidden;
+      background: var(--uwc-card-bg, ${surface});
+      border: var(--uwc-card-border, 1px solid ${border});
+      color: var(--uwc-card-color, ${text});
+      font-family: inherit;
+      font-size: ${fontSizeMd};
+    }
+
+    :host([elevated]) {
+      box-shadow: var(--uwc-card-shadow, ${shadowMd});
+      border-color: transparent;
+    }
+
+    :host([flat]) {
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    /* ── Header slot (image / media zone) ────────────────────────────── */
+    .uwc-card__header {
+      display: block;
+      overflow: hidden;
+    }
+    .uwc-card__header::slotted(*),
+    ::slotted([slot="header"]) {
+      display: block;
+    }
+    /* The slotted image or element fills the header edge-to-edge */
+    slot[name="header"]::slotted(img),
+    slot[name="header"]::slotted(video) {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .uwc-card__header:empty { display: none; }
+
+    /* ── Inner wrapper (fills host, stacks body + footer) ───────────── */
+    .uwc-card__inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Body ────────────────────────────────────────────────────────── */
+    .uwc-card__body {
+      padding: var(--uwc-card-body-padding, 1.25rem 1.5rem);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: ${space3};
+    }
+
+    /* ── Title block (title + subtitle) ─────────────────────────────── */
+    .uwc-card__title-block {
+      display: flex;
+      flex-direction: column;
+      gap: ${space1};
+    }
+    .uwc-card__title-block:empty { display: none; }
+
+    .uwc-card__title {
+      font-size: var(--uwc-card-title-size, ${fontSizeXl});
+      font-weight: ${fontWeightSemibold};
+      color: var(--uwc-card-title-color, ${text});
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .uwc-card__subtitle {
+      font-size: var(--uwc-card-subtitle-size, ${fontSizeMd});
+      color: var(--uwc-card-subtitle-color, ${textSecondary});
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ── Content slot ────────────────────────────────────────────────── */
+    .uwc-card__content {
+      font-size: ${fontSizeMd};
+      color: var(--uwc-card-content-color, ${textSecondary});
+      line-height: 1.7;
+    }
+    .uwc-card__content:empty { display: none; }
+
+    /* Slot content inherits body font */
+    slot:not([name]) {
+      display: block;
+    }
+
+    /* ── Footer slot ─────────────────────────────────────────────────── */
+    .uwc-card__footer {
+      padding: var(--uwc-card-footer-padding, .875rem 1.5rem 1.25rem);
+      border-top: 1px solid ${border};
+      display: block;
+    }
+    .uwc-card__footer:empty { display: none; }
+
+    /* ── Horizontal layout ───────────────────────────────────────────── */
+    :host([horizontal]) {
+      flex-direction: row;
+    }
+    :host([horizontal]) .uwc-card__header {
+      flex-shrink: 0;
+      width: var(--uwc-card-horizontal-header-width, 220px);
+    }
+    :host([horizontal]) slot[name="header"]::slotted(img),
+    :host([horizontal]) slot[name="header"]::slotted(video) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    :host([horizontal]) .uwc-card__inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    :host([horizontal]) .uwc-card__footer {
+      margin-top: auto;
+    }
+  `
+];
+
+// src/card/index.ts
+var UwcCard = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.title = "";
+    this.subtitle = "";
+    this.elevated = false;
+    this.flat = false;
+    this.horizontal = false;
+  }
+  // ── Slot detection ────────────────────────────────────────────────────────
+  _hasSlot(name) {
+    return this.querySelector(`[slot="${name}"]`) !== null;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  _renderTitleBlock() {
+    const hasTitle = this.title || this._hasSlot("title");
+    const hasSubtitle = this.subtitle || this._hasSlot("subtitle");
+    if (!hasTitle && !hasSubtitle) return A;
+    return b2`
+      <div class="uwc-card__title-block">
+        ${hasTitle ? b2`
+          <p class="uwc-card__title" part="title">
+            ${this._hasSlot("title") ? b2`<slot name="title"></slot>` : this.title}
+          </p>
+        ` : A}
+        ${hasSubtitle ? b2`
+          <p class="uwc-card__subtitle" part="subtitle">
+            ${this._hasSlot("subtitle") ? b2`<slot name="subtitle"></slot>` : this.subtitle}
+          </p>
+        ` : A}
+      </div>
+    `;
+  }
+  render() {
+    return b2`
+      <div class="uwc-card__header" part="header">
+        <slot name="header"></slot>
+      </div>
+
+      <div class="uwc-card__inner">
+        <div class="uwc-card__body" part="body">
+          ${this._renderTitleBlock()}
+          <div class="uwc-card__content" part="content">
+            <slot></slot>
+          </div>
+        </div>
+
+        <div class="uwc-card__footer" part="footer">
+          <slot name="footer"></slot>
+        </div>
+      </div>
+    `;
+  }
+};
+UwcCard.styles = styles_default2;
+__decorateClass([
+  n4({ reflect: true })
+], UwcCard.prototype, "title", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcCard.prototype, "subtitle", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCard.prototype, "elevated", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCard.prototype, "flat", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCard.prototype, "horizontal", 2);
+
+// node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i6 = " !" + n5;
+var o7 = e6(class extends i5 {
+  constructor(t6) {
+    if (super(t6), t6.type !== t3.ATTRIBUTE || "style" !== t6.name || t6.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t6) {
+    return Object.keys(t6).reduce((e9, r7) => {
+      const s5 = t6[r7];
+      return null == s5 ? e9 : e9 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
+    }, "");
+  }
+  update(e9, [r7]) {
+    const { style: s5 } = e9.element;
+    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
+    for (const t6 of this.ft) null == r7[t6] && (this.ft.delete(t6), t6.includes("-") ? s5.removeProperty(t6) : s5[t6] = null);
+    for (const t6 in r7) {
+      const e10 = r7[t6];
+      if (null != e10) {
+        this.ft.add(t6);
+        const r8 = "string" == typeof e10 && e10.endsWith(i6);
+        t6.includes("-") || r8 ? s5.setProperty(t6, r8 ? e10.slice(0, -11) : e10, r8 ? n5 : "") : s5[t6] = e10;
+      }
+    }
+    return E;
+  }
+});
+
+// node_modules/lit-html/directive-helpers.js
+var { I: t4 } = j;
+var i7 = (o10) => o10;
+var r6 = (o10) => void 0 === o10.strings;
+var s4 = () => document.createComment("");
+var v2 = (o10, n6, e9) => {
+  const l4 = o10._$AA.parentNode, d3 = void 0 === n6 ? o10._$AB : n6._$AA;
+  if (void 0 === e9) {
+    const i8 = l4.insertBefore(s4(), d3), n7 = l4.insertBefore(s4(), d3);
+    e9 = new t4(i8, n7, o10, o10.options);
+  } else {
+    const t6 = e9._$AB.nextSibling, n7 = e9._$AM, c5 = n7 !== o10;
+    if (c5) {
+      let t7;
+      e9._$AQ?.(o10), e9._$AM = o10, void 0 !== e9._$AP && (t7 = o10._$AU) !== n7._$AU && e9._$AP(t7);
+    }
+    if (t6 !== d3 || c5) {
+      let o11 = e9._$AA;
+      for (; o11 !== t6; ) {
+        const t7 = i7(o11).nextSibling;
+        i7(l4).insertBefore(o11, d3), o11 = t7;
+      }
+    }
+  }
+  return e9;
+};
+var u3 = (o10, t6, i8 = o10) => (o10._$AI(t6, i8), o10);
+var m2 = {};
+var p3 = (o10, t6 = m2) => o10._$AH = t6;
+var M2 = (o10) => o10._$AH;
+var h3 = (o10) => {
+  o10._$AR(), o10._$AA.remove();
+};
+
+// node_modules/lit-html/directives/repeat.js
+var u4 = (e9, s5, t6) => {
+  const r7 = /* @__PURE__ */ new Map();
+  for (let l4 = s5; l4 <= t6; l4++) r7.set(e9[l4], l4);
+  return r7;
+};
+var c4 = e6(class extends i5 {
+  constructor(e9) {
+    if (super(e9), e9.type !== t3.CHILD) throw Error("repeat() can only be used in text expressions");
+  }
+  dt(e9, s5, t6) {
+    let r7;
+    void 0 === t6 ? t6 = s5 : void 0 !== s5 && (r7 = s5);
+    const l4 = [], o10 = [];
+    let i8 = 0;
+    for (const s6 of e9) l4[i8] = r7 ? r7(s6, i8) : i8, o10[i8] = t6(s6, i8), i8++;
+    return { values: o10, keys: l4 };
+  }
+  render(e9, s5, t6) {
+    return this.dt(e9, s5, t6).values;
+  }
+  update(s5, [t6, r7, c5]) {
+    const d3 = M2(s5), { values: p4, keys: a3 } = this.dt(t6, r7, c5);
+    if (!Array.isArray(d3)) return this.ut = a3, p4;
+    const h4 = this.ut ?? (this.ut = []), v3 = [];
+    let m3, y3, x2 = 0, j2 = d3.length - 1, k2 = 0, w2 = p4.length - 1;
+    for (; x2 <= j2 && k2 <= w2; ) if (null === d3[x2]) x2++;
+    else if (null === d3[j2]) j2--;
+    else if (h4[x2] === a3[k2]) v3[k2] = u3(d3[x2], p4[k2]), x2++, k2++;
+    else if (h4[j2] === a3[w2]) v3[w2] = u3(d3[j2], p4[w2]), j2--, w2--;
+    else if (h4[x2] === a3[w2]) v3[w2] = u3(d3[x2], p4[w2]), v2(s5, v3[w2 + 1], d3[x2]), x2++, w2--;
+    else if (h4[j2] === a3[k2]) v3[k2] = u3(d3[j2], p4[k2]), v2(s5, d3[x2], d3[j2]), j2--, k2++;
+    else if (void 0 === m3 && (m3 = u4(a3, k2, w2), y3 = u4(h4, x2, j2)), m3.has(h4[x2])) if (m3.has(h4[j2])) {
+      const e9 = y3.get(a3[k2]), t7 = void 0 !== e9 ? d3[e9] : null;
+      if (null === t7) {
+        const e10 = v2(s5, d3[x2]);
+        u3(e10, p4[k2]), v3[k2] = e10;
+      } else v3[k2] = u3(t7, p4[k2]), v2(s5, d3[x2], t7), d3[e9] = null;
+      k2++;
+    } else h3(d3[j2]), j2--;
+    else h3(d3[x2]), x2++;
+    for (; k2 <= w2; ) {
+      const e9 = v2(s5, v3[w2 + 1]);
+      u3(e9, p4[k2]), v3[k2++] = e9;
+    }
+    for (; x2 <= j2; ) {
+      const e9 = d3[x2++];
+      null !== e9 && h3(e9);
+    }
+    return this.ut = a3, p3(s5, v3), E;
+  }
+});
+
+// src/utils/dom.utils.ts
+function deepQueryById(root, id) {
+  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
+  if (direct) return direct;
+  for (const el of Array.from(root.querySelectorAll("*"))) {
+    if (el.shadowRoot) {
+      const found = deepQueryById(
+        el.shadowRoot,
+        id
+      );
+      if (found) return found;
+    }
+  }
+  return null;
+}
+function computeCoords(tRect, pRect, placement, offset) {
+  const [side, align = "center"] = placement.split("-");
+  let top = 0, left = 0;
+  switch (side) {
+    case "top":
+      top = tRect.top - pRect.height - offset;
+      break;
+    case "bottom":
+      top = tRect.bottom + offset;
+      break;
+    case "left":
+      left = tRect.left - pRect.width - offset;
+      break;
+    case "right":
+      left = tRect.right + offset;
+      break;
+  }
+  if (side === "top" || side === "bottom") {
+    if (align === "start") left = tRect.left;
+    else if (align === "end") left = tRect.right - pRect.width;
+    else left = tRect.left + (tRect.width - pRect.width) / 2;
+  } else {
+    if (align === "start") top = tRect.top;
+    else if (align === "end") top = tRect.bottom - pRect.height;
+    else top = tRect.top + (tRect.height - pRect.height) / 2;
+  }
+  return { top, left };
+}
+function clampToViewport({ top, left }, pRect, margin = 8) {
+  return {
+    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
+    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
+  };
+}
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+function emit(host, name, detail, opts = {}) {
+  const event = new CustomEvent(name, {
+    detail,
+    bubbles: true,
+    composed: true,
+    ...opts
+  });
+  host.dispatchEvent(event);
+  return event;
+}
+
+// src/carousel/styles.ts
+var styles_default3 = [
+  hostReset,
+  focusRing(".uwc-car__prev", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-car__next", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-car__dot", "--uwc-color-primary", "#6366f1"),
+  i`
+    :host {
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Header / Footer slots ─────────────────────────────────────── */
+    .uwc-car__header,
+    .uwc-car__footer {
+      padding: ${space2} 0;
+    }
+    .uwc-car__header:empty,
+    .uwc-car__footer:empty { display: none; }
+
+    /* ── Region — wraps viewport + nav buttons ─────────────────────── */
+    .uwc-car__region {
+      position: relative;
+    }
+
+    /* ── Vertical host stretches via flex so region fills user-set height */
+    :host([orientation="vertical"]) {
+      display: flex;
+      flex-direction: column;
+    }
+    :host([orientation="vertical"]) .uwc-car__region {
+      flex: 1;
+      min-height: 0;
+    }
+    :host([orientation="vertical"]) .uwc-car__viewport {
+      height: 100%;
+    }
+
+    /* ── Viewport — clips the track ────────────────────────────────── */
+    .uwc-car__viewport {
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Track — flex row or column of item pages ──────────────────── */
+    .uwc-car__track {
+      display: flex;
+      will-change: transform;
+    }
+    :host([orientation="horizontal"]) .uwc-car__track { flex-direction: row; }
+    :host([orientation="vertical"])   .uwc-car__track { flex-direction: column; }
+
+    /* ── Single item wrapper ────────────────────────────────────────── */
+    .uwc-car__item {
+      flex-shrink: 0;
+      box-sizing: border-box;
+      padding: 0 ${space2};
+    }
+    :host([orientation="vertical"]) .uwc-car__item {
+      padding: ${space2} 0;
+    }
+
+    /* ── Navigation buttons ─────────────────────────────────────────── */
+    .uwc-car__nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 2;
+      padding: 0 ${space2};
+    }
+    :host([orientation="vertical"]) .uwc-car__nav {
+      flex-direction: column;
+      justify-content: space-between;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: auto;
+      width: auto;
+      transform: translateX(-50%);
+      padding: ${space2} 0;
+    }
+
+    .uwc-car__prev,
+    .uwc-car__next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: ${radiusFull};
+      border: 1px solid ${border};
+      background: ${surface};
+      color: ${text};
+      cursor: pointer;
+      pointer-events: all;
+      transition:
+        background ${durationBase},
+        color ${durationBase},
+        border-color ${durationBase},
+        box-shadow ${durationBase};
+      box-shadow: ${shadowSm};
+      flex-shrink: 0;
+    }
+    .uwc-car__prev:hover,
+    .uwc-car__next:hover {
+      background: ${primary};
+      color: ${surface};
+      border-color: ${primary};
+    }
+    .uwc-car__prev:disabled,
+    .uwc-car__next:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ── Indicators ─────────────────────────────────────────────────── */
+    .uwc-car__indicators {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: ${space2};
+      padding: ${space3} 0 ${space1};
+    }
+    :host([orientation="vertical"]) .uwc-car__indicators {
+      flex-direction: column;
+      padding: 0 ${space1} 0 ${space3};
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .uwc-car__dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: ${radiusFull};
+      border: none;
+      padding: 0;
+      background: var(--uwc-carousel-dot-color, #cbd5e1);
+      cursor: pointer;
+      transition: background ${durationBase}, transform ${durationBase};
+      flex-shrink: 0;
+    }
+    .uwc-car__dot:hover { background: var(--uwc-carousel-dot-hover, #94a3b8); }
+    .uwc-car__dot.active {
+      background: var(--uwc-carousel-dot-active, ${primary});
+      transform: scale(1.35);
+    }
+
+    /* ── Transition ─────────────────────────────────────────────────── */
+    .uwc-car__track.is-animating {
+      transition: transform var(--uwc-carousel-duration, 400ms) ${easingStandard};
+    }
+
+    /* ── Reduced motion ─────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-car__track.is-animating { transition: none; }
+      .uwc-car__prev,
+      .uwc-car__next,
+      .uwc-car__dot { transition: none; }
+    }
+  `
+];
+
+// src/carousel/index.ts
+var UwcCarousel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.items = [];
+    this.numVisible = 3;
+    this.numScroll = 1;
+    this.circular = false;
+    this.autoplayInterval = 0;
+    this.orientation = "horizontal";
+    this.showNavigators = true;
+    this.showIndicators = true;
+    this.prevIcon = "chevron-left";
+    this.nextIcon = "chevron-right";
+    this.ariaLabel = "Carousel";
+    /** Breakpoint responsive overrides. */
+    this.responsiveOptions = [];
+    this._page = 0;
+    this._effectiveNumVisible = 3;
+    this._effectiveNumScroll = 1;
+    this._animating = false;
+    this._viewportH = 0;
+    this._pointerStartX = 0;
+    this._pointerStartY = 0;
+    this._pointerDeltaX = 0;
+    this._pointerDeltaY = 0;
+    this._dragging = false;
+    this._liveLabel = "";
+  }
+  // ── Lifecycle ───────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this._resizeObserver = new ResizeObserver(() => this._applyResponsive());
+    this._resizeObserver.observe(this);
+    this._applyResponsive();
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._resizeObserver?.disconnect();
+    this._stopAutoplay();
+  }
+  updated(changed) {
+    if (changed.has("autoplayInterval")) {
+      this._stopAutoplay();
+      this._startAutoplay();
+    }
+    if (changed.has("items") || changed.has("numVisible") || changed.has("numScroll")) {
+      this._applyResponsive();
+      const maxPage = this._maxPage;
+      if (this._page > maxPage) this._page = maxPage;
+    }
+  }
+  // ── Responsive ─────────────────────────────────────────────────────────────
+  _applyResponsive() {
+    const w2 = this.offsetWidth;
+    let nv = this.numVisible;
+    let ns = this.numScroll;
+    if (this.responsiveOptions.length) {
+      const sorted = [...this.responsiveOptions].sort(
+        (a3, b3) => parseInt(b3.breakpoint) - parseInt(a3.breakpoint)
+      );
+      for (const opt of sorted) {
+        if (w2 <= parseInt(opt.breakpoint)) {
+          nv = opt.numVisible;
+          ns = opt.numScroll;
+        }
+      }
+    }
+    this._effectiveNumVisible = Math.max(1, Math.min(nv, this.items.length || 1));
+    this._effectiveNumScroll = Math.max(1, ns);
+  }
+  // ── Pagination ──────────────────────────────────────────────────────────────
+  get _totalPages() {
+    const n6 = this.items.length;
+    if (n6 <= this._effectiveNumVisible) return 1;
+    return Math.ceil((n6 - this._effectiveNumVisible) / this._effectiveNumScroll) + 1;
+  }
+  get _maxPage() {
+    return Math.max(0, this._totalPages - 1);
+  }
+  get _isPrevDisabled() {
+    return !this.circular && this._page === 0;
+  }
+  get _isNextDisabled() {
+    return !this.circular && this._page >= this._maxPage;
+  }
+  _goTo(page, byAutoplay = false) {
+    const total = this._totalPages;
+    let next = page;
+    if (this.circular) {
+      next = (page % total + total) % total;
+    } else {
+      next = Math.max(0, Math.min(page, this._maxPage));
+    }
+    if (next === this._page) return;
+    this._animating = true;
+    this._page = next;
+    const startItem = next * this._effectiveNumScroll;
+    const endItem = Math.min(startItem + this._effectiveNumVisible, this.items.length);
+    this._liveLabel = `Slide ${startItem + 1} to ${endItem} of ${this.items.length}`;
+    emit(this, byAutoplay ? "uwc-autoplay" : "uwc-page", { page: next });
+    const track = this._track;
+    if (track) {
+      const done = () => {
+        this._animating = false;
+        track.removeEventListener("transitionend", done);
+      };
+      track.addEventListener("transitionend", done, { once: true });
+      setTimeout(() => {
+        this._animating = false;
+      }, 500);
+    }
+  }
+  _prev() {
+    this._goTo(this._page - 1);
+  }
+  _next() {
+    this._goTo(this._page + 1);
+  }
+  // ── Autoplay ─────────────────────────────────────────────────────────────────
+  _startAutoplay() {
+    if (!this.autoplayInterval || this.autoplayInterval <= 0) return;
+    this._autoplayTimer = setInterval(() => {
+      const next = this.circular ? (this._page + 1) % this._totalPages : this._page < this._maxPage ? this._page + 1 : 0;
+      this._goTo(next, true);
+    }, this.autoplayInterval);
+  }
+  _stopAutoplay() {
+    if (this._autoplayTimer) {
+      clearInterval(this._autoplayTimer);
+      this._autoplayTimer = void 0;
+    }
+  }
+  // ── Touch / pointer swipe ───────────────────────────────────────────────────
+  _onPointerDown(e9) {
+    if (e9.button !== 0) return;
+    this._pointerStartX = e9.clientX;
+    this._pointerStartY = e9.clientY;
+    this._pointerDeltaX = 0;
+    this._pointerDeltaY = 0;
+    this._dragging = true;
+    e9.currentTarget.setPointerCapture(e9.pointerId);
+    this._stopAutoplay();
+  }
+  _onPointerMove(e9) {
+    if (!this._dragging) return;
+    this._pointerDeltaX = e9.clientX - this._pointerStartX;
+    this._pointerDeltaY = e9.clientY - this._pointerStartY;
+  }
+  _onPointerUp() {
+    if (!this._dragging) return;
+    this._dragging = false;
+    const threshold = 50;
+    const isHoriz = this.orientation === "horizontal";
+    const delta = isHoriz ? this._pointerDeltaX : this._pointerDeltaY;
+    if (Math.abs(delta) >= threshold) {
+      delta < 0 ? this._next() : this._prev();
+    }
+    this._startAutoplay();
+  }
+  // ── Keyboard navigation ──────────────────────────────────────────────────────
+  _onKeyDown(e9) {
+    const isHoriz = this.orientation === "horizontal";
+    switch (e9.key) {
+      case "ArrowLeft":
+      case "ArrowUp":
+        if (isHoriz ? e9.key === "ArrowLeft" : e9.key === "ArrowUp") {
+          e9.preventDefault();
+          this._prev();
+        }
+        break;
+      case "ArrowRight":
+      case "ArrowDown":
+        if (isHoriz ? e9.key === "ArrowRight" : e9.key === "ArrowDown") {
+          e9.preventDefault();
+          this._next();
+        }
+        break;
+      case "Home":
+        e9.preventDefault();
+        this._goTo(0);
+        break;
+      case "End":
+        e9.preventDefault();
+        this._goTo(this._maxPage);
+        break;
+    }
+  }
+  // ── Default item template ────────────────────────────────────────────────────
+  _renderItem(item, index) {
+    if (this.itemTemplate) return this.itemTemplate(item, index);
+    const it = item;
+    return b2`
+      <div class="uwc-car__default-item">
+        ${it["image"] ? b2`<img src=${String(it["image"])} alt=${String(it["alt"] ?? it["title"] ?? "")} loading="lazy" />` : A}
+        ${it["title"] ? b2`<p class="uwc-car__default-title">${it["title"]}</p>` : A}
+        ${it["subtitle"] ? b2`<p class="uwc-car__default-subtitle">${it["subtitle"]}</p>` : A}
+        ${it["content"] ? b2`<p class="uwc-car__default-content">${it["content"]}</p>` : A}
+      </div>
+    `;
+  }
+  // ── Computed transform ───────────────────────────────────────────────────────
+  get _trackStyle() {
+    const itemPct = 100 / this._effectiveNumVisible;
+    const offsetPct = -(this._page * this._effectiveNumScroll * itemPct);
+    if (this.orientation === "vertical") {
+      return { transform: `translateY(${offsetPct}%)` };
+    }
+    return { transform: `translateX(${offsetPct}%)` };
+  }
+  // ── Render ───────────────────────────────────────────────────────────────────
+  render() {
+    const itemPct = 100 / this._effectiveNumVisible;
+    const isHoriz = this.orientation === "horizontal";
+    const pages = this._totalPages;
+    const itemStyle = isHoriz ? { width: `${itemPct}%` } : { height: `${itemPct}%`, width: "100%" };
+    return b2`
+      <!-- Live region for screen readers -->
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        class="visually-hidden"
+        style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap"
+      >${this._liveLabel}</div>
+
+      <!-- Header slot -->
+      <div class="uwc-car__header"><slot name="header"></slot></div>
+
+      <!-- Carousel region -->
+      <div
+        class="uwc-car__region"
+        role="region"
+        aria-label=${this.ariaLabel ?? "Carousel"}
+        aria-roledescription="carousel"
+      >
+        <!-- Viewport -->
+        <div
+          class="uwc-car__viewport"
+          @keydown=${this._onKeyDown}
+          tabindex="0"
+          aria-label="Slide container"
+          @pointerdown=${this._onPointerDown}
+          @pointermove=${this._onPointerMove}
+          @pointerup=${this._onPointerUp}
+          @pointercancel=${this._onPointerUp}
+        >
+          <div
+            class=${e7({ "uwc-car__track": true, "is-animating": this._animating })}
+            style=${o7(this._trackStyle)}
+            aria-live="off"
+          >
+            ${c4(
+      this.items,
+      (_2, i8) => i8,
+      (item, index) => b2`
+                <div
+                  class="uwc-car__item"
+                  style=${o7(itemStyle)}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label="Slide ${index + 1} of ${this.items.length}"
+                >
+                  ${this._renderItem(item, index)}
+                </div>
+              `
+    )}
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        ${this.showNavigators ? b2`
+          <div class="uwc-car__nav" aria-hidden="true">
+            <button
+              class="uwc-car__prev"
+              type="button"
+              aria-label="Previous slide"
+              ?disabled=${this._isPrevDisabled}
+              @click=${this._prev}
+            >
+              <uwc-icon name=${this.prevIcon} size="16px"></uwc-icon>
+            </button>
+            <button
+              class="uwc-car__next"
+              type="button"
+              aria-label="Next slide"
+              ?disabled=${this._isNextDisabled}
+              @click=${this._next}
+            >
+              <uwc-icon name=${this.nextIcon} size="16px"></uwc-icon>
+            </button>
+          </div>
+        ` : A}
+      </div>
+
+      <!-- Indicators -->
+      ${this.showIndicators && pages > 1 ? b2`
+        <div class="uwc-car__indicators" role="tablist" aria-label="Slide indicators">
+          ${Array.from({ length: pages }, (_2, i8) => b2`
+            <button
+              class=${e7({ "uwc-car__dot": true, active: i8 === this._page })}
+              type="button"
+              role="tab"
+              aria-selected=${i8 === this._page ? "true" : "false"}
+              aria-label="Go to slide ${i8 + 1}"
+              @click=${() => this._goTo(i8)}
+            ></button>
+          `)}
+        </div>
+      ` : A}
+
+      <!-- Footer slot -->
+      <div class="uwc-car__footer"><slot name="footer"></slot></div>
+    `;
+  }
+};
+UwcCarousel.styles = styles_default3;
+__decorateClass([
+  n4({ type: Array })
+], UwcCarousel.prototype, "items", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "num-visible" })
+], UwcCarousel.prototype, "numVisible", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "num-scroll" })
+], UwcCarousel.prototype, "numScroll", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCarousel.prototype, "circular", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "autoplay-interval" })
+], UwcCarousel.prototype, "autoplayInterval", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcCarousel.prototype, "orientation", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-navigators" })
+], UwcCarousel.prototype, "showNavigators", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-indicators" })
+], UwcCarousel.prototype, "showIndicators", 2);
+__decorateClass([
+  n4({ attribute: "prev-icon" })
+], UwcCarousel.prototype, "prevIcon", 2);
+__decorateClass([
+  n4({ attribute: "next-icon" })
+], UwcCarousel.prototype, "nextIcon", 2);
+__decorateClass([
+  n4({ attribute: "aria-label" })
+], UwcCarousel.prototype, "ariaLabel", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_page", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_effectiveNumVisible", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_effectiveNumScroll", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_animating", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_viewportH", 2);
+__decorateClass([
+  e5(".uwc-car__track")
+], UwcCarousel.prototype, "_track", 2);
+__decorateClass([
+  e5(".uwc-car__viewport")
+], UwcCarousel.prototype, "_viewport", 2);
+
 // src/accordion/styles.ts
 var panelStyles = [
   hostReset,
@@ -1279,69 +2212,6 @@ var accordionStyles = [
     slot { display: contents; }
   `
 ];
-
-// src/utils/dom.utils.ts
-function deepQueryById(root, id) {
-  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
-  if (direct) return direct;
-  for (const el of Array.from(root.querySelectorAll("*"))) {
-    if (el.shadowRoot) {
-      const found = deepQueryById(
-        el.shadowRoot,
-        id
-      );
-      if (found) return found;
-    }
-  }
-  return null;
-}
-function computeCoords(tRect, pRect, placement, offset) {
-  const [side, align = "center"] = placement.split("-");
-  let top = 0, left = 0;
-  switch (side) {
-    case "top":
-      top = tRect.top - pRect.height - offset;
-      break;
-    case "bottom":
-      top = tRect.bottom + offset;
-      break;
-    case "left":
-      left = tRect.left - pRect.width - offset;
-      break;
-    case "right":
-      left = tRect.right + offset;
-      break;
-  }
-  if (side === "top" || side === "bottom") {
-    if (align === "start") left = tRect.left;
-    else if (align === "end") left = tRect.right - pRect.width;
-    else left = tRect.left + (tRect.width - pRect.width) / 2;
-  } else {
-    if (align === "start") top = tRect.top;
-    else if (align === "end") top = tRect.bottom - pRect.height;
-    else top = tRect.top + (tRect.height - pRect.height) / 2;
-  }
-  return { top, left };
-}
-function clampToViewport({ top, left }, pRect, margin = 8) {
-  return {
-    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
-    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
-  };
-}
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-function emit(host, name, detail, opts = {}) {
-  const event = new CustomEvent(name, {
-    detail,
-    bubbles: true,
-    composed: true,
-    ...opts
-  });
-  host.dispatchEvent(event);
-  return event;
-}
 
 // src/accordion/index.ts
 var TOGGLE_EVENT = "uwc-accordion-toggle";
@@ -2753,7 +3623,7 @@ __decorateClass([
 ], UwcSplitter.prototype, "step", 2);
 
 // src/checkbox/styles.ts
-var styles_default2 = [
+var styles_default4 = [
   hostReset,
   i`
     :host {
@@ -2912,7 +3782,7 @@ var UwcCheckbox = class extends i4 {
     `;
   }
 };
-UwcCheckbox.styles = [styles_default2];
+UwcCheckbox.styles = [styles_default4];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcCheckbox.prototype, "checked", 2);
@@ -2939,7 +3809,7 @@ __decorateClass([
 ], UwcCheckbox.prototype, "variant", 2);
 
 // src/dialog/styles.ts
-var styles_default3 = [
+var styles_default5 = [
   hostReset,
   i`
     :host { display: contents; }
@@ -3474,7 +4344,7 @@ var UwcDialog = class extends i4 {
     `;
   }
 };
-UwcDialog.styles = [styles_default3];
+UwcDialog.styles = [styles_default5];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcDialog.prototype, "open", 2);
@@ -3524,37 +4394,8 @@ __decorateClass([
   e5("dialog")
 ], UwcDialog.prototype, "_dialog", 2);
 
-// node_modules/lit-html/directives/style-map.js
-var n5 = "important";
-var i6 = " !" + n5;
-var o7 = e6(class extends i5 {
-  constructor(t6) {
-    if (super(t6), t6.type !== t3.ATTRIBUTE || "style" !== t6.name || t6.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
-  }
-  render(t6) {
-    return Object.keys(t6).reduce((e9, r7) => {
-      const s5 = t6[r7];
-      return null == s5 ? e9 : e9 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
-    }, "");
-  }
-  update(e9, [r7]) {
-    const { style: s5 } = e9.element;
-    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
-    for (const t6 of this.ft) null == r7[t6] && (this.ft.delete(t6), t6.includes("-") ? s5.removeProperty(t6) : s5[t6] = null);
-    for (const t6 in r7) {
-      const e10 = r7[t6];
-      if (null != e10) {
-        this.ft.add(t6);
-        const r8 = "string" == typeof e10 && e10.endsWith(i6);
-        t6.includes("-") || r8 ? s5.setProperty(t6, r8 ? e10.slice(0, -11) : e10, r8 ? n5 : "") : s5[t6] = e10;
-      }
-    }
-    return E;
-  }
-});
-
 // src/colorpicker/styles.ts
-var styles_default4 = [
+var styles_default6 = [
   hostReset,
   // Panel enters/exits via the floatingPanel mixin — same as dropdown/popover/tooltip
   floatingPanel(".uwc-cp__panel", { durationVar: "--uwc-cp-duration", durationDefault: "140ms" }),
@@ -4366,7 +5207,7 @@ var UwcColorPicker = class extends i4 {
     `;
   }
 };
-UwcColorPicker.styles = [styles_default4];
+UwcColorPicker.styles = [styles_default6];
 __decorateClass([
   n4({ reflect: true })
 ], UwcColorPicker.prototype, "placement", 2);
@@ -4408,7 +5249,7 @@ __decorateClass([
 ], UwcColorPicker.prototype, "_alphaEl", 2);
 
 // src/datatable/styles.ts
-var styles_default5 = [
+var styles_default7 = [
   hostReset,
   i`
     :host { display: block; }
@@ -4744,93 +5585,6 @@ var styles_default5 = [
     .dt-pag-info   { font-size: ${fontSizeXs}; color: ${textSecondary}; }
   `
 ];
-
-// node_modules/lit-html/directive-helpers.js
-var { I: t4 } = j;
-var i7 = (o10) => o10;
-var r6 = (o10) => void 0 === o10.strings;
-var s4 = () => document.createComment("");
-var v2 = (o10, n6, e9) => {
-  const l4 = o10._$AA.parentNode, d3 = void 0 === n6 ? o10._$AB : n6._$AA;
-  if (void 0 === e9) {
-    const i8 = l4.insertBefore(s4(), d3), n7 = l4.insertBefore(s4(), d3);
-    e9 = new t4(i8, n7, o10, o10.options);
-  } else {
-    const t6 = e9._$AB.nextSibling, n7 = e9._$AM, c5 = n7 !== o10;
-    if (c5) {
-      let t7;
-      e9._$AQ?.(o10), e9._$AM = o10, void 0 !== e9._$AP && (t7 = o10._$AU) !== n7._$AU && e9._$AP(t7);
-    }
-    if (t6 !== d3 || c5) {
-      let o11 = e9._$AA;
-      for (; o11 !== t6; ) {
-        const t7 = i7(o11).nextSibling;
-        i7(l4).insertBefore(o11, d3), o11 = t7;
-      }
-    }
-  }
-  return e9;
-};
-var u3 = (o10, t6, i8 = o10) => (o10._$AI(t6, i8), o10);
-var m2 = {};
-var p3 = (o10, t6 = m2) => o10._$AH = t6;
-var M2 = (o10) => o10._$AH;
-var h3 = (o10) => {
-  o10._$AR(), o10._$AA.remove();
-};
-
-// node_modules/lit-html/directives/repeat.js
-var u4 = (e9, s5, t6) => {
-  const r7 = /* @__PURE__ */ new Map();
-  for (let l4 = s5; l4 <= t6; l4++) r7.set(e9[l4], l4);
-  return r7;
-};
-var c4 = e6(class extends i5 {
-  constructor(e9) {
-    if (super(e9), e9.type !== t3.CHILD) throw Error("repeat() can only be used in text expressions");
-  }
-  dt(e9, s5, t6) {
-    let r7;
-    void 0 === t6 ? t6 = s5 : void 0 !== s5 && (r7 = s5);
-    const l4 = [], o10 = [];
-    let i8 = 0;
-    for (const s6 of e9) l4[i8] = r7 ? r7(s6, i8) : i8, o10[i8] = t6(s6, i8), i8++;
-    return { values: o10, keys: l4 };
-  }
-  render(e9, s5, t6) {
-    return this.dt(e9, s5, t6).values;
-  }
-  update(s5, [t6, r7, c5]) {
-    const d3 = M2(s5), { values: p4, keys: a3 } = this.dt(t6, r7, c5);
-    if (!Array.isArray(d3)) return this.ut = a3, p4;
-    const h4 = this.ut ?? (this.ut = []), v3 = [];
-    let m3, y3, x2 = 0, j2 = d3.length - 1, k2 = 0, w2 = p4.length - 1;
-    for (; x2 <= j2 && k2 <= w2; ) if (null === d3[x2]) x2++;
-    else if (null === d3[j2]) j2--;
-    else if (h4[x2] === a3[k2]) v3[k2] = u3(d3[x2], p4[k2]), x2++, k2++;
-    else if (h4[j2] === a3[w2]) v3[w2] = u3(d3[j2], p4[w2]), j2--, w2--;
-    else if (h4[x2] === a3[w2]) v3[w2] = u3(d3[x2], p4[w2]), v2(s5, v3[w2 + 1], d3[x2]), x2++, w2--;
-    else if (h4[j2] === a3[k2]) v3[k2] = u3(d3[j2], p4[k2]), v2(s5, d3[x2], d3[j2]), j2--, k2++;
-    else if (void 0 === m3 && (m3 = u4(a3, k2, w2), y3 = u4(h4, x2, j2)), m3.has(h4[x2])) if (m3.has(h4[j2])) {
-      const e9 = y3.get(a3[k2]), t7 = void 0 !== e9 ? d3[e9] : null;
-      if (null === t7) {
-        const e10 = v2(s5, d3[x2]);
-        u3(e10, p4[k2]), v3[k2] = e10;
-      } else v3[k2] = u3(t7, p4[k2]), v2(s5, d3[x2], t7), d3[e9] = null;
-      k2++;
-    } else h3(d3[j2]), j2--;
-    else h3(d3[x2]), x2++;
-    for (; k2 <= w2; ) {
-      const e9 = v2(s5, v3[w2 + 1]);
-      u3(e9, p4[k2]), v3[k2++] = e9;
-    }
-    for (; x2 <= j2; ) {
-      const e9 = d3[x2++];
-      null !== e9 && h3(e9);
-    }
-    return this.ut = a3, p3(s5, v3), E;
-  }
-});
 
 // node_modules/lit-html/directives/live.js
 var l3 = e6(class extends i5 {
@@ -5563,7 +6317,7 @@ var UwcDatatable = class extends i4 {
   }
 };
 // ── Styles ────────────────────────────────────────────────────────────────
-UwcDatatable.styles = [styles_default5];
+UwcDatatable.styles = [styles_default7];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatatable.prototype, "data", 2);
@@ -5650,7 +6404,7 @@ __decorateClass([
 ], UwcDatatable.prototype, "_resizeStartW", 2);
 
 // src/datepicker/styles.ts
-var styles_default6 = [
+var styles_default8 = [
   hostReset,
   floatingPanel(".dp-panel", { durationVar: "--uwc-dp-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -6809,7 +7563,7 @@ var UwcDatepicker = class extends i4 {
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
 // ═══════════════════════════════════════════════════════════════════════════
-UwcDatepicker.styles = [styles_default6];
+UwcDatepicker.styles = [styles_default8];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatepicker.prototype, "value", 2);
@@ -6920,7 +7674,7 @@ __decorateClass([
 ], UwcDatepicker.prototype, "_panel", 2);
 
 // src/dropdown/styles.ts
-var styles_default7 = [
+var styles_default9 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-dd-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -7504,7 +8258,7 @@ var UwcDropdown = class extends i4 {
       </div>`;
   }
 };
-UwcDropdown.styles = [styles_default7];
+UwcDropdown.styles = [styles_default9];
 __decorateClass([
   n4({ type: Array })
 ], UwcDropdown.prototype, "options", 2);
@@ -7851,7 +8605,7 @@ __decorateClass([
 ], UwcIcon.prototype, "isLocalIcon", 2);
 
 // src/inputtext/styles.ts
-var styles_default8 = [
+var styles_default10 = [
   hostReset,
   i`
     :host {
@@ -8023,7 +8777,7 @@ var UwcInputText = class extends i4 {
     `;
   }
 };
-UwcInputText.styles = [styles_default8];
+UwcInputText.styles = [styles_default10];
 __decorateClass([
   n4()
 ], UwcInputText.prototype, "value", 2);
@@ -8068,7 +8822,7 @@ __decorateClass([
 ], UwcInputText.prototype, "_hasSuffix", 2);
 
 // src/listbox/styles.ts
-var styles_default9 = [
+var styles_default11 = [
   hostReset,
   i`
     :host {
@@ -8362,7 +9116,7 @@ var UwcListbox = class extends i4 {
     `;
   }
 };
-UwcListbox.styles = [styles_default9];
+UwcListbox.styles = [styles_default11];
 __decorateClass([
   n4({ type: Array })
 ], UwcListbox.prototype, "options", 2);
@@ -8404,7 +9158,7 @@ __decorateClass([
 ], UwcListbox.prototype, "_focusedIdx", 2);
 
 // src/menu/styles.ts
-var styles_default10 = [
+var styles_default12 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-menu-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -8806,7 +9560,7 @@ var UwcMenu = class extends i4 {
       </div>`;
   }
 };
-UwcMenu.styles = [styles_default10];
+UwcMenu.styles = [styles_default12];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcMenu.prototype, "triggerId", 2);
@@ -8830,7 +9584,7 @@ __decorateClass([
 ], UwcMenu.prototype, "_focusedIndex", 2);
 
 // src/overlay/styles.ts
-var styles_default11 = [
+var styles_default13 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-overlay-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -8963,7 +9717,7 @@ var UwcOverlay = class extends i4 {
       </div>`;
   }
 };
-UwcOverlay.styles = [styles_default11];
+UwcOverlay.styles = [styles_default13];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcOverlay.prototype, "triggerId", 2);
@@ -8990,7 +9744,7 @@ __decorateClass([
 ], UwcOverlay.prototype, "_backdrop", 2);
 
 // src/paginator/styles.ts
-var styles_default12 = [
+var styles_default14 = [
   hostReset,
   i`
     :host {
@@ -9452,7 +10206,7 @@ var UwcPaginator = class extends i4 {
     return this.currentPageReportTemplate.replace("{currentPage}", String(cur + 1)).replace("{totalPages}", String(pc)).replace("{first}", String(first)).replace("{last}", String(last)).replace("{totalRecords}", String(this.totalRecords));
   }
 };
-UwcPaginator.styles = styles_default12;
+UwcPaginator.styles = styles_default14;
 __decorateClass([
   n4({ type: Number, reflect: true })
 ], UwcPaginator.prototype, "first", 2);
@@ -9497,7 +10251,7 @@ __decorateClass([
 ], UwcPaginator.prototype, "_jumpValue", 2);
 
 // src/popover/styles.ts
-var styles_default13 = [
+var styles_default15 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-popover-duration", durationDefault: "160ms" }),
   placementOrigins,
@@ -9695,7 +10449,7 @@ var UwcPopover = class extends i4 {
       </div>`;
   }
 };
-UwcPopover.styles = [styles_default13];
+UwcPopover.styles = [styles_default15];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcPopover.prototype, "triggerId", 2);
@@ -9728,7 +10482,7 @@ __decorateClass([
 ], UwcPopover.prototype, "_arrow", 2);
 
 // src/radiobutton/styles.ts
-var styles_default14 = [
+var styles_default16 = [
   hostReset,
   i`
     :host {
@@ -9868,7 +10622,7 @@ var UwcRadioButton = class extends i4 {
     `;
   }
 };
-UwcRadioButton.styles = [styles_default14];
+UwcRadioButton.styles = [styles_default16];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcRadioButton.prototype, "checked", 2);
@@ -9892,7 +10646,7 @@ __decorateClass([
 ], UwcRadioButton.prototype, "variant", 2);
 
 // src/togglebutton/styles.ts
-var styles_default15 = [
+var styles_default17 = [
   hostReset,
   i`
     :host {
@@ -10065,7 +10819,7 @@ var UwcToggleButton = class extends i4 {
     `;
   }
 };
-UwcToggleButton.styles = [styles_default15];
+UwcToggleButton.styles = [styles_default17];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleButton.prototype, "checked", 2);
@@ -10095,7 +10849,7 @@ __decorateClass([
 ], UwcToggleButton.prototype, "disabled", 2);
 
 // src/toggleswitch/styles.ts
-var styles_default16 = [
+var styles_default18 = [
   hostReset,
   i`
     :host {
@@ -10230,7 +10984,7 @@ var UwcToggleSwitch = class extends i4 {
     `;
   }
 };
-UwcToggleSwitch.styles = [styles_default16];
+UwcToggleSwitch.styles = [styles_default18];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleSwitch.prototype, "checked", 2);
@@ -10251,7 +11005,7 @@ __decorateClass([
 ], UwcToggleSwitch.prototype, "invalid", 2);
 
 // src/tooltip/styles.ts
-var styles_default17 = [
+var styles_default19 = [
   hostReset,
   floatingPanel(".panel", {
     scaleFrom: "scale(0.93)",
@@ -10471,7 +11225,7 @@ var UwcTooltip = class extends i4 {
       </div>`;
   }
 };
-UwcTooltip.styles = [styles_default17];
+UwcTooltip.styles = [styles_default19];
 __decorateClass([
   n4({ type: String })
 ], UwcTooltip.prototype, "triggerId", 2);
@@ -10511,6 +11265,8 @@ __decorateClass([
 
 // src/index.ts
 customElements.define("uwc-button", UwcButton);
+customElements.define("uwc-card", UwcCard);
+customElements.define("uwc-carousel", UwcCarousel);
 customElements.define("uwc-checkbox", UwcCheckbox);
 customElements.define("uwc-dialog", UwcDialog);
 customElements.define("uwc-colorpicker", UwcColorPicker);

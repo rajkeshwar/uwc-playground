@@ -791,6 +791,14 @@ var placementOriginsExtended = i`
   [data-placement="right-start"] { transform-origin: left top;     }
   [data-placement="right-end"]   { transform-origin: left bottom;  }
 `;
+function focusRing(selector, colorVar = "--uwc-color-primary", colorDefault = "#6366f1") {
+  return i`
+    ${r(selector)}:focus-visible {
+      outline: 2px solid var(${r(colorVar)}, ${r(colorDefault)});
+      outline-offset: 2px;
+    }
+  `;
+}
 
 // src/button/styles.ts
 var styles_default = [
@@ -1151,12 +1159,227 @@ var UwcButton2 = createComponent({
   }
 });
 
-// src/dialog/react.ts
-import { createComponent as createComponent2 } from "@lit/react";
+// src/card/react.ts
 import React2 from "react";
+import { createComponent as createComponent2 } from "@lit/react";
+
+// src/card/styles.ts
+var styles_default2 = [
+  hostReset,
+  i`
+    /* ── Host ────────────────────────────────────────────────────────── */
+    :host {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--uwc-card-radius, ${radiusXl});
+      overflow: hidden;
+      background: var(--uwc-card-bg, ${surface});
+      border: var(--uwc-card-border, 1px solid ${border});
+      color: var(--uwc-card-color, ${text});
+      font-family: inherit;
+      font-size: ${fontSizeMd};
+    }
+
+    :host([elevated]) {
+      box-shadow: var(--uwc-card-shadow, ${shadowMd});
+      border-color: transparent;
+    }
+
+    :host([flat]) {
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    /* ── Header slot (image / media zone) ────────────────────────────── */
+    .uwc-card__header {
+      display: block;
+      overflow: hidden;
+    }
+    .uwc-card__header::slotted(*),
+    ::slotted([slot="header"]) {
+      display: block;
+    }
+    /* The slotted image or element fills the header edge-to-edge */
+    slot[name="header"]::slotted(img),
+    slot[name="header"]::slotted(video) {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .uwc-card__header:empty { display: none; }
+
+    /* ── Inner wrapper (fills host, stacks body + footer) ───────────── */
+    .uwc-card__inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Body ────────────────────────────────────────────────────────── */
+    .uwc-card__body {
+      padding: var(--uwc-card-body-padding, 1.25rem 1.5rem);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: ${space3};
+    }
+
+    /* ── Title block (title + subtitle) ─────────────────────────────── */
+    .uwc-card__title-block {
+      display: flex;
+      flex-direction: column;
+      gap: ${space1};
+    }
+    .uwc-card__title-block:empty { display: none; }
+
+    .uwc-card__title {
+      font-size: var(--uwc-card-title-size, ${fontSizeXl});
+      font-weight: ${fontWeightSemibold};
+      color: var(--uwc-card-title-color, ${text});
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .uwc-card__subtitle {
+      font-size: var(--uwc-card-subtitle-size, ${fontSizeMd});
+      color: var(--uwc-card-subtitle-color, ${textSecondary});
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ── Content slot ────────────────────────────────────────────────── */
+    .uwc-card__content {
+      font-size: ${fontSizeMd};
+      color: var(--uwc-card-content-color, ${textSecondary});
+      line-height: 1.7;
+    }
+    .uwc-card__content:empty { display: none; }
+
+    /* Slot content inherits body font */
+    slot:not([name]) {
+      display: block;
+    }
+
+    /* ── Footer slot ─────────────────────────────────────────────────── */
+    .uwc-card__footer {
+      padding: var(--uwc-card-footer-padding, .875rem 1.5rem 1.25rem);
+      border-top: 1px solid ${border};
+      display: block;
+    }
+    .uwc-card__footer:empty { display: none; }
+
+    /* ── Horizontal layout ───────────────────────────────────────────── */
+    :host([horizontal]) {
+      flex-direction: row;
+    }
+    :host([horizontal]) .uwc-card__header {
+      flex-shrink: 0;
+      width: var(--uwc-card-horizontal-header-width, 220px);
+    }
+    :host([horizontal]) slot[name="header"]::slotted(img),
+    :host([horizontal]) slot[name="header"]::slotted(video) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    :host([horizontal]) .uwc-card__inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    :host([horizontal]) .uwc-card__footer {
+      margin-top: auto;
+    }
+  `
+];
+
+// src/card/index.ts
+var UwcCard = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.title = "";
+    this.subtitle = "";
+    this.elevated = false;
+    this.flat = false;
+    this.horizontal = false;
+  }
+  // ── Slot detection ────────────────────────────────────────────────────────
+  _hasSlot(name) {
+    return this.querySelector(`[slot="${name}"]`) !== null;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  _renderTitleBlock() {
+    const hasTitle = this.title || this._hasSlot("title");
+    const hasSubtitle = this.subtitle || this._hasSlot("subtitle");
+    if (!hasTitle && !hasSubtitle) return A;
+    return b2`
+      <div class="uwc-card__title-block">
+        ${hasTitle ? b2`
+          <p class="uwc-card__title" part="title">
+            ${this._hasSlot("title") ? b2`<slot name="title"></slot>` : this.title}
+          </p>
+        ` : A}
+        ${hasSubtitle ? b2`
+          <p class="uwc-card__subtitle" part="subtitle">
+            ${this._hasSlot("subtitle") ? b2`<slot name="subtitle"></slot>` : this.subtitle}
+          </p>
+        ` : A}
+      </div>
+    `;
+  }
+  render() {
+    return b2`
+      <div class="uwc-card__header" part="header">
+        <slot name="header"></slot>
+      </div>
+
+      <div class="uwc-card__inner">
+        <div class="uwc-card__body" part="body">
+          ${this._renderTitleBlock()}
+          <div class="uwc-card__content" part="content">
+            <slot></slot>
+          </div>
+        </div>
+
+        <div class="uwc-card__footer" part="footer">
+          <slot name="footer"></slot>
+        </div>
+      </div>
+    `;
+  }
+};
+UwcCard.styles = styles_default2;
+__decorateClass([
+  n4({ reflect: true })
+], UwcCard.prototype, "title", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcCard.prototype, "subtitle", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCard.prototype, "elevated", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCard.prototype, "flat", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCard.prototype, "horizontal", 2);
+
+// src/card/react.ts
+var UwcCardReact = createComponent2({
+  react: React2,
+  tagName: "uwc-card",
+  elementClass: UwcCard
+});
+
+// src/dialog/react.ts
+import { createComponent as createComponent3 } from "@lit/react";
+import React3 from "react";
 
 // src/dialog/styles.ts
-var styles_default2 = [
+var styles_default3 = [
   hostReset,
   i`
     :host { display: contents; }
@@ -1754,7 +1977,7 @@ var UwcDialog = class extends i4 {
     `;
   }
 };
-UwcDialog.styles = [styles_default2];
+UwcDialog.styles = [styles_default3];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcDialog.prototype, "open", 2);
@@ -1805,10 +2028,10 @@ __decorateClass([
 ], UwcDialog.prototype, "_dialog", 2);
 
 // src/dialog/react.ts
-var UwcDialog2 = createComponent2({
+var UwcDialog2 = createComponent3({
   tagName: "uwc-dialog",
   elementClass: UwcDialog,
-  react: React2,
+  react: React3,
   events: {
     onUwcShow: "uwc-show",
     onUwcHide: "uwc-hide",
@@ -1822,11 +2045,11 @@ var UwcDialog2 = createComponent2({
 });
 
 // src/checkbox/react.ts
-import { createComponent as createComponent3 } from "@lit/react";
-import React3 from "react";
+import { createComponent as createComponent4 } from "@lit/react";
+import React4 from "react";
 
 // src/checkbox/styles.ts
-var styles_default3 = [
+var styles_default4 = [
   hostReset,
   i`
     :host {
@@ -1985,7 +2208,7 @@ var UwcCheckbox = class extends i4 {
     `;
   }
 };
-UwcCheckbox.styles = [styles_default3];
+UwcCheckbox.styles = [styles_default4];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcCheckbox.prototype, "checked", 2);
@@ -2012,18 +2235,18 @@ __decorateClass([
 ], UwcCheckbox.prototype, "variant", 2);
 
 // src/checkbox/react.ts
-var UwcCheckbox2 = createComponent3({
+var UwcCheckbox2 = createComponent4({
   tagName: "uwc-checkbox",
   elementClass: UwcCheckbox,
-  react: React3,
+  react: React4,
   events: {
     onUwcChange: "uwc-change"
   }
 });
 
 // src/colorpicker/react.ts
-import { createComponent as createComponent4 } from "@lit/react";
-import React4 from "react";
+import { createComponent as createComponent5 } from "@lit/react";
+import React5 from "react";
 
 // node_modules/lit-html/directives/style-map.js
 var n5 = "important";
@@ -2055,7 +2278,7 @@ var o7 = e6(class extends i5 {
 });
 
 // src/colorpicker/styles.ts
-var styles_default4 = [
+var styles_default5 = [
   hostReset,
   // Panel enters/exits via the floatingPanel mixin — same as dropdown/popover/tooltip
   floatingPanel(".uwc-cp__panel", { durationVar: "--uwc-cp-duration", durationDefault: "140ms" }),
@@ -2867,7 +3090,7 @@ var UwcColorPicker = class extends i4 {
     `;
   }
 };
-UwcColorPicker.styles = [styles_default4];
+UwcColorPicker.styles = [styles_default5];
 __decorateClass([
   n4({ reflect: true })
 ], UwcColorPicker.prototype, "placement", 2);
@@ -2909,21 +3132,21 @@ __decorateClass([
 ], UwcColorPicker.prototype, "_alphaEl", 2);
 
 // src/colorpicker/react.ts
-var UwcColorPicker2 = createComponent4({
+var UwcColorPicker2 = createComponent5({
   tagName: "uwc-colorpicker",
   elementClass: UwcColorPicker,
-  react: React4,
+  react: React5,
   events: {
     onUwcChange: "uwc-change"
   }
 });
 
 // src/datatable/react.ts
-import { createComponent as createComponent5 } from "@lit/react";
-import React5 from "react";
+import { createComponent as createComponent6 } from "@lit/react";
+import React6 from "react";
 
 // src/datatable/styles.ts
-var styles_default5 = [
+var styles_default6 = [
   hostReset,
   i`
     :host { display: block; }
@@ -4078,7 +4301,7 @@ var UwcDatatable = class extends i4 {
   }
 };
 // ── Styles ────────────────────────────────────────────────────────────────
-UwcDatatable.styles = [styles_default5];
+UwcDatatable.styles = [styles_default6];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatatable.prototype, "data", 2);
@@ -4165,10 +4388,10 @@ __decorateClass([
 ], UwcDatatable.prototype, "_resizeStartW", 2);
 
 // src/datatable/react.ts
-var UwcDatatable2 = createComponent5({
+var UwcDatatable2 = createComponent6({
   tagName: "uwc-datatable",
   elementClass: UwcDatatable,
-  react: React5,
+  react: React6,
   events: {
     onUwcFilter: "uwc-filter",
     onUwcSelectionChange: "uwc-selection-change",
@@ -4183,11 +4406,11 @@ var UwcDatatable2 = createComponent5({
 });
 
 // src/datepicker/react.ts
-import { createComponent as createComponent6 } from "@lit/react";
-import React6 from "react";
+import { createComponent as createComponent7 } from "@lit/react";
+import React7 from "react";
 
 // src/datepicker/styles.ts
-var styles_default6 = [
+var styles_default7 = [
   hostReset,
   floatingPanel(".dp-panel", { durationVar: "--uwc-dp-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -5346,7 +5569,7 @@ var UwcDatepicker = class extends i4 {
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
 // ═══════════════════════════════════════════════════════════════════════════
-UwcDatepicker.styles = [styles_default6];
+UwcDatepicker.styles = [styles_default7];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatepicker.prototype, "value", 2);
@@ -5457,10 +5680,10 @@ __decorateClass([
 ], UwcDatepicker.prototype, "_panel", 2);
 
 // src/datepicker/react.ts
-var UwcDatepicker2 = createComponent6({
+var UwcDatepicker2 = createComponent7({
   tagName: "uwc-datepicker",
   elementClass: UwcDatepicker,
-  react: React6,
+  react: React7,
   events: {
     onUwcDateSelect: "uwc-date-select",
     onUwcMonthChange: "uwc-month-change",
@@ -5473,11 +5696,11 @@ var UwcDatepicker2 = createComponent6({
 });
 
 // src/dropdown/react.ts
-import { createComponent as createComponent7 } from "@lit/react";
-import React7 from "react";
+import { createComponent as createComponent8 } from "@lit/react";
+import React8 from "react";
 
 // src/dropdown/styles.ts
-var styles_default7 = [
+var styles_default8 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-dd-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -6061,7 +6284,7 @@ var UwcDropdown = class extends i4 {
       </div>`;
   }
 };
-UwcDropdown.styles = [styles_default7];
+UwcDropdown.styles = [styles_default8];
 __decorateClass([
   n4({ type: Array })
 ], UwcDropdown.prototype, "options", 2);
@@ -6130,10 +6353,10 @@ __decorateClass([
 ], UwcDropdown.prototype, "_optionsList", 2);
 
 // src/dropdown/react.ts
-var UwcDropdown2 = createComponent7({
+var UwcDropdown2 = createComponent8({
   tagName: "uwc-dropdown",
   elementClass: UwcDropdown,
-  react: React7,
+  react: React8,
   events: {
     onUwcChange: "uwc-change",
     onUwcFilter: "uwc-filter",
@@ -6146,8 +6369,8 @@ var UwcDropdown2 = createComponent7({
 });
 
 // src/icon/react.ts
-import { createComponent as createComponent8 } from "@lit/react";
-import React8 from "react";
+import { createComponent as createComponent9 } from "@lit/react";
+import React9 from "react";
 
 // node_modules/lit-html/directives/unsafe-html.js
 var e8 = class extends i5 {
@@ -6428,19 +6651,19 @@ __decorateClass([
 ], UwcIcon.prototype, "isLocalIcon", 2);
 
 // src/icon/react.ts
-var UwcIcon2 = createComponent8({
+var UwcIcon2 = createComponent9({
   tagName: "uwc-icon",
   elementClass: UwcIcon,
-  react: React8,
+  react: React9,
   events: {}
 });
 
 // src/inputtext/react.ts
-import { createComponent as createComponent9 } from "@lit/react";
-import React9 from "react";
+import { createComponent as createComponent10 } from "@lit/react";
+import React10 from "react";
 
 // src/inputtext/styles.ts
-var styles_default8 = [
+var styles_default9 = [
   hostReset,
   i`
     :host {
@@ -6612,7 +6835,7 @@ var UwcInputText = class extends i4 {
     `;
   }
 };
-UwcInputText.styles = [styles_default8];
+UwcInputText.styles = [styles_default9];
 __decorateClass([
   n4()
 ], UwcInputText.prototype, "value", 2);
@@ -6657,10 +6880,10 @@ __decorateClass([
 ], UwcInputText.prototype, "_hasSuffix", 2);
 
 // src/inputtext/react.ts
-var UwcInputText2 = createComponent9({
+var UwcInputText2 = createComponent10({
   tagName: "uwc-inputtext",
   elementClass: UwcInputText,
-  react: React9,
+  react: React10,
   events: {
     onUwcInput: "uwc-input",
     onUwcChange: "uwc-change",
@@ -6670,11 +6893,11 @@ var UwcInputText2 = createComponent9({
 });
 
 // src/listbox/react.ts
-import { createComponent as createComponent10 } from "@lit/react";
-import React10 from "react";
+import { createComponent as createComponent11 } from "@lit/react";
+import React11 from "react";
 
 // src/listbox/styles.ts
-var styles_default9 = [
+var styles_default10 = [
   hostReset,
   i`
     :host {
@@ -6968,7 +7191,7 @@ var UwcListbox = class extends i4 {
     `;
   }
 };
-UwcListbox.styles = [styles_default9];
+UwcListbox.styles = [styles_default10];
 __decorateClass([
   n4({ type: Array })
 ], UwcListbox.prototype, "options", 2);
@@ -7010,10 +7233,10 @@ __decorateClass([
 ], UwcListbox.prototype, "_focusedIdx", 2);
 
 // src/listbox/react.ts
-var UwcListbox2 = createComponent10({
+var UwcListbox2 = createComponent11({
   tagName: "uwc-listbox",
   elementClass: UwcListbox,
-  react: React10,
+  react: React11,
   events: {
     onUwcChange: "uwc-change",
     onUwcFilter: "uwc-filter"
@@ -7021,11 +7244,11 @@ var UwcListbox2 = createComponent10({
 });
 
 // src/menu/react.ts
-import { createComponent as createComponent11 } from "@lit/react";
-import React11 from "react";
+import { createComponent as createComponent12 } from "@lit/react";
+import React12 from "react";
 
 // src/menu/styles.ts
-var styles_default10 = [
+var styles_default11 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-menu-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -7427,7 +7650,7 @@ var UwcMenu = class extends i4 {
       </div>`;
   }
 };
-UwcMenu.styles = [styles_default10];
+UwcMenu.styles = [styles_default11];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcMenu.prototype, "triggerId", 2);
@@ -7451,10 +7674,10 @@ __decorateClass([
 ], UwcMenu.prototype, "_focusedIndex", 2);
 
 // src/menu/react.ts
-var UwcMenu2 = createComponent11({
+var UwcMenu2 = createComponent12({
   tagName: "uwc-menu",
   elementClass: UwcMenu,
-  react: React11,
+  react: React12,
   events: {
     onUwcShow: "uwc-show",
     onUwcHide: "uwc-hide",
@@ -7463,11 +7686,11 @@ var UwcMenu2 = createComponent11({
 });
 
 // src/overlay/react.ts
-import { createComponent as createComponent12 } from "@lit/react";
-import React12 from "react";
+import { createComponent as createComponent13 } from "@lit/react";
+import React13 from "react";
 
 // src/overlay/styles.ts
-var styles_default11 = [
+var styles_default12 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-overlay-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -7600,7 +7823,7 @@ var UwcOverlay = class extends i4 {
       </div>`;
   }
 };
-UwcOverlay.styles = [styles_default11];
+UwcOverlay.styles = [styles_default12];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcOverlay.prototype, "triggerId", 2);
@@ -7627,10 +7850,10 @@ __decorateClass([
 ], UwcOverlay.prototype, "_backdrop", 2);
 
 // src/overlay/react.ts
-var UwcOverlay2 = createComponent12({
+var UwcOverlay2 = createComponent13({
   tagName: "uwc-overlay",
   elementClass: UwcOverlay,
-  react: React12,
+  react: React13,
   events: {
     onUwcShow: "uwc-show",
     onUwcHide: "uwc-hide"
@@ -7638,11 +7861,11 @@ var UwcOverlay2 = createComponent12({
 });
 
 // src/paginator/react.ts
-import { createComponent as createComponent13 } from "@lit/react";
-import React13 from "react";
+import { createComponent as createComponent14 } from "@lit/react";
+import React14 from "react";
 
 // src/paginator/styles.ts
-var styles_default12 = [
+var styles_default13 = [
   hostReset,
   i`
     :host {
@@ -8104,7 +8327,7 @@ var UwcPaginator = class extends i4 {
     return this.currentPageReportTemplate.replace("{currentPage}", String(cur + 1)).replace("{totalPages}", String(pc)).replace("{first}", String(first)).replace("{last}", String(last)).replace("{totalRecords}", String(this.totalRecords));
   }
 };
-UwcPaginator.styles = styles_default12;
+UwcPaginator.styles = styles_default13;
 __decorateClass([
   n4({ type: Number, reflect: true })
 ], UwcPaginator.prototype, "first", 2);
@@ -8149,21 +8372,21 @@ __decorateClass([
 ], UwcPaginator.prototype, "_jumpValue", 2);
 
 // src/paginator/react.ts
-var UwcPaginator2 = createComponent13({
+var UwcPaginator2 = createComponent14({
   tagName: "uwc-paginator",
   elementClass: UwcPaginator,
-  react: React13,
+  react: React14,
   events: {
     onUwcPageChange: "uwc-page-change"
   }
 });
 
 // src/popover/react.ts
-import { createComponent as createComponent14 } from "@lit/react";
-import React14 from "react";
+import { createComponent as createComponent15 } from "@lit/react";
+import React15 from "react";
 
 // src/popover/styles.ts
-var styles_default13 = [
+var styles_default14 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-popover-duration", durationDefault: "160ms" }),
   placementOrigins,
@@ -8361,7 +8584,7 @@ var UwcPopover = class extends i4 {
       </div>`;
   }
 };
-UwcPopover.styles = [styles_default13];
+UwcPopover.styles = [styles_default14];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcPopover.prototype, "triggerId", 2);
@@ -8394,10 +8617,10 @@ __decorateClass([
 ], UwcPopover.prototype, "_arrow", 2);
 
 // src/popover/react.ts
-var UwcPopover2 = createComponent14({
+var UwcPopover2 = createComponent15({
   tagName: "uwc-popover",
   elementClass: UwcPopover,
-  react: React14,
+  react: React15,
   events: {
     onUwcShow: "uwc-show",
     onUwcHide: "uwc-hide",
@@ -8406,11 +8629,11 @@ var UwcPopover2 = createComponent14({
 });
 
 // src/radiobutton/react.ts
-import { createComponent as createComponent15 } from "@lit/react";
-import React15 from "react";
+import { createComponent as createComponent16 } from "@lit/react";
+import React16 from "react";
 
 // src/radiobutton/styles.ts
-var styles_default14 = [
+var styles_default15 = [
   hostReset,
   i`
     :host {
@@ -8550,7 +8773,7 @@ var UwcRadioButton = class extends i4 {
     `;
   }
 };
-UwcRadioButton.styles = [styles_default14];
+UwcRadioButton.styles = [styles_default15];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcRadioButton.prototype, "checked", 2);
@@ -8574,21 +8797,21 @@ __decorateClass([
 ], UwcRadioButton.prototype, "variant", 2);
 
 // src/radiobutton/react.ts
-var UwcRadioButton2 = createComponent15({
+var UwcRadioButton2 = createComponent16({
   tagName: "uwc-radiobutton",
   elementClass: UwcRadioButton,
-  react: React15,
+  react: React16,
   events: {
     onUwcChange: "uwc-change"
   }
 });
 
 // src/togglebutton/react.ts
-import { createComponent as createComponent16 } from "@lit/react";
-import React16 from "react";
+import { createComponent as createComponent17 } from "@lit/react";
+import React17 from "react";
 
 // src/togglebutton/styles.ts
-var styles_default15 = [
+var styles_default16 = [
   hostReset,
   i`
     :host {
@@ -8761,7 +8984,7 @@ var UwcToggleButton = class extends i4 {
     `;
   }
 };
-UwcToggleButton.styles = [styles_default15];
+UwcToggleButton.styles = [styles_default16];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleButton.prototype, "checked", 2);
@@ -8791,21 +9014,21 @@ __decorateClass([
 ], UwcToggleButton.prototype, "disabled", 2);
 
 // src/togglebutton/react.ts
-var UwcToggleButton2 = createComponent16({
+var UwcToggleButton2 = createComponent17({
   tagName: "uwc-togglebutton",
   elementClass: UwcToggleButton,
-  react: React16,
+  react: React17,
   events: {
     onUwcChange: "uwc-change"
   }
 });
 
 // src/toggleswitch/react.ts
-import { createComponent as createComponent17 } from "@lit/react";
-import React17 from "react";
+import { createComponent as createComponent18 } from "@lit/react";
+import React18 from "react";
 
 // src/toggleswitch/styles.ts
-var styles_default16 = [
+var styles_default17 = [
   hostReset,
   i`
     :host {
@@ -8940,7 +9163,7 @@ var UwcToggleSwitch = class extends i4 {
     `;
   }
 };
-UwcToggleSwitch.styles = [styles_default16];
+UwcToggleSwitch.styles = [styles_default17];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleSwitch.prototype, "checked", 2);
@@ -8961,21 +9184,21 @@ __decorateClass([
 ], UwcToggleSwitch.prototype, "invalid", 2);
 
 // src/toggleswitch/react.ts
-var UwcToggleSwitch2 = createComponent17({
+var UwcToggleSwitch2 = createComponent18({
   tagName: "uwc-toggleswitch",
   elementClass: UwcToggleSwitch,
-  react: React17,
+  react: React18,
   events: {
     onUwcChange: "uwc-change"
   }
 });
 
 // src/tooltip/react.ts
-import { createComponent as createComponent18 } from "@lit/react";
-import React18 from "react";
+import { createComponent as createComponent19 } from "@lit/react";
+import React19 from "react";
 
 // src/tooltip/styles.ts
-var styles_default17 = [
+var styles_default18 = [
   hostReset,
   floatingPanel(".panel", {
     scaleFrom: "scale(0.93)",
@@ -9195,7 +9418,7 @@ var UwcTooltip = class extends i4 {
       </div>`;
   }
 };
-UwcTooltip.styles = [styles_default17];
+UwcTooltip.styles = [styles_default18];
 __decorateClass([
   n4({ type: String })
 ], UwcTooltip.prototype, "triggerId", 2);
@@ -9234,10 +9457,10 @@ __decorateClass([
 ], UwcTooltip.prototype, "_arrow", 2);
 
 // src/tooltip/react.ts
-var UwcTooltip2 = createComponent18({
+var UwcTooltip2 = createComponent19({
   tagName: "uwc-tooltip",
   elementClass: UwcTooltip,
-  react: React18,
+  react: React19,
   events: {
     onUwcShow: "uwc-show",
     onUwcHide: "uwc-hide"
@@ -9245,8 +9468,8 @@ var UwcTooltip2 = createComponent18({
 });
 
 // src/tabs/react.ts
-import { createComponent as createComponent19 } from "@lit/react";
-import React19 from "react";
+import { createComponent as createComponent20 } from "@lit/react";
+import React20 from "react";
 
 // src/tabs/styles.ts
 var tabPanelStyles = [
@@ -9852,23 +10075,1139 @@ __decorateClass([
 ], UwcTabs.prototype, "_inkBar", 2);
 
 // src/tabs/react.ts
-var UwcTabs2 = createComponent19({
+var UwcTabs2 = createComponent20({
   tagName: "uwc-tabs",
   elementClass: UwcTabs,
-  react: React19,
+  react: React20,
   events: {
     onUwcChange: "uwc-change",
     onUwcClose: "uwc-close"
   }
 });
-var UwcTabPanel2 = createComponent19({
+var UwcTabPanel2 = createComponent20({
   tagName: "uwc-tab-panel",
   elementClass: UwcTabPanel,
-  react: React19,
+  react: React20,
   events: {}
 });
+
+// src/accordion/react.ts
+import React21 from "react";
+import { createComponent as createComponent21 } from "@lit/react";
+
+// src/accordion/styles.ts
+var panelStyles = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+      border:        var(--uwc-acc-panel-border,  1px solid ${border});
+      border-radius: var(--uwc-acc-panel-radius,  ${radiusLg});
+      overflow:      hidden;
+      background:    var(--uwc-acc-panel-bg,      ${surface});
+    }
+
+    /* Grouped / stacked mode — set by parent uwc-accordion[stacked] */
+    :host([grouped]) {
+      border-radius: 0;
+      margin-top:    -1px;
+    }
+    :host([grouped]:first-of-type) { border-radius: ${radiusLg} ${radiusLg} 0 0; margin-top: 0; }
+    :host([grouped]:last-of-type)  { border-radius: 0 0 ${radiusLg} ${radiusLg}; }
+    :host([grouped]:only-of-type)  { border-radius: ${radiusLg}; margin-top: 0; }
+
+    /* ── <details> reset ───────────────────────────────────────────────── */
+    details {
+      display: block;
+    }
+
+    /* ── <summary> — reset browser defaults, apply design tokens ────────── */
+    summary {
+      display:        flex;
+      list-style:     none;
+      align-items:    center;
+      gap:            0.5rem;
+      cursor:         pointer;
+      user-select:    none;
+
+      padding:     var(--uwc-acc-header-padding,      1rem 1.25rem);
+      background:  var(--uwc-acc-header-bg,           transparent);
+      color:       var(--uwc-acc-header-color,        ${text});
+      font-size:   var(--uwc-acc-header-font-size,    ${fontSizeMd});
+      font-weight: var(--uwc-acc-header-font-weight,  ${fontWeightSemibold});
+      line-height: 1.4;
+
+      transition: background ${durationBase} ease, color ${durationBase} ease;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    summary:hover {
+      background: var(--uwc-acc-header-hover-bg, ${hoverBg});
+    }
+
+    summary:focus-visible {
+      outline:        2px solid var(--uwc-color-primary, ${primary});
+      outline-offset: -2px;
+      border-radius:  ${radiusSm};
+    }
+
+    .uwc-acc-panel__header--disabled {
+      cursor:         not-allowed;
+      opacity:        0.48;
+      pointer-events: none;
+    }
+
+    details[open] > summary {
+      color:      var(--uwc-acc-header-active-color, ${primary});
+      background: var(--uwc-acc-header-active-bg,    transparent);
+    }
+
+    /* ── Title ─────────────────────────────────────────────────────────── */
+    .uwc-acc-panel__title {
+      flex:          1;
+      min-width:     0;
+      overflow:      hidden;
+      text-overflow: ellipsis;
+      white-space:   nowrap;
+    }
+
+    /* ── Toggle icon wrapper ──────────────────────────────────────────────
+       Rotates 90° when the panel is open so chevron-right naturally becomes
+       chevron-down (pointing downward). The transition is independent of the
+       WAAPI content animation so both run in parallel and finish together.
+    ─────────────────────────────────────────────────────────────────────── */
+    .uwc-acc-panel__chevron {
+      flex-shrink:     0;
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      color:           var(--uwc-acc-icon-color, ${textSecondary});
+      transform:       rotate(0deg);
+      transition:      transform 250ms ease, color 250ms ease;
+    }
+
+    /* Default (end) position: push the icon to the trailing edge */
+    :host(:not([toggle-icon-pos="start"])) .uwc-acc-panel__chevron {
+      margin-left: auto;
+    }
+
+    /* Rotate 90° and change colour when open */
+    details[open] > summary .uwc-acc-panel__chevron {
+      transform: rotate(90deg);
+      color:     var(--uwc-acc-icon-active-color, ${primary});
+    }
+
+    /* ── Content wrapper ──────────────────────────────────────────────────
+       Height is animated by WAAPI in JavaScript (open: 0 → scrollHeight,
+       close: scrollHeight → 0). overflow:hidden is applied inline during the
+       animation and removed on finish so natural scrolling is restored.
+       No grid-template-rows trick needed.
+    ─────────────────────────────────────────────────────────────────────── */
+    .uwc-acc-panel__content-wrap {
+      /* Baseline — overflow is set/removed inline by WAAPI animation */
+    }
+
+    /* ── Content body ──────────────────────────────────────────────────── */
+    .uwc-acc-panel__content {
+      border-top:  1px solid var(--uwc-acc-content-border, ${borderSubtle});
+      padding:     var(--uwc-acc-content-padding, 0 1.25rem 1.25rem);
+      color:       var(--uwc-acc-content-color,   ${text});
+      font-size:   var(--uwc-acc-content-font-size, ${fontSizeMd});
+      line-height: 1.6;
+    }
+
+    /* ── Reduced motion ────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-acc-panel__chevron { transition: none; }
+      summary                 { transition: none; }
+      /* Content height animation duration is set to 0ms in JS via _duration() */
+    }
+  `
+];
+var accordionStyles = [
+  hostReset,
+  i`
+    :host {
+      display:        flex;
+      flex-direction: column;
+      gap:            var(--uwc-acc-gap, 0.5rem);
+    }
+
+    :host([stacked]) { gap: 0; }
+
+    slot { display: contents; }
+  `
+];
+
+// src/accordion/index.ts
+var TOGGLE_EVENT = "uwc-accordion-toggle";
+var UwcAccordionPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.header = "";
+    this.collapsed = true;
+    this.disabled = false;
+    this.value = "";
+    this.toggleIcon = "chevron-right";
+    this.toggleIconPos = "end";
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.dispatchEvent(new CustomEvent("uwc-accordion-panel-connected", {
+      bubbles: true,
+      composed: true
+    }));
+  }
+  firstUpdated() {
+    if (this._details) {
+      this._details.open = !this.collapsed;
+    }
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (!changed.has("collapsed") || !this._details) return;
+    const shouldBeOpen = !this.collapsed;
+    if (this._details.open === shouldBeOpen) return;
+    if (shouldBeOpen) {
+      this._animateOpen();
+    } else {
+      this._animateClose();
+    }
+  }
+  // ── WAAPI animation helpers ───────────────────────────────────────────────
+  /**
+   * Expand the panel using WAAPI.
+   *
+   * Strategy (mirrors Shoelace sl-details):
+   *   1. Capture the current rendered height before cancelling any in-flight
+   *      animation — this gives a smooth reversal when rapidly toggling.
+   *   2. Cancel the previous animation (removes its fill effect).
+   *   3. Set details.open = true so the UA stylesheet makes content visible
+   *      and scrollHeight becomes measurable.
+   *   4. Animate height from `fromHeight` → `scrollHeight`.
+   *   5. On finish, cancel the animation (releases fill) and clear inline styles.
+   */
+  _animateOpen() {
+    const details = this._details;
+    const wrap = this._wrap;
+    if (!details || !wrap) return;
+    const fromHeight = this._currentAnimation ? wrap.getBoundingClientRect().height : 0;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    details.open = true;
+    const toHeight = wrap.scrollHeight;
+    const anim = wrap.animate(
+      [
+        { height: `${fromHeight}px`, overflow: "hidden" },
+        { height: `${toHeight}px`, overflow: "hidden" }
+      ],
+      {
+        duration: this._duration(),
+        easing: "ease",
+        fill: "both"
+      }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      wrap.style.removeProperty("height");
+      wrap.style.removeProperty("overflow");
+      this._currentAnimation = void 0;
+    }, { once: true });
+  }
+  /**
+   * Collapse the panel using WAAPI.
+   *
+   * Strategy:
+   *   1. Capture current rendered height (handles mid-animation state).
+   *   2. Cancel any in-flight animation.
+   *   3. Animate height → 0.
+   *   4. On finish, set details.open = false (UA hides content) and clear styles.
+   */
+  _animateClose() {
+    const details = this._details;
+    const wrap = this._wrap;
+    if (!details?.open || !wrap) {
+      if (details) details.open = false;
+      return;
+    }
+    const fromHeight = wrap.getBoundingClientRect().height;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    const anim = wrap.animate(
+      [
+        { height: `${fromHeight}px`, overflow: "hidden" },
+        { height: "0px", overflow: "hidden" }
+      ],
+      {
+        duration: this._duration(),
+        easing: "ease",
+        fill: "both"
+      }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      details.open = false;
+      wrap.style.removeProperty("height");
+      wrap.style.removeProperty("overflow");
+      this._currentAnimation = void 0;
+    }, { once: true });
+  }
+  /** Returns 0ms when the user prefers reduced motion, otherwise 250ms. */
+  _duration() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
+  }
+  // ── Summary event handlers ────────────────────────────────────────────────
+  _onSummaryClick(e9) {
+    e9.preventDefault();
+    if (this.disabled) return;
+    const evt = new CustomEvent(TOGGLE_EVENT, {
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    });
+    this.dispatchEvent(evt);
+    if (!evt.defaultPrevented) {
+      this._selfToggle();
+    }
+  }
+  _selfToggle() {
+    if (this.collapsed) {
+      this.collapsed = false;
+      emit(this, "uwc-open");
+    } else {
+      this.collapsed = true;
+      emit(this, "uwc-close");
+    }
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  /** Open this panel. No-op if already open or disabled. */
+  open() {
+    if (this.disabled || !this.collapsed) return;
+    this.collapsed = false;
+    emit(this, "uwc-open");
+  }
+  /** Close this panel. No-op if already closed or disabled. */
+  close() {
+    if (this.disabled || this.collapsed) return;
+    this.collapsed = true;
+    emit(this, "uwc-close");
+  }
+  /** Toggle this panel. */
+  toggle() {
+    this.collapsed ? this.open() : this.close();
+  }
+  // ── Private render helpers ────────────────────────────────────────────────
+  /**
+   * Renders the `<uwc-icon>` toggle indicator inside a wrapper `<span>`.
+   * The wrapper drives a 90° CSS rotation via `details[open]` selector so
+   * `chevron-right` (closed) smoothly rotates to point downward (open).
+   *
+   * `aria-hidden` keeps it out of the AT tree — `<summary>` already carries
+   * the expanded/collapsed state.
+   */
+  _renderToggleIcon() {
+    return b2`
+      <span part="toggle-icon" class="uwc-acc-panel__chevron" aria-hidden="true">
+        <slot name="icon">
+          <uwc-icon name=${this.toggleIcon}></uwc-icon>
+        </slot>
+      </span>
+    `;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    const atStart = this.toggleIconPos === "start";
+    return b2`
+      <details part="panel">
+        <summary
+          part="header"
+          class=${e7({
+      "uwc-acc-panel__header": true,
+      "uwc-acc-panel__header--disabled": this.disabled
+    })}
+          aria-disabled=${this.disabled ? "true" : A}
+          @click=${this._onSummaryClick}
+        >
+          ${atStart ? this._renderToggleIcon() : A}
+
+          <slot name="header">
+            <span part="title" class="uwc-acc-panel__title">${this.header}</span>
+          </slot>
+
+          ${!atStart ? this._renderToggleIcon() : A}
+        </summary>
+
+        <div class="uwc-acc-panel__content-wrap">
+          <div part="content" class="uwc-acc-panel__content">
+            <slot></slot>
+          </div>
+        </div>
+      </details>
+    `;
+  }
+};
+UwcAccordionPanel.styles = panelStyles;
+__decorateClass([
+  n4()
+], UwcAccordionPanel.prototype, "header", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordionPanel.prototype, "collapsed", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordionPanel.prototype, "disabled", 2);
+__decorateClass([
+  n4()
+], UwcAccordionPanel.prototype, "value", 2);
+__decorateClass([
+  n4({ attribute: "toggle-icon" })
+], UwcAccordionPanel.prototype, "toggleIcon", 2);
+__decorateClass([
+  n4({ attribute: "toggle-icon-pos", reflect: true })
+], UwcAccordionPanel.prototype, "toggleIconPos", 2);
+__decorateClass([
+  e5("details")
+], UwcAccordionPanel.prototype, "_details", 2);
+__decorateClass([
+  e5(".uwc-acc-panel__content-wrap")
+], UwcAccordionPanel.prototype, "_wrap", 2);
+var UwcAccordion = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.multiple = false;
+    this.stacked = false;
+    this.activeIndex = "";
+    // ── Internal state ────────────────────────────────────────────────────────
+    this._panels = [];
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener(TOGGLE_EVENT, this._onPanelToggle);
+    this.addEventListener("uwc-accordion-panel-connected", this._onPanelConnect);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener(TOGGLE_EVENT, this._onPanelToggle);
+    this.removeEventListener("uwc-accordion-panel-connected", this._onPanelConnect);
+  }
+  firstUpdated() {
+    this._syncPanels();
+    this._applyGrouped();
+    this._applyActiveIndex();
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("stacked")) this._applyGrouped();
+  }
+  // ── Internal helpers ──────────────────────────────────────────────────────
+  _syncPanels() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcAccordionPanel
+    );
+  }
+  _applyGrouped() {
+    Array.from(this.children).filter((el) => el instanceof UwcAccordionPanel).forEach((p4) => {
+      if (this.stacked) p4.setAttribute("grouped", "");
+      else p4.removeAttribute("grouped");
+    });
+  }
+  _applyActiveIndex() {
+    if (!this.activeIndex) return;
+    this.activeIndex.split(",").map((s5) => parseInt(s5.trim(), 10)).filter((n6) => !isNaN(n6)).forEach((i8) => {
+      const p4 = this._panels[i8];
+      if (p4 && !p4.disabled) p4.collapsed = false;
+    });
+  }
+  // ── Event handlers ────────────────────────────────────────────────────────
+  _onPanelConnect() {
+    this._syncPanels();
+    this._applyGrouped();
+  }
+  _onPanelToggle(e9) {
+    const panel = e9.target;
+    const index = this._panels.indexOf(panel);
+    if (index === -1) return;
+    e9.preventDefault();
+    const wasCollapsed = panel.collapsed;
+    if (!this.multiple) {
+      this._panels.forEach((p4, i8) => {
+        if (p4 !== panel && !p4.collapsed) {
+          p4.collapsed = true;
+          emit(this, "uwc-close", { index: i8, value: p4.value || String(i8) });
+        }
+      });
+    }
+    if (wasCollapsed) {
+      panel.collapsed = false;
+      emit(this, "uwc-open", { index, value: panel.value || String(index) });
+    } else {
+      panel.collapsed = true;
+      emit(this, "uwc-close", { index, value: panel.value || String(index) });
+    }
+    this._emitChange();
+  }
+  _onSlotChange() {
+    this._syncPanels();
+    this._applyGrouped();
+  }
+  _emitChange() {
+    emit(this, "uwc-change", { activeIndex: this.getActiveIndices() });
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  /** Open the panel at `index`. In single mode, closes any currently open panel. */
+  openPanel(index) {
+    const panel = this._panels[index];
+    if (!panel || panel.disabled || !panel.collapsed) return;
+    if (!this.multiple) {
+      this._panels.forEach((p4, i8) => {
+        if (p4 !== panel && !p4.collapsed) {
+          p4.collapsed = true;
+          emit(this, "uwc-close", { index: i8, value: p4.value || String(i8) });
+        }
+      });
+    }
+    panel.collapsed = false;
+    emit(this, "uwc-open", { index, value: panel.value || String(index) });
+    this._emitChange();
+  }
+  /** Close the panel at `index`. */
+  closePanel(index) {
+    const panel = this._panels[index];
+    if (!panel || panel.collapsed) return;
+    panel.collapsed = true;
+    emit(this, "uwc-close", { index, value: panel.value || String(index) });
+    this._emitChange();
+  }
+  /** Open all non-disabled panels. Most useful with `multiple`. */
+  openAll() {
+    this._panels.forEach((p4, i8) => {
+      if (!p4.disabled && p4.collapsed) {
+        p4.collapsed = false;
+        emit(this, "uwc-open", { index: i8, value: p4.value || String(i8) });
+      }
+    });
+    this._emitChange();
+  }
+  /** Close all panels. */
+  closeAll() {
+    this._panels.forEach((p4, i8) => {
+      if (!p4.collapsed) {
+        p4.collapsed = true;
+        emit(this, "uwc-close", { index: i8, value: p4.value || String(i8) });
+      }
+    });
+    this._emitChange();
+  }
+  /** Returns the indices of all currently open panels. */
+  getActiveIndices() {
+    return this._panels.map((p4, i8) => p4.collapsed ? -1 : i8).filter((i8) => i8 >= 0);
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    return b2`<slot @slotchange=${this._onSlotChange}></slot>`;
+  }
+};
+UwcAccordion.styles = accordionStyles;
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordion.prototype, "multiple", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordion.prototype, "stacked", 2);
+__decorateClass([
+  n4({ attribute: "active-index" })
+], UwcAccordion.prototype, "activeIndex", 2);
+
+// src/accordion/react.ts
+var UwcAccordionReact = createComponent21({
+  react: React21,
+  tagName: "uwc-accordion",
+  elementClass: UwcAccordion,
+  events: {
+    onUwcOpen: "uwc-open",
+    onUwcClose: "uwc-close",
+    onUwcChange: "uwc-change"
+  }
+});
+var UwcAccordionPanelReact = createComponent21({
+  react: React21,
+  tagName: "uwc-accordion-panel",
+  elementClass: UwcAccordionPanel,
+  events: {
+    onUwcOpen: "uwc-open",
+    onUwcClose: "uwc-close"
+  }
+});
+
+// src/carousel/react.ts
+import React22 from "react";
+import { createComponent as createComponent22 } from "@lit/react";
+
+// src/carousel/styles.ts
+var styles_default19 = [
+  hostReset,
+  focusRing(".uwc-car__prev", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-car__next", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-car__dot", "--uwc-color-primary", "#6366f1"),
+  i`
+    :host {
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Header / Footer slots ─────────────────────────────────────── */
+    .uwc-car__header,
+    .uwc-car__footer {
+      padding: ${space2} 0;
+    }
+    .uwc-car__header:empty,
+    .uwc-car__footer:empty { display: none; }
+
+    /* ── Region — wraps viewport + nav buttons ─────────────────────── */
+    .uwc-car__region {
+      position: relative;
+    }
+
+    /* ── Vertical host stretches via flex so region fills user-set height */
+    :host([orientation="vertical"]) {
+      display: flex;
+      flex-direction: column;
+    }
+    :host([orientation="vertical"]) .uwc-car__region {
+      flex: 1;
+      min-height: 0;
+    }
+    :host([orientation="vertical"]) .uwc-car__viewport {
+      height: 100%;
+    }
+
+    /* ── Viewport — clips the track ────────────────────────────────── */
+    .uwc-car__viewport {
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Track — flex row or column of item pages ──────────────────── */
+    .uwc-car__track {
+      display: flex;
+      will-change: transform;
+    }
+    :host([orientation="horizontal"]) .uwc-car__track { flex-direction: row; }
+    :host([orientation="vertical"])   .uwc-car__track { flex-direction: column; }
+
+    /* ── Single item wrapper ────────────────────────────────────────── */
+    .uwc-car__item {
+      flex-shrink: 0;
+      box-sizing: border-box;
+      padding: 0 ${space2};
+    }
+    :host([orientation="vertical"]) .uwc-car__item {
+      padding: ${space2} 0;
+    }
+
+    /* ── Navigation buttons ─────────────────────────────────────────── */
+    .uwc-car__nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 2;
+      padding: 0 ${space2};
+    }
+    :host([orientation="vertical"]) .uwc-car__nav {
+      flex-direction: column;
+      justify-content: space-between;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: auto;
+      width: auto;
+      transform: translateX(-50%);
+      padding: ${space2} 0;
+    }
+
+    .uwc-car__prev,
+    .uwc-car__next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: ${radiusFull};
+      border: 1px solid ${border};
+      background: ${surface};
+      color: ${text};
+      cursor: pointer;
+      pointer-events: all;
+      transition:
+        background ${durationBase},
+        color ${durationBase},
+        border-color ${durationBase},
+        box-shadow ${durationBase};
+      box-shadow: ${shadowSm};
+      flex-shrink: 0;
+    }
+    .uwc-car__prev:hover,
+    .uwc-car__next:hover {
+      background: ${primary};
+      color: ${surface};
+      border-color: ${primary};
+    }
+    .uwc-car__prev:disabled,
+    .uwc-car__next:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ── Indicators ─────────────────────────────────────────────────── */
+    .uwc-car__indicators {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: ${space2};
+      padding: ${space3} 0 ${space1};
+    }
+    :host([orientation="vertical"]) .uwc-car__indicators {
+      flex-direction: column;
+      padding: 0 ${space1} 0 ${space3};
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .uwc-car__dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: ${radiusFull};
+      border: none;
+      padding: 0;
+      background: var(--uwc-carousel-dot-color, #cbd5e1);
+      cursor: pointer;
+      transition: background ${durationBase}, transform ${durationBase};
+      flex-shrink: 0;
+    }
+    .uwc-car__dot:hover { background: var(--uwc-carousel-dot-hover, #94a3b8); }
+    .uwc-car__dot.active {
+      background: var(--uwc-carousel-dot-active, ${primary});
+      transform: scale(1.35);
+    }
+
+    /* ── Transition ─────────────────────────────────────────────────── */
+    .uwc-car__track.is-animating {
+      transition: transform var(--uwc-carousel-duration, 400ms) ${easingStandard};
+    }
+
+    /* ── Reduced motion ─────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-car__track.is-animating { transition: none; }
+      .uwc-car__prev,
+      .uwc-car__next,
+      .uwc-car__dot { transition: none; }
+    }
+  `
+];
+
+// src/carousel/index.ts
+var UwcCarousel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.items = [];
+    this.numVisible = 3;
+    this.numScroll = 1;
+    this.circular = false;
+    this.autoplayInterval = 0;
+    this.orientation = "horizontal";
+    this.showNavigators = true;
+    this.showIndicators = true;
+    this.prevIcon = "chevron-left";
+    this.nextIcon = "chevron-right";
+    this.ariaLabel = "Carousel";
+    /** Breakpoint responsive overrides. */
+    this.responsiveOptions = [];
+    this._page = 0;
+    this._effectiveNumVisible = 3;
+    this._effectiveNumScroll = 1;
+    this._animating = false;
+    this._viewportH = 0;
+    this._pointerStartX = 0;
+    this._pointerStartY = 0;
+    this._pointerDeltaX = 0;
+    this._pointerDeltaY = 0;
+    this._dragging = false;
+    this._liveLabel = "";
+  }
+  // ── Lifecycle ───────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this._resizeObserver = new ResizeObserver(() => this._applyResponsive());
+    this._resizeObserver.observe(this);
+    this._applyResponsive();
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._resizeObserver?.disconnect();
+    this._stopAutoplay();
+  }
+  updated(changed) {
+    if (changed.has("autoplayInterval")) {
+      this._stopAutoplay();
+      this._startAutoplay();
+    }
+    if (changed.has("items") || changed.has("numVisible") || changed.has("numScroll")) {
+      this._applyResponsive();
+      const maxPage = this._maxPage;
+      if (this._page > maxPage) this._page = maxPage;
+    }
+  }
+  // ── Responsive ─────────────────────────────────────────────────────────────
+  _applyResponsive() {
+    const w2 = this.offsetWidth;
+    let nv = this.numVisible;
+    let ns = this.numScroll;
+    if (this.responsiveOptions.length) {
+      const sorted = [...this.responsiveOptions].sort(
+        (a3, b3) => parseInt(b3.breakpoint) - parseInt(a3.breakpoint)
+      );
+      for (const opt of sorted) {
+        if (w2 <= parseInt(opt.breakpoint)) {
+          nv = opt.numVisible;
+          ns = opt.numScroll;
+        }
+      }
+    }
+    this._effectiveNumVisible = Math.max(1, Math.min(nv, this.items.length || 1));
+    this._effectiveNumScroll = Math.max(1, ns);
+  }
+  // ── Pagination ──────────────────────────────────────────────────────────────
+  get _totalPages() {
+    const n6 = this.items.length;
+    if (n6 <= this._effectiveNumVisible) return 1;
+    return Math.ceil((n6 - this._effectiveNumVisible) / this._effectiveNumScroll) + 1;
+  }
+  get _maxPage() {
+    return Math.max(0, this._totalPages - 1);
+  }
+  get _isPrevDisabled() {
+    return !this.circular && this._page === 0;
+  }
+  get _isNextDisabled() {
+    return !this.circular && this._page >= this._maxPage;
+  }
+  _goTo(page, byAutoplay = false) {
+    const total = this._totalPages;
+    let next = page;
+    if (this.circular) {
+      next = (page % total + total) % total;
+    } else {
+      next = Math.max(0, Math.min(page, this._maxPage));
+    }
+    if (next === this._page) return;
+    this._animating = true;
+    this._page = next;
+    const startItem = next * this._effectiveNumScroll;
+    const endItem = Math.min(startItem + this._effectiveNumVisible, this.items.length);
+    this._liveLabel = `Slide ${startItem + 1} to ${endItem} of ${this.items.length}`;
+    emit(this, byAutoplay ? "uwc-autoplay" : "uwc-page", { page: next });
+    const track = this._track;
+    if (track) {
+      const done = () => {
+        this._animating = false;
+        track.removeEventListener("transitionend", done);
+      };
+      track.addEventListener("transitionend", done, { once: true });
+      setTimeout(() => {
+        this._animating = false;
+      }, 500);
+    }
+  }
+  _prev() {
+    this._goTo(this._page - 1);
+  }
+  _next() {
+    this._goTo(this._page + 1);
+  }
+  // ── Autoplay ─────────────────────────────────────────────────────────────────
+  _startAutoplay() {
+    if (!this.autoplayInterval || this.autoplayInterval <= 0) return;
+    this._autoplayTimer = setInterval(() => {
+      const next = this.circular ? (this._page + 1) % this._totalPages : this._page < this._maxPage ? this._page + 1 : 0;
+      this._goTo(next, true);
+    }, this.autoplayInterval);
+  }
+  _stopAutoplay() {
+    if (this._autoplayTimer) {
+      clearInterval(this._autoplayTimer);
+      this._autoplayTimer = void 0;
+    }
+  }
+  // ── Touch / pointer swipe ───────────────────────────────────────────────────
+  _onPointerDown(e9) {
+    if (e9.button !== 0) return;
+    this._pointerStartX = e9.clientX;
+    this._pointerStartY = e9.clientY;
+    this._pointerDeltaX = 0;
+    this._pointerDeltaY = 0;
+    this._dragging = true;
+    e9.currentTarget.setPointerCapture(e9.pointerId);
+    this._stopAutoplay();
+  }
+  _onPointerMove(e9) {
+    if (!this._dragging) return;
+    this._pointerDeltaX = e9.clientX - this._pointerStartX;
+    this._pointerDeltaY = e9.clientY - this._pointerStartY;
+  }
+  _onPointerUp() {
+    if (!this._dragging) return;
+    this._dragging = false;
+    const threshold = 50;
+    const isHoriz = this.orientation === "horizontal";
+    const delta = isHoriz ? this._pointerDeltaX : this._pointerDeltaY;
+    if (Math.abs(delta) >= threshold) {
+      delta < 0 ? this._next() : this._prev();
+    }
+    this._startAutoplay();
+  }
+  // ── Keyboard navigation ──────────────────────────────────────────────────────
+  _onKeyDown(e9) {
+    const isHoriz = this.orientation === "horizontal";
+    switch (e9.key) {
+      case "ArrowLeft":
+      case "ArrowUp":
+        if (isHoriz ? e9.key === "ArrowLeft" : e9.key === "ArrowUp") {
+          e9.preventDefault();
+          this._prev();
+        }
+        break;
+      case "ArrowRight":
+      case "ArrowDown":
+        if (isHoriz ? e9.key === "ArrowRight" : e9.key === "ArrowDown") {
+          e9.preventDefault();
+          this._next();
+        }
+        break;
+      case "Home":
+        e9.preventDefault();
+        this._goTo(0);
+        break;
+      case "End":
+        e9.preventDefault();
+        this._goTo(this._maxPage);
+        break;
+    }
+  }
+  // ── Default item template ────────────────────────────────────────────────────
+  _renderItem(item, index) {
+    if (this.itemTemplate) return this.itemTemplate(item, index);
+    const it = item;
+    return b2`
+      <div class="uwc-car__default-item">
+        ${it["image"] ? b2`<img src=${String(it["image"])} alt=${String(it["alt"] ?? it["title"] ?? "")} loading="lazy" />` : A}
+        ${it["title"] ? b2`<p class="uwc-car__default-title">${it["title"]}</p>` : A}
+        ${it["subtitle"] ? b2`<p class="uwc-car__default-subtitle">${it["subtitle"]}</p>` : A}
+        ${it["content"] ? b2`<p class="uwc-car__default-content">${it["content"]}</p>` : A}
+      </div>
+    `;
+  }
+  // ── Computed transform ───────────────────────────────────────────────────────
+  get _trackStyle() {
+    const itemPct = 100 / this._effectiveNumVisible;
+    const offsetPct = -(this._page * this._effectiveNumScroll * itemPct);
+    if (this.orientation === "vertical") {
+      return { transform: `translateY(${offsetPct}%)` };
+    }
+    return { transform: `translateX(${offsetPct}%)` };
+  }
+  // ── Render ───────────────────────────────────────────────────────────────────
+  render() {
+    const itemPct = 100 / this._effectiveNumVisible;
+    const isHoriz = this.orientation === "horizontal";
+    const pages = this._totalPages;
+    const itemStyle = isHoriz ? { width: `${itemPct}%` } : { height: `${itemPct}%`, width: "100%" };
+    return b2`
+      <!-- Live region for screen readers -->
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        class="visually-hidden"
+        style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap"
+      >${this._liveLabel}</div>
+
+      <!-- Header slot -->
+      <div class="uwc-car__header"><slot name="header"></slot></div>
+
+      <!-- Carousel region -->
+      <div
+        class="uwc-car__region"
+        role="region"
+        aria-label=${this.ariaLabel ?? "Carousel"}
+        aria-roledescription="carousel"
+      >
+        <!-- Viewport -->
+        <div
+          class="uwc-car__viewport"
+          @keydown=${this._onKeyDown}
+          tabindex="0"
+          aria-label="Slide container"
+          @pointerdown=${this._onPointerDown}
+          @pointermove=${this._onPointerMove}
+          @pointerup=${this._onPointerUp}
+          @pointercancel=${this._onPointerUp}
+        >
+          <div
+            class=${e7({ "uwc-car__track": true, "is-animating": this._animating })}
+            style=${o7(this._trackStyle)}
+            aria-live="off"
+          >
+            ${c4(
+      this.items,
+      (_2, i8) => i8,
+      (item, index) => b2`
+                <div
+                  class="uwc-car__item"
+                  style=${o7(itemStyle)}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label="Slide ${index + 1} of ${this.items.length}"
+                >
+                  ${this._renderItem(item, index)}
+                </div>
+              `
+    )}
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        ${this.showNavigators ? b2`
+          <div class="uwc-car__nav" aria-hidden="true">
+            <button
+              class="uwc-car__prev"
+              type="button"
+              aria-label="Previous slide"
+              ?disabled=${this._isPrevDisabled}
+              @click=${this._prev}
+            >
+              <uwc-icon name=${this.prevIcon} size="16px"></uwc-icon>
+            </button>
+            <button
+              class="uwc-car__next"
+              type="button"
+              aria-label="Next slide"
+              ?disabled=${this._isNextDisabled}
+              @click=${this._next}
+            >
+              <uwc-icon name=${this.nextIcon} size="16px"></uwc-icon>
+            </button>
+          </div>
+        ` : A}
+      </div>
+
+      <!-- Indicators -->
+      ${this.showIndicators && pages > 1 ? b2`
+        <div class="uwc-car__indicators" role="tablist" aria-label="Slide indicators">
+          ${Array.from({ length: pages }, (_2, i8) => b2`
+            <button
+              class=${e7({ "uwc-car__dot": true, active: i8 === this._page })}
+              type="button"
+              role="tab"
+              aria-selected=${i8 === this._page ? "true" : "false"}
+              aria-label="Go to slide ${i8 + 1}"
+              @click=${() => this._goTo(i8)}
+            ></button>
+          `)}
+        </div>
+      ` : A}
+
+      <!-- Footer slot -->
+      <div class="uwc-car__footer"><slot name="footer"></slot></div>
+    `;
+  }
+};
+UwcCarousel.styles = styles_default19;
+__decorateClass([
+  n4({ type: Array })
+], UwcCarousel.prototype, "items", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "num-visible" })
+], UwcCarousel.prototype, "numVisible", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "num-scroll" })
+], UwcCarousel.prototype, "numScroll", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcCarousel.prototype, "circular", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "autoplay-interval" })
+], UwcCarousel.prototype, "autoplayInterval", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcCarousel.prototype, "orientation", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-navigators" })
+], UwcCarousel.prototype, "showNavigators", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-indicators" })
+], UwcCarousel.prototype, "showIndicators", 2);
+__decorateClass([
+  n4({ attribute: "prev-icon" })
+], UwcCarousel.prototype, "prevIcon", 2);
+__decorateClass([
+  n4({ attribute: "next-icon" })
+], UwcCarousel.prototype, "nextIcon", 2);
+__decorateClass([
+  n4({ attribute: "aria-label" })
+], UwcCarousel.prototype, "ariaLabel", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_page", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_effectiveNumVisible", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_effectiveNumScroll", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_animating", 2);
+__decorateClass([
+  r5()
+], UwcCarousel.prototype, "_viewportH", 2);
+__decorateClass([
+  e5(".uwc-car__track")
+], UwcCarousel.prototype, "_track", 2);
+__decorateClass([
+  e5(".uwc-car__viewport")
+], UwcCarousel.prototype, "_viewport", 2);
+
+// src/carousel/react.ts
+var UwcCarouselReact = createComponent22({
+  react: React22,
+  tagName: "uwc-carousel",
+  elementClass: UwcCarousel,
+  events: {
+    onUwcPage: "uwc-page",
+    onUwcAutoplay: "uwc-autoplay"
+  }
+});
 export {
+  UwcAccordionReact as UwcAccordion,
+  UwcAccordionPanelReact as UwcAccordionPanel,
   UwcButton2 as UwcButton,
+  UwcCardReact as UwcCard,
+  UwcCarouselReact as UwcCarousel,
   UwcCheckbox2 as UwcCheckbox,
   UwcColorPicker2 as UwcColorPicker,
   UwcDatatable2 as UwcDatatable,

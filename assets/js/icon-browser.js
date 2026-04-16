@@ -765,6 +765,7 @@ var IconBrowserDemo = class extends i4 {
     switch (provider) {
       case "bootstrap": {
         const data = await this._fetchBundle(BUNDLE_URLS.bootstrap);
+        console.log("Bootstrap Icons bundle loaded:", data);
         return _parseBundle(data).sort((a3, b3) => a3.name.localeCompare(b3.name));
       }
       case "mdi": {
@@ -1078,13 +1079,13 @@ IconBrowserDemo.styles = i`
       gap: .25rem;
     }
 
-    /* ── Icon cell — fixed 48×48 square, icon centred inside ────────────── */
+    /* ── Icon cell — fixed 52×52 square, icon centred inside ────────────── */
     .ic {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: 6px;
       cursor: pointer;
       transition: background 120ms;
@@ -1093,28 +1094,21 @@ IconBrowserDemo.styles = i`
       font-family: inherit;
       color: #374151;
       padding: 0;
-      box-sizing: border-box;
     }
     .ic:hover { background: #f1f5f9; }
 
-    /* .ic-svg is a plain 24×24 flex wrapper. !important on the SVG dimensions
-       overrides any presentation attributes (e.g. Bootstrap Icons width="16")
-       regardless of shadow DOM specificity context. */
+    /* Inline SVG — use display:contents so the SVG is a direct flex child
+       of .ic, then size it explicitly. line-height:0 kills any inline gap. */
     .ic-svg {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
+      display: contents;
       line-height: 0;
-      font-size: 0;
     }
     .ic-svg svg {
       display: block;
-      width: 24px !important;
-      height: 24px !important;
+      width: 28px;
+      height: 28px;
       fill: currentColor;
+      flex-shrink: 0;
       overflow: visible;
     }
 
