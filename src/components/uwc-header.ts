@@ -143,6 +143,17 @@ export class UwcHeader extends LitElement {
     .status-dot.error     { background: var(--red);   box-shadow: 0 0 6px var(--red); }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+    /* ── Responsive: mobile ── */
+    @media (max-width: 640px) {
+      :host { padding: 0 10px; gap: 6px; }
+      .layout-group { display: none; }
+      .sep { display: none; }
+      .fw-label { display: none; }
+      .fw-btn { padding: 0 10px; }
+      .status-row span { display: none; }
+      .logo-accent { display: none; }
+    }
+
     /* ── Icon buttons (settings, docs) ── */
     .icon-btn {
       display: flex; align-items: center; justify-content: center;
@@ -186,7 +197,7 @@ export class UwcHeader extends LitElement {
             title="Switch to ${fw.name}"
           >
             <span class="fw-icon">${unsafeHTML(FRAMEWORK_LOGOS[fw.id] ?? '')}</span>
-            ${fw.name}
+            <span class="fw-label">${fw.name}</span>
           </button>
         `)}
       </div>

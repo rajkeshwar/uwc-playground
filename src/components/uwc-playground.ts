@@ -123,6 +123,20 @@ export class UwcPlayground extends LitElement {
     .gutter:hover::after, .gutter:active::after { opacity:1; }
     .gutter.gutter-horizontal { cursor:col-resize; }
     .gutter.gutter-vertical   { cursor:row-resize; }
+
+    /* ── Mobile tab bar ── */
+    .mobile-tab-bar {
+      height:52px; background:var(--surface); border-top:1px solid var(--border);
+      flex-shrink:0; display:flex; align-items:stretch;
+    }
+    .mobile-tab {
+      flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      background:none; border:none; border-top:2px solid transparent;
+      color:var(--text-dim); font-family:var(--mono); font-size:10px; font-weight:500;
+      cursor:pointer; transition:color 0.12s, border-color 0.12s; outline:none;
+    }
+    .mobile-tab.active { color:var(--accent); border-top-color:var(--accent); }
+    .mobile-tab svg { pointer-events:none; }
   `;
 
   // ── Public properties ────────────────────────────────────────────────────────
@@ -143,6 +157,8 @@ export class UwcPlayground extends LitElement {
   @state() private _consoleTab: 'output' | 'console' = 'output';
   @state() private _consoleUnread = 0;
   @state() private _consoleOpen   = true;
+  @state() private _isMobile      = false;
+  @state() private _mobilePanel: 'ts' | 'scss' | 'preview' = 'preview';
 
   /** Frameworks with code supplied via POST (populated in firstUpdated after plugins are registered) */
   @state() private _activePlugins: FrameworkPlugin[] = [];
@@ -165,6 +181,8 @@ export class UwcPlayground extends LitElement {
   private _compileTimer: ReturnType<typeof setTimeout> | null = null;
   private _propsApplied = false;
   private _msgHandler!: (e: MessageEvent) => void;
+  private _mql!: MediaQueryList;
+  private _mqlHandler!: (e: MediaQueryListEvent) => void;
 
   // ──────────────────────────────────────────────────────────────────────────
   // Lifecycle
@@ -174,6 +192,7 @@ export class UwcPlayground extends LitElement {
     super.connectedCallback();
     this._loadPersistedState();
     this._readQueryString();
+    this._isMobile = window.matchMedia('(max-width: 640px)').matches;
   }
 
   async firstUpdated() {
@@ -206,6 +225,14 @@ export class UwcPlayground extends LitElement {
     this._msgHandler = (e: MessageEvent) => this._onIframeMessage(e);
     window.addEventListener('message', this._msgHandler);
 
+    // Mobile breakpoint listener
+    this._mql = window.matchMedia('(max-width: 640px)');
+    this._mqlHandler = (e: MediaQueryListEvent) => {
+      this._isMobile = e.matches;
+      this._applyLayout();
+    };
+    this._mql.addEventListener('change', this._mqlHandler);
+
     this._scheduleCompile(300);
     this._hideBoot();
   }
@@ -216,6 +243,7 @@ export class UwcPlayground extends LitElement {
     this._editors?.destroy();
     this._workspace?.destroy();
     window.removeEventListener('message', this._msgHandler);
+    this._mql?.removeEventListener('change', this._mqlHandler);
   }
 
   updated(changed: Map<string, unknown>) {
@@ -405,6 +433,32 @@ export class UwcPlayground extends LitElement {
 
       <div id="workspace"></div>
 
+      ${this._isMobile ? html`
+        <div class="mobile-tab-bar">
+          <button
+            class="mobile-tab ${this._mobilePanel === 'ts' ? 'active' : ''}"
+            @click=${() => this._switchMobilePanel('ts')}
+          >
+            ${unsafeHTML(PANEL_ICONS.ts)}
+            <span>TypeScript</span>
+          </button>
+          <button
+            class="mobile-tab ${this._mobilePanel === 'scss' ? 'active' : ''}"
+            @click=${() => this._switchMobilePanel('scss')}
+          >
+            ${unsafeHTML(PANEL_ICONS.scss)}
+            <span>SCSS</span>
+          </button>
+          <button
+            class="mobile-tab ${this._mobilePanel === 'preview' ? 'active' : ''}"
+            @click=${() => this._switchMobilePanel('preview')}
+          >
+            ${unsafeHTML(PANEL_ICONS.preview)}
+            <span>Output</span>
+          </button>
+        </div>
+      ` : ''}
+
       <uwc-settings
         ?open=${this._settingsOpen}
         .framework=${this._framework}
@@ -536,12 +590,42 @@ export class UwcPlayground extends LitElement {
   // ──────────────────────────────────────────────────────────────────────────
 
   private _applyLayout() {
+    if (this._isMobile) {
+      this._workspace.prepareForMobile({
+        ts:      this._tsPanelEl,
+        scss:    this._scssPanelEl,
+        preview: this._previewPanelEl,
+      });
+      this._applyMobilePanel();
+      return;
+    }
     this._workspace.applyLayout(this._layout, {
       ts:      this._tsPanelEl,
       scss:    this._scssPanelEl,
       preview: this._previewPanelEl,
     });
     requestAnimationFrame(() => this._editors?.refreshLayout());
+  }
+
+  private _applyMobilePanel() {
+    const show = (el: HTMLElement) =>
+      (el.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;');
+    const hide = (el: HTMLElement) =>
+      (el.style.cssText = 'flex:0 0 0px;width:0;min-width:0;overflow:hidden;pointer-events:none;');
+
+    if (this._mobilePanel === 'ts') {
+      show(this._tsPanelEl); hide(this._scssPanelEl); hide(this._previewPanelEl);
+    } else if (this._mobilePanel === 'scss') {
+      hide(this._tsPanelEl); show(this._scssPanelEl); hide(this._previewPanelEl);
+    } else {
+      hide(this._tsPanelEl); hide(this._scssPanelEl); show(this._previewPanelEl);
+    }
+    requestAnimationFrame(() => this._editors?.refreshLayout());
+  }
+
+  private _switchMobilePanel(panel: 'ts' | 'scss' | 'preview') {
+    this._mobilePanel = panel;
+    this._applyMobilePanel();
   }
 
   // ──────────────────────────────────────────────────────────────────────────
