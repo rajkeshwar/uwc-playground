@@ -1135,6 +1135,1623 @@ __decorateClass([
   n4({ type: Boolean })
 ], UwcButton.prototype, "autofocus", 2);
 
+// src/accordion/styles.ts
+var panelStyles = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+      border:        var(--uwc-acc-panel-border,  1px solid ${border});
+      border-radius: var(--uwc-acc-panel-radius,  ${radiusLg});
+      overflow:      hidden;
+      background:    var(--uwc-acc-panel-bg,      ${surface});
+    }
+
+    /* Grouped / stacked mode — set by parent uwc-accordion[stacked] */
+    :host([grouped]) {
+      border-radius: 0;
+      margin-top:    -1px;
+    }
+    :host([grouped]:first-of-type) { border-radius: ${radiusLg} ${radiusLg} 0 0; margin-top: 0; }
+    :host([grouped]:last-of-type)  { border-radius: 0 0 ${radiusLg} ${radiusLg}; }
+    :host([grouped]:only-of-type)  { border-radius: ${radiusLg}; margin-top: 0; }
+
+    /* ── <details> reset ───────────────────────────────────────────────── */
+    details {
+      display: block;
+    }
+
+    /* ── <summary> — reset browser defaults, apply design tokens ────────── */
+    summary {
+      display:        flex;
+      list-style:     none;
+      align-items:    center;
+      gap:            0.5rem;
+      cursor:         pointer;
+      user-select:    none;
+
+      padding:     var(--uwc-acc-header-padding,      1rem 1.25rem);
+      background:  var(--uwc-acc-header-bg,           transparent);
+      color:       var(--uwc-acc-header-color,        ${text});
+      font-size:   var(--uwc-acc-header-font-size,    ${fontSizeMd});
+      font-weight: var(--uwc-acc-header-font-weight,  ${fontWeightSemibold});
+      line-height: 1.4;
+
+      transition: background ${durationBase} ease, color ${durationBase} ease;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    summary:hover {
+      background: var(--uwc-acc-header-hover-bg, ${hoverBg});
+    }
+
+    summary:focus-visible {
+      outline:        2px solid var(--uwc-color-primary, ${primary});
+      outline-offset: -2px;
+      border-radius:  ${radiusSm};
+    }
+
+    .uwc-acc-panel__header--disabled {
+      cursor:         not-allowed;
+      opacity:        0.48;
+      pointer-events: none;
+    }
+
+    details[open] > summary {
+      color:      var(--uwc-acc-header-active-color, ${primary});
+      background: var(--uwc-acc-header-active-bg,    transparent);
+    }
+
+    /* ── Title ─────────────────────────────────────────────────────────── */
+    .uwc-acc-panel__title {
+      flex:          1;
+      min-width:     0;
+      overflow:      hidden;
+      text-overflow: ellipsis;
+      white-space:   nowrap;
+    }
+
+    /* ── Toggle icon wrapper ──────────────────────────────────────────────
+       Rotates 90° when the panel is open so chevron-right naturally becomes
+       chevron-down (pointing downward). The transition is independent of the
+       WAAPI content animation so both run in parallel and finish together.
+    ─────────────────────────────────────────────────────────────────────── */
+    .uwc-acc-panel__chevron {
+      flex-shrink:     0;
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      color:           var(--uwc-acc-icon-color, ${textSecondary});
+      transform:       rotate(0deg);
+      transition:      transform 250ms ease, color 250ms ease;
+    }
+
+    /* Default (end) position: push the icon to the trailing edge */
+    :host(:not([toggle-icon-pos="start"])) .uwc-acc-panel__chevron {
+      margin-left: auto;
+    }
+
+    /* Rotate 90° and change colour when open */
+    details[open] > summary .uwc-acc-panel__chevron {
+      transform: rotate(90deg);
+      color:     var(--uwc-acc-icon-active-color, ${primary});
+    }
+
+    /* ── Content wrapper ──────────────────────────────────────────────────
+       Height is animated by WAAPI in JavaScript (open: 0 → scrollHeight,
+       close: scrollHeight → 0). overflow:hidden is applied inline during the
+       animation and removed on finish so natural scrolling is restored.
+       No grid-template-rows trick needed.
+    ─────────────────────────────────────────────────────────────────────── */
+    .uwc-acc-panel__content-wrap {
+      /* Baseline — overflow is set/removed inline by WAAPI animation */
+    }
+
+    /* ── Content body ──────────────────────────────────────────────────── */
+    .uwc-acc-panel__content {
+      border-top:  1px solid var(--uwc-acc-content-border, ${borderSubtle});
+      padding:     var(--uwc-acc-content-padding, 0 1.25rem 1.25rem);
+      color:       var(--uwc-acc-content-color,   ${text});
+      font-size:   var(--uwc-acc-content-font-size, ${fontSizeMd});
+      line-height: 1.6;
+    }
+
+    /* ── Reduced motion ────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-acc-panel__chevron { transition: none; }
+      summary                 { transition: none; }
+      /* Content height animation duration is set to 0ms in JS via _duration() */
+    }
+  `
+];
+var accordionStyles = [
+  hostReset,
+  i`
+    :host {
+      display:        flex;
+      flex-direction: column;
+      gap:            var(--uwc-acc-gap, 0.5rem);
+    }
+
+    :host([stacked]) { gap: 0; }
+
+    slot { display: contents; }
+  `
+];
+
+// src/utils/dom.utils.ts
+function deepQueryById(root, id) {
+  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
+  if (direct) return direct;
+  for (const el of Array.from(root.querySelectorAll("*"))) {
+    if (el.shadowRoot) {
+      const found = deepQueryById(
+        el.shadowRoot,
+        id
+      );
+      if (found) return found;
+    }
+  }
+  return null;
+}
+function computeCoords(tRect, pRect, placement, offset) {
+  const [side, align = "center"] = placement.split("-");
+  let top = 0, left = 0;
+  switch (side) {
+    case "top":
+      top = tRect.top - pRect.height - offset;
+      break;
+    case "bottom":
+      top = tRect.bottom + offset;
+      break;
+    case "left":
+      left = tRect.left - pRect.width - offset;
+      break;
+    case "right":
+      left = tRect.right + offset;
+      break;
+  }
+  if (side === "top" || side === "bottom") {
+    if (align === "start") left = tRect.left;
+    else if (align === "end") left = tRect.right - pRect.width;
+    else left = tRect.left + (tRect.width - pRect.width) / 2;
+  } else {
+    if (align === "start") top = tRect.top;
+    else if (align === "end") top = tRect.bottom - pRect.height;
+    else top = tRect.top + (tRect.height - pRect.height) / 2;
+  }
+  return { top, left };
+}
+function clampToViewport({ top, left }, pRect, margin = 8) {
+  return {
+    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
+    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
+  };
+}
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+function emit(host, name, detail, opts = {}) {
+  const event = new CustomEvent(name, {
+    detail,
+    bubbles: true,
+    composed: true,
+    ...opts
+  });
+  host.dispatchEvent(event);
+  return event;
+}
+
+// src/accordion/index.ts
+var TOGGLE_EVENT = "uwc-accordion-toggle";
+var UwcAccordionPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.header = "";
+    this.collapsed = true;
+    this.disabled = false;
+    this.value = "";
+    this.toggleIcon = "chevron-right";
+    this.toggleIconPos = "end";
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.dispatchEvent(new CustomEvent("uwc-accordion-panel-connected", {
+      bubbles: true,
+      composed: true
+    }));
+  }
+  firstUpdated() {
+    if (this._details) {
+      this._details.open = !this.collapsed;
+    }
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (!changed.has("collapsed") || !this._details) return;
+    const shouldBeOpen = !this.collapsed;
+    if (this._details.open === shouldBeOpen) return;
+    if (shouldBeOpen) {
+      this._animateOpen();
+    } else {
+      this._animateClose();
+    }
+  }
+  // ── WAAPI animation helpers ───────────────────────────────────────────────
+  /**
+   * Expand the panel using WAAPI.
+   *
+   * Strategy (mirrors Shoelace sl-details):
+   *   1. Capture the current rendered height before cancelling any in-flight
+   *      animation — this gives a smooth reversal when rapidly toggling.
+   *   2. Cancel the previous animation (removes its fill effect).
+   *   3. Set details.open = true so the UA stylesheet makes content visible
+   *      and scrollHeight becomes measurable.
+   *   4. Animate height from `fromHeight` → `scrollHeight`.
+   *   5. On finish, cancel the animation (releases fill) and clear inline styles.
+   */
+  _animateOpen() {
+    const details = this._details;
+    const wrap = this._wrap;
+    if (!details || !wrap) return;
+    const fromHeight = this._currentAnimation ? wrap.getBoundingClientRect().height : 0;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    details.open = true;
+    const toHeight = wrap.scrollHeight;
+    const anim = wrap.animate(
+      [
+        { height: `${fromHeight}px`, overflow: "hidden" },
+        { height: `${toHeight}px`, overflow: "hidden" }
+      ],
+      {
+        duration: this._duration(),
+        easing: "ease",
+        fill: "both"
+      }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      wrap.style.removeProperty("height");
+      wrap.style.removeProperty("overflow");
+      this._currentAnimation = void 0;
+    }, { once: true });
+  }
+  /**
+   * Collapse the panel using WAAPI.
+   *
+   * Strategy:
+   *   1. Capture current rendered height (handles mid-animation state).
+   *   2. Cancel any in-flight animation.
+   *   3. Animate height → 0.
+   *   4. On finish, set details.open = false (UA hides content) and clear styles.
+   */
+  _animateClose() {
+    const details = this._details;
+    const wrap = this._wrap;
+    if (!details?.open || !wrap) {
+      if (details) details.open = false;
+      return;
+    }
+    const fromHeight = wrap.getBoundingClientRect().height;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    const anim = wrap.animate(
+      [
+        { height: `${fromHeight}px`, overflow: "hidden" },
+        { height: "0px", overflow: "hidden" }
+      ],
+      {
+        duration: this._duration(),
+        easing: "ease",
+        fill: "both"
+      }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      details.open = false;
+      wrap.style.removeProperty("height");
+      wrap.style.removeProperty("overflow");
+      this._currentAnimation = void 0;
+    }, { once: true });
+  }
+  /** Returns 0ms when the user prefers reduced motion, otherwise 250ms. */
+  _duration() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
+  }
+  // ── Summary event handlers ────────────────────────────────────────────────
+  _onSummaryClick(e9) {
+    e9.preventDefault();
+    if (this.disabled) return;
+    const evt = new CustomEvent(TOGGLE_EVENT, {
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    });
+    this.dispatchEvent(evt);
+    if (!evt.defaultPrevented) {
+      this._selfToggle();
+    }
+  }
+  _selfToggle() {
+    if (this.collapsed) {
+      this.collapsed = false;
+      emit(this, "uwc-open");
+    } else {
+      this.collapsed = true;
+      emit(this, "uwc-close");
+    }
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  /** Open this panel. No-op if already open or disabled. */
+  open() {
+    if (this.disabled || !this.collapsed) return;
+    this.collapsed = false;
+    emit(this, "uwc-open");
+  }
+  /** Close this panel. No-op if already closed or disabled. */
+  close() {
+    if (this.disabled || this.collapsed) return;
+    this.collapsed = true;
+    emit(this, "uwc-close");
+  }
+  /** Toggle this panel. */
+  toggle() {
+    this.collapsed ? this.open() : this.close();
+  }
+  // ── Private render helpers ────────────────────────────────────────────────
+  /**
+   * Renders the `<uwc-icon>` toggle indicator inside a wrapper `<span>`.
+   * The wrapper drives a 90° CSS rotation via `details[open]` selector so
+   * `chevron-right` (closed) smoothly rotates to point downward (open).
+   *
+   * `aria-hidden` keeps it out of the AT tree — `<summary>` already carries
+   * the expanded/collapsed state.
+   */
+  _renderToggleIcon() {
+    return b2`
+      <span part="toggle-icon" class="uwc-acc-panel__chevron" aria-hidden="true">
+        <slot name="icon">
+          <uwc-icon name=${this.toggleIcon}></uwc-icon>
+        </slot>
+      </span>
+    `;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    const atStart = this.toggleIconPos === "start";
+    return b2`
+      <details part="panel">
+        <summary
+          part="header"
+          class=${e7({
+      "uwc-acc-panel__header": true,
+      "uwc-acc-panel__header--disabled": this.disabled
+    })}
+          aria-disabled=${this.disabled ? "true" : A}
+          @click=${this._onSummaryClick}
+        >
+          ${atStart ? this._renderToggleIcon() : A}
+
+          <slot name="header">
+            <span part="title" class="uwc-acc-panel__title">${this.header}</span>
+          </slot>
+
+          ${!atStart ? this._renderToggleIcon() : A}
+        </summary>
+
+        <div class="uwc-acc-panel__content-wrap">
+          <div part="content" class="uwc-acc-panel__content">
+            <slot></slot>
+          </div>
+        </div>
+      </details>
+    `;
+  }
+};
+UwcAccordionPanel.styles = panelStyles;
+__decorateClass([
+  n4()
+], UwcAccordionPanel.prototype, "header", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordionPanel.prototype, "collapsed", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordionPanel.prototype, "disabled", 2);
+__decorateClass([
+  n4()
+], UwcAccordionPanel.prototype, "value", 2);
+__decorateClass([
+  n4({ attribute: "toggle-icon" })
+], UwcAccordionPanel.prototype, "toggleIcon", 2);
+__decorateClass([
+  n4({ attribute: "toggle-icon-pos", reflect: true })
+], UwcAccordionPanel.prototype, "toggleIconPos", 2);
+__decorateClass([
+  e5("details")
+], UwcAccordionPanel.prototype, "_details", 2);
+__decorateClass([
+  e5(".uwc-acc-panel__content-wrap")
+], UwcAccordionPanel.prototype, "_wrap", 2);
+var UwcAccordion = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.multiple = false;
+    this.stacked = false;
+    this.activeIndex = "";
+    // ── Internal state ────────────────────────────────────────────────────────
+    this._panels = [];
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener(TOGGLE_EVENT, this._onPanelToggle);
+    this.addEventListener("uwc-accordion-panel-connected", this._onPanelConnect);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener(TOGGLE_EVENT, this._onPanelToggle);
+    this.removeEventListener("uwc-accordion-panel-connected", this._onPanelConnect);
+  }
+  firstUpdated() {
+    this._syncPanels();
+    this._applyGrouped();
+    this._applyActiveIndex();
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("stacked")) this._applyGrouped();
+  }
+  // ── Internal helpers ──────────────────────────────────────────────────────
+  _syncPanels() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcAccordionPanel
+    );
+  }
+  _applyGrouped() {
+    Array.from(this.children).filter((el) => el instanceof UwcAccordionPanel).forEach((p4) => {
+      if (this.stacked) p4.setAttribute("grouped", "");
+      else p4.removeAttribute("grouped");
+    });
+  }
+  _applyActiveIndex() {
+    if (!this.activeIndex) return;
+    this.activeIndex.split(",").map((s5) => parseInt(s5.trim(), 10)).filter((n6) => !isNaN(n6)).forEach((i8) => {
+      const p4 = this._panels[i8];
+      if (p4 && !p4.disabled) p4.collapsed = false;
+    });
+  }
+  // ── Event handlers ────────────────────────────────────────────────────────
+  _onPanelConnect() {
+    this._syncPanels();
+    this._applyGrouped();
+  }
+  _onPanelToggle(e9) {
+    const panel = e9.target;
+    const index = this._panels.indexOf(panel);
+    if (index === -1) return;
+    e9.preventDefault();
+    const wasCollapsed = panel.collapsed;
+    if (!this.multiple) {
+      this._panels.forEach((p4, i8) => {
+        if (p4 !== panel && !p4.collapsed) {
+          p4.collapsed = true;
+          emit(this, "uwc-close", { index: i8, value: p4.value || String(i8) });
+        }
+      });
+    }
+    if (wasCollapsed) {
+      panel.collapsed = false;
+      emit(this, "uwc-open", { index, value: panel.value || String(index) });
+    } else {
+      panel.collapsed = true;
+      emit(this, "uwc-close", { index, value: panel.value || String(index) });
+    }
+    this._emitChange();
+  }
+  _onSlotChange() {
+    this._syncPanels();
+    this._applyGrouped();
+  }
+  _emitChange() {
+    emit(this, "uwc-change", { activeIndex: this.getActiveIndices() });
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  /** Open the panel at `index`. In single mode, closes any currently open panel. */
+  openPanel(index) {
+    const panel = this._panels[index];
+    if (!panel || panel.disabled || !panel.collapsed) return;
+    if (!this.multiple) {
+      this._panels.forEach((p4, i8) => {
+        if (p4 !== panel && !p4.collapsed) {
+          p4.collapsed = true;
+          emit(this, "uwc-close", { index: i8, value: p4.value || String(i8) });
+        }
+      });
+    }
+    panel.collapsed = false;
+    emit(this, "uwc-open", { index, value: panel.value || String(index) });
+    this._emitChange();
+  }
+  /** Close the panel at `index`. */
+  closePanel(index) {
+    const panel = this._panels[index];
+    if (!panel || panel.collapsed) return;
+    panel.collapsed = true;
+    emit(this, "uwc-close", { index, value: panel.value || String(index) });
+    this._emitChange();
+  }
+  /** Open all non-disabled panels. Most useful with `multiple`. */
+  openAll() {
+    this._panels.forEach((p4, i8) => {
+      if (!p4.disabled && p4.collapsed) {
+        p4.collapsed = false;
+        emit(this, "uwc-open", { index: i8, value: p4.value || String(i8) });
+      }
+    });
+    this._emitChange();
+  }
+  /** Close all panels. */
+  closeAll() {
+    this._panels.forEach((p4, i8) => {
+      if (!p4.collapsed) {
+        p4.collapsed = true;
+        emit(this, "uwc-close", { index: i8, value: p4.value || String(i8) });
+      }
+    });
+    this._emitChange();
+  }
+  /** Returns the indices of all currently open panels. */
+  getActiveIndices() {
+    return this._panels.map((p4, i8) => p4.collapsed ? -1 : i8).filter((i8) => i8 >= 0);
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    return b2`<slot @slotchange=${this._onSlotChange}></slot>`;
+  }
+};
+UwcAccordion.styles = accordionStyles;
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordion.prototype, "multiple", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcAccordion.prototype, "stacked", 2);
+__decorateClass([
+  n4({ attribute: "active-index" })
+], UwcAccordion.prototype, "activeIndex", 2);
+
+// src/tabs/styles.ts
+var tabPanelStyles = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+    }
+    /* Hidden when not active — parent sets [active] attribute */
+    :host(:not([active])) {
+      display: none !important;
+    }
+  `
+];
+var tabsStyles = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+    }
+
+    /* ── Root layout ──────────────────────────────────────────────────────── */
+    .uwc-tabs {
+      display:        flex;
+      flex-direction: column;
+    }
+
+    /* ── Nav wrap: holds optional scroll buttons + nav container ─────────── */
+    .uwc-tabs__nav-wrap {
+      display:     flex;
+      align-items: center;
+      position:    relative;
+      border-bottom: 1px solid var(--uwc-tabs-nav-border, ${border});
+    }
+
+    /* ── Nav container: clips overflow, positions the ink bar ────────────── */
+    .uwc-tabs__nav-container {
+      flex:      1;
+      min-width: 0;
+      position:  relative;
+      overflow:  hidden;
+    }
+
+    /* ── Tab list ────────────────────────────────────────────────────────── */
+    .uwc-tabs__nav {
+      display:     flex;
+      align-items: stretch;
+      overflow-x:  auto;
+      /* Hide scrollbar — navigation is via JS scroll buttons */
+      scrollbar-width:    none;
+      -ms-overflow-style: none;
+    }
+    .uwc-tabs__nav::-webkit-scrollbar { display: none; }
+
+    /* ── Individual tab (uses role="tab" on a <div> so we can nest a
+         <button> for the close action without nesting interactive HTML) ─── */
+    .uwc-tabs__tab {
+      position:    relative;
+      display:     inline-flex;
+      align-items: center;
+      gap:         var(--uwc-tabs-tab-gap, 0.375rem);
+      padding:     var(--uwc-tabs-tab-padding, 0.625rem 1rem);
+      cursor:      pointer;
+      white-space: nowrap;
+      user-select: none;
+      outline:     none;
+
+      color:       var(--uwc-tabs-tab-color,       ${textSecondary});
+      font-size:   var(--uwc-tabs-tab-font-size,    ${fontSizeMd});
+      font-weight: var(--uwc-tabs-tab-font-weight,  ${fontWeightMedium});
+      line-height: 1.4;
+
+      transition:
+        color      ${durationBase} ease,
+        background ${durationBase} ease;
+    }
+
+    .uwc-tabs__tab:hover:not(.uwc-tabs__tab--disabled):not(.uwc-tabs__tab--active) {
+      color:      var(--uwc-tabs-tab-hover-color, ${text});
+      background: var(--uwc-tabs-tab-hover-bg,    ${hoverBg});
+    }
+
+    .uwc-tabs__tab:focus-visible {
+      outline:        2px solid var(--uwc-color-primary, ${primary});
+      outline-offset: -2px;
+      border-radius:  ${radiusSm};
+    }
+
+    .uwc-tabs__tab--active {
+      color:       var(--uwc-tabs-tab-active-color,       ${primary});
+      font-weight: var(--uwc-tabs-tab-active-font-weight, ${fontWeightSemibold});
+    }
+
+    .uwc-tabs__tab--disabled {
+      color:          var(--uwc-tabs-tab-disabled-color, ${textDisabled});
+      cursor:         not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── Tab label ───────────────────────────────────────────────────────── */
+    .uwc-tabs__tab-label {
+      flex:          1;
+      min-width:     0;
+      overflow:      hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Tab icon ────────────────────────────────────────────────────────── */
+    .uwc-tabs__tab-icon {
+      flex-shrink: 0;
+    }
+
+    /* ── Close button ─────────────────────────────────────────────────────
+       Sits inside the role="tab" <div> — valid because <div> is not an
+       interactive element. Focusable via mouse; keyboard uses Delete key.
+    ──────────────────────────────────────────────────────────────────────── */
+    .uwc-tabs__close-btn {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           18px;
+      height:          18px;
+      margin-left:     0.125rem;
+      padding:         0;
+      border:          none;
+      border-radius:   ${radiusSm};
+      background:      transparent;
+      cursor:          pointer;
+      color:           currentColor;
+      opacity:         0.45;
+      transition:
+        opacity    ${durationBase} ease,
+        background ${durationBase} ease;
+    }
+    .uwc-tabs__close-btn:hover {
+      opacity:    1;
+      background: color-mix(in oklab, currentColor 14%, transparent);
+    }
+
+    /* ── Animated ink bar ─────────────────────────────────────────────────
+       Position is set by JS after measuring the active tab's offsetLeft
+       and offsetWidth. Transitions produce the sliding effect.
+    ──────────────────────────────────────────────────────────────────────── */
+    .uwc-tabs__ink-bar {
+      position:      absolute;
+      bottom:        0;
+      left:          0;
+      height:        var(--uwc-tabs-ink-bar-size,  2px);
+      width:         0;
+      background:    var(--uwc-tabs-ink-bar-color, ${primary});
+      border-radius: ${radiusFull};
+      pointer-events: none;
+      transition:
+        left   220ms ${easingStandard},
+        width  220ms ${easingStandard},
+        top    220ms ${easingStandard},
+        height 220ms ${easingStandard};
+    }
+
+    /* ── Scroll buttons ──────────────────────────────────────────────────── */
+    .uwc-tabs__scroll-btn {
+      flex-shrink:     0;
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           28px;
+      height:          100%;
+      min-height:      38px;
+      border:          none;
+      padding:         0;
+      background:      var(--uwc-tabs-scroll-btn-bg, ${surface});
+      color:           var(--uwc-tabs-scroll-btn-color, ${textSecondary});
+      cursor:          pointer;
+      transition:
+        color      ${durationBase} ease,
+        background ${durationBase} ease;
+    }
+    .uwc-tabs__scroll-btn:hover {
+      color:      ${text};
+      background: ${hoverBg};
+    }
+
+    /* ── Panels container ────────────────────────────────────────────────── */
+    .uwc-tabs__panels {
+      padding: var(--uwc-tabs-panels-padding, 1.25rem 0 0);
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TAB POSITIONS
+       CSS-driven layout shifts with the ink-bar repositioned via JS.
+    ══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Bottom ──────────────────────────────────────────────────────────── */
+    :host([tab-position="bottom"]) .uwc-tabs {
+      flex-direction: column-reverse;
+    }
+    :host([tab-position="bottom"]) .uwc-tabs__nav-wrap {
+      border-bottom: none;
+      border-top:    1px solid var(--uwc-tabs-nav-border, ${border});
+    }
+    :host([tab-position="bottom"]) .uwc-tabs__ink-bar {
+      bottom: auto;
+      top:    0;
+    }
+    :host([tab-position="bottom"]) .uwc-tabs__panels {
+      padding: 0 0 1.25rem;
+    }
+
+    /* ── Left ────────────────────────────────────────────────────────────── */
+    :host([tab-position="left"]) .uwc-tabs {
+      flex-direction: row;
+      align-items:    stretch;
+    }
+    :host([tab-position="left"]) .uwc-tabs__nav-wrap {
+      flex-direction: column;
+      align-items:    stretch;
+      border-bottom:  none;
+      border-right:   1px solid var(--uwc-tabs-nav-border, ${border});
+      width:          var(--uwc-tabs-vertical-width, 168px);
+      flex-shrink:    0;
+    }
+    :host([tab-position="left"]) .uwc-tabs__nav {
+      flex-direction: column;
+      overflow-x:     hidden;
+      overflow-y:     auto;
+    }
+    :host([tab-position="left"]) .uwc-tabs__tab {
+      justify-content: flex-start;
+    }
+    :host([tab-position="left"]) .uwc-tabs__ink-bar {
+      /* Vertical bar on the right edge of the nav */
+      bottom:     auto;
+      top:        0;
+      left:       auto;
+      right:      -1px;
+      width:      var(--uwc-tabs-ink-bar-size, 2px);
+      height:     0;
+    }
+    :host([tab-position="left"]) .uwc-tabs__panels {
+      flex:    1;
+      min-width: 0;
+      padding: 0 0 0 1.25rem;
+    }
+
+    /* ── Right ───────────────────────────────────────────────────────────── */
+    :host([tab-position="right"]) .uwc-tabs {
+      flex-direction: row-reverse;
+      align-items:    stretch;
+    }
+    :host([tab-position="right"]) .uwc-tabs__nav-wrap {
+      flex-direction: column;
+      align-items:    stretch;
+      border-bottom:  none;
+      border-left:    1px solid var(--uwc-tabs-nav-border, ${border});
+      width:          var(--uwc-tabs-vertical-width, 168px);
+      flex-shrink:    0;
+    }
+    :host([tab-position="right"]) .uwc-tabs__nav {
+      flex-direction: column;
+      overflow-x:     hidden;
+      overflow-y:     auto;
+    }
+    :host([tab-position="right"]) .uwc-tabs__tab {
+      justify-content: flex-start;
+    }
+    :host([tab-position="right"]) .uwc-tabs__ink-bar {
+      /* Vertical bar on the left edge of the nav */
+      bottom:     auto;
+      top:        0;
+      left:       -1px;
+      right:      auto;
+      width:      var(--uwc-tabs-ink-bar-size, 2px);
+      height:     0;
+    }
+    :host([tab-position="right"]) .uwc-tabs__panels {
+      flex:      1;
+      min-width: 0;
+      padding:   0 1.25rem 0 0;
+    }
+
+    /* ── Reduced motion ──────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-tabs__tab     { transition: none; }
+      .uwc-tabs__ink-bar { transition: none; }
+    }
+  `
+];
+
+// src/tabs/index.ts
+var PANEL_CONNECTED = "uwc-tab-panel-connected";
+var UwcTabPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.header = "";
+    this.value = "";
+    this.icon = "";
+    this.disabled = false;
+    this.closable = false;
+    this.active = false;
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    this.dispatchEvent(new CustomEvent(PANEL_CONNECTED, {
+      bubbles: true,
+      composed: true
+    }));
+  }
+  render() {
+    return b2`<slot part="panel"></slot>`;
+  }
+};
+UwcTabPanel.styles = tabPanelStyles;
+__decorateClass([
+  n4()
+], UwcTabPanel.prototype, "header", 2);
+__decorateClass([
+  n4()
+], UwcTabPanel.prototype, "value", 2);
+__decorateClass([
+  n4()
+], UwcTabPanel.prototype, "icon", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabPanel.prototype, "disabled", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabPanel.prototype, "closable", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabPanel.prototype, "active", 2);
+var UwcTabs = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.value = "";
+    this.scrollable = false;
+    this.tabPosition = "top";
+    this._panels = [];
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener(PANEL_CONNECTED, this._onPanelConnect);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener(PANEL_CONNECTED, this._onPanelConnect);
+  }
+  firstUpdated() {
+    this._syncPanels();
+    this._initActiveTab();
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("value")) {
+      this._syncActiveState();
+    }
+    requestAnimationFrame(() => this._updateInkBar());
+  }
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  /**
+   * Collects direct `uwc-tab-panel` children and stamps ARIA attributes on
+   * their host elements so `aria-controls` (in shadow DOM) can reference them
+   * by id across the shadow boundary.
+   */
+  _syncPanels() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcTabPanel
+    );
+    this._panels.forEach((p4) => {
+      p4.id = `uwc-tabpanel-${p4.value}`;
+      p4.setAttribute("role", "tabpanel");
+      p4.setAttribute("tabindex", "0");
+      p4.setAttribute("aria-labelledby", `uwc-tab-${p4.value}`);
+    });
+  }
+  /** Auto-selects the first non-disabled panel if `value` is not set. */
+  _initActiveTab() {
+    if (!this.value) {
+      const first = this._panels.find((p4) => !p4.disabled);
+      if (first) this.value = first.value;
+    }
+    this._syncActiveState();
+    requestAnimationFrame(() => this._updateInkBar());
+  }
+  /** Sets `active` on every panel to match the current `value`. */
+  _syncActiveState() {
+    this._panels.forEach((p4) => {
+      p4.active = p4.value === this.value;
+    });
+  }
+  /**
+   * Measures the active tab button's position and sizes the ink bar to match.
+   * Runs after every render via `requestAnimationFrame` so layout is complete.
+   */
+  _updateInkBar() {
+    const inkBar = this._inkBar;
+    const nav = this._nav;
+    if (!inkBar || !nav) return;
+    const activeEl = this.shadowRoot.querySelector(
+      '[role="tab"][aria-selected="true"]'
+    );
+    if (!activeEl) return;
+    const isVertical = this.tabPosition === "left" || this.tabPosition === "right";
+    if (isVertical) {
+      inkBar.style.top = `${activeEl.offsetTop}px`;
+      inkBar.style.height = `${activeEl.offsetHeight}px`;
+      inkBar.style.left = "";
+      inkBar.style.width = "";
+    } else {
+      inkBar.style.left = `${activeEl.offsetLeft - nav.scrollLeft}px`;
+      inkBar.style.width = `${activeEl.offsetWidth}px`;
+      inkBar.style.top = "";
+      inkBar.style.height = "";
+    }
+  }
+  // ── Event handlers ────────────────────────────────────────────────────────
+  _onPanelConnect() {
+    this._syncPanels();
+    this._initActiveTab();
+  }
+  _onSlotChange() {
+    this._syncPanels();
+    this._initActiveTab();
+  }
+  /** Make `value` the active tab and fire `uwc-change`. */
+  _selectTab(value) {
+    if (value === this.value) return;
+    const previousValue = this.value;
+    this.value = value;
+    emit(this, "uwc-change", { value, previousValue });
+  }
+  /**
+   * Fire `uwc-close` (cancelable). If not prevented, removes the panel from
+   * the DOM and selects the next available tab.
+   */
+  _closeTab(panelValue, e9) {
+    e9.stopPropagation();
+    const evt = new CustomEvent("uwc-close", {
+      detail: { value: panelValue },
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    });
+    this.dispatchEvent(evt);
+    if (evt.defaultPrevented) return;
+    const panel = this._panels.find((p4) => p4.value === panelValue);
+    if (!panel) return;
+    panel.remove();
+    this._syncPanels();
+    if (this.value === panelValue) {
+      const next = this._panels.find((p4) => !p4.disabled);
+      this.value = next?.value ?? "";
+      if (next) emit(this, "uwc-change", { value: this.value, previousValue: panelValue });
+    }
+  }
+  /**
+   * WAI-ARIA Tabs keyboard pattern:
+   *   Arrow Right / Down  — next tab
+   *   Arrow Left  / Up    — previous tab
+   *   Home                — first tab
+   *   End                 — last tab
+   *   Delete              — close tab (if closable)
+   */
+  _onTabKeydown(e9, panelValue) {
+    const enabled = this._panels.filter((p4) => !p4.disabled);
+    const idx = enabled.findIndex((p4) => p4.value === panelValue);
+    const isVertical = this.tabPosition === "left" || this.tabPosition === "right";
+    const nextKeys = isVertical ? ["ArrowDown", "ArrowRight"] : ["ArrowRight", "ArrowDown"];
+    const prevKeys = isVertical ? ["ArrowUp", "ArrowLeft"] : ["ArrowLeft", "ArrowUp"];
+    let nextIdx = idx;
+    if (nextKeys.includes(e9.key)) {
+      e9.preventDefault();
+      nextIdx = (idx + 1) % enabled.length;
+    } else if (prevKeys.includes(e9.key)) {
+      e9.preventDefault();
+      nextIdx = (idx - 1 + enabled.length) % enabled.length;
+    } else if (e9.key === "Home") {
+      e9.preventDefault();
+      nextIdx = 0;
+    } else if (e9.key === "End") {
+      e9.preventDefault();
+      nextIdx = enabled.length - 1;
+    } else if (e9.key === "Delete") {
+      if (enabled[idx]?.closable) {
+        e9.preventDefault();
+        this._closeTab(panelValue, e9);
+      }
+      return;
+    } else {
+      return;
+    }
+    const target = enabled[nextIdx];
+    if (!target) return;
+    this._selectTab(target.value);
+    this.shadowRoot.querySelector(`#uwc-tab-${target.value}`)?.focus();
+  }
+  /** Scroll the tab list left (dir = -1) or right (dir = 1). */
+  _scrollNav(dir) {
+    this._nav?.scrollBy({ left: dir * 160, behavior: "smooth" });
+  }
+  // ── Render helpers ────────────────────────────────────────────────────────
+  _renderTab(panel) {
+    const isActive = panel.value === this.value;
+    return b2`
+      <div
+        id="uwc-tab-${panel.value}"
+        role="tab"
+        part="tab ${isActive ? "tab--active" : ""} ${panel.disabled ? "tab--disabled" : ""}"
+        class=${e7({
+      "uwc-tabs__tab": true,
+      "uwc-tabs__tab--active": isActive,
+      "uwc-tabs__tab--disabled": panel.disabled
+    })}
+        tabindex=${isActive ? "0" : "-1"}
+        aria-selected=${isActive ? "true" : "false"}
+        aria-controls="uwc-tabpanel-${panel.value}"
+        aria-disabled=${panel.disabled ? "true" : A}
+        @click=${panel.disabled ? null : () => this._selectTab(panel.value)}
+        @keydown=${(e9) => this._onTabKeydown(e9, panel.value)}
+      >
+        ${panel.icon ? b2`<uwc-icon
+                   name=${panel.icon}
+                   size="15px"
+                   class="uwc-tabs__tab-icon"
+                 ></uwc-icon>` : A}
+        <span class="uwc-tabs__tab-label">${panel.header || panel.value}</span>
+        ${panel.closable ? b2`
+          <button
+            class="uwc-tabs__close-btn"
+            tabindex="-1"
+            aria-label="Close ${panel.header || panel.value}"
+            @click=${(e9) => this._closeTab(panel.value, e9)}
+          ><uwc-icon name="x-lg" size="11px"></uwc-icon></button>
+        ` : A}
+      </div>
+    `;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    const isVertical = this.tabPosition === "left" || this.tabPosition === "right";
+    return b2`
+      <div class="uwc-tabs" part="base">
+
+        <!-- Tab strip: scroll buttons (optional) + tab list + ink bar -->
+        <div class="uwc-tabs__nav-wrap" part="nav-wrap">
+          ${this.scrollable ? b2`
+            <button
+              class="uwc-tabs__scroll-btn"
+              aria-hidden="true"
+              tabindex="-1"
+              @click=${() => this._scrollNav(-1)}
+            ><uwc-icon name="chevron-left"  size="14px"></uwc-icon></button>
+          ` : A}
+
+          <div class="uwc-tabs__nav-container">
+            <div
+              class="uwc-tabs__nav"
+              role="tablist"
+              aria-orientation=${isVertical ? "vertical" : "horizontal"}
+            >
+              ${this._panels.map((p4) => this._renderTab(p4))}
+            </div>
+            <div class="uwc-tabs__ink-bar" part="ink-bar"></div>
+          </div>
+
+          ${this.scrollable ? b2`
+            <button
+              class="uwc-tabs__scroll-btn"
+              aria-hidden="true"
+              tabindex="-1"
+              @click=${() => this._scrollNav(1)}
+            ><uwc-icon name="chevron-right" size="14px"></uwc-icon></button>
+          ` : A}
+        </div>
+
+        <!-- Panel content -->
+        <div class="uwc-tabs__panels" part="panels">
+          <slot @slotchange=${this._onSlotChange}></slot>
+        </div>
+
+      </div>
+    `;
+  }
+};
+UwcTabs.styles = tabsStyles;
+__decorateClass([
+  n4({ reflect: true })
+], UwcTabs.prototype, "value", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabs.prototype, "scrollable", 2);
+__decorateClass([
+  n4({ attribute: "tab-position", reflect: true })
+], UwcTabs.prototype, "tabPosition", 2);
+__decorateClass([
+  r5()
+], UwcTabs.prototype, "_panels", 2);
+__decorateClass([
+  e5(".uwc-tabs__nav")
+], UwcTabs.prototype, "_nav", 2);
+__decorateClass([
+  e5(".uwc-tabs__ink-bar")
+], UwcTabs.prototype, "_inkBar", 2);
+
+// src/splitter/styles.ts
+var panelStyles2 = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+      overflow: auto;
+      min-width: 0;
+      min-height: 0;
+
+      /* Custom scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: ${border} transparent;
+    }
+    :host::-webkit-scrollbar       { width: 5px; height: 5px; }
+    :host::-webkit-scrollbar-thumb {
+      background:    ${border};
+      border-radius: ${radiusFull};
+    }
+  `
+];
+var splitterStyles = [
+  hostReset,
+  i`
+    :host {
+      display:   flex;
+      overflow:  hidden;
+      width:     100%;
+      height:    100%;
+    }
+
+    :host([layout='vertical']) {
+      flex-direction: column;
+    }
+
+    /* Slot is transparent — panels/gutters become direct flex children */
+    slot {
+      display: contents;
+    }
+
+    /* ── Slotted panels ────────────────────────────────────────────────── */
+    ::slotted(uwc-splitter-panel) {
+      flex-shrink: 0;
+      flex-grow:   0;
+      overflow:    hidden;
+      min-width:   0;
+      min-height:  0;
+    }
+
+    /* ── Gutters (injected as light-DOM divs, distributed via default slot) */
+    ::slotted(.uwc-splitter__gutter) {
+      flex-shrink:      0;
+      flex-grow:        0;
+      position:         relative;
+      display:          flex;
+      align-items:      center;
+      justify-content:  center;
+      z-index:          1;
+      outline:          none;
+      /* background / cursor set via inline styles (dynamic) */
+    }
+
+    ::slotted(.uwc-splitter__gutter:focus-visible) {
+      background-color: var(--uwc-splitter-gutter-focus-bg, ${selectedBg}) !important;
+    }
+  `
+];
+
+// src/splitter/index.ts
+var UwcSplitterPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.size = null;
+    this.minSize = 0;
+  }
+  render() {
+    return b2`<slot></slot>`;
+  }
+};
+UwcSplitterPanel.styles = panelStyles2;
+__decorateClass([
+  n4({ type: Number })
+], UwcSplitterPanel.prototype, "size", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "min-size" })
+], UwcSplitterPanel.prototype, "minSize", 2);
+var UwcSplitter = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.layout = "horizontal";
+    this.gutterSize = 6;
+    this.stateKey = "";
+    this.stateStorage = "local";
+    this.step = 5;
+    // ── Private state ─────────────────────────────────────────────────────────
+    this._panels = [];
+    this._sizes = [];
+    this._gutters = [];
+    this._handles = [];
+    this._draggingIndex = -1;
+    this._startPos = 0;
+    this._startSizeA = 0;
+    this._startSizeB = 0;
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._cleanup();
+  }
+  firstUpdated() {
+    this._setup();
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("layout") || changed.has("gutterSize")) {
+      this._cleanup();
+      this._setup();
+    }
+  }
+  // ── Setup / teardown ──────────────────────────────────────────────────────
+  _setup() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcSplitterPanel
+    );
+    if (this._panels.length < 2) return;
+    this._sizes = this._loadState() ?? this._defaultSizes();
+    this._applyPanelStyles();
+    this._injectGutters();
+  }
+  _cleanup() {
+    this._gutters.forEach((g2) => g2.remove());
+    this._gutters = [];
+    this._handles = [];
+  }
+  _defaultSizes() {
+    let defined = 0;
+    const raw = this._panels.map((p4) => {
+      if (p4.size != null) {
+        defined += p4.size;
+        return p4.size;
+      }
+      return -1;
+    });
+    const unset = raw.filter((s5) => s5 < 0).length;
+    const perUnset = unset > 0 ? (100 - defined) / unset : 0;
+    return raw.map((s5) => s5 < 0 ? perUnset : s5);
+  }
+  /**
+   * Applies flex-basis to each panel using the split.js formula:
+   *   calc(X% - X/100 * totalGutterPx)
+   * This ensures panels + gutters always sum to exactly 100% of the container.
+   */
+  _applyPanelStyles() {
+    const isH = this.layout !== "vertical";
+    const totalGutterPx = (this._panels.length - 1) * this.gutterSize;
+    this._panels.forEach((p4, i8) => {
+      const pct = this._sizes[i8];
+      const gutterAdj = pct / 100 * totalGutterPx;
+      const basis = `calc(${pct}% - ${gutterAdj}px)`;
+      p4.style.flexBasis = basis;
+      if (isH) {
+        p4.style.width = basis;
+        p4.style.height = "100%";
+        p4.style.minWidth = p4.minSize > 0 ? `calc(${p4.minSize}% - ${p4.minSize / 100 * totalGutterPx}px)` : "";
+        p4.style.minHeight = "";
+      } else {
+        p4.style.height = basis;
+        p4.style.width = "100%";
+        p4.style.minHeight = p4.minSize > 0 ? `calc(${p4.minSize}% - ${p4.minSize / 100 * totalGutterPx}px)` : "";
+        p4.style.minWidth = "";
+      }
+    });
+  }
+  _injectGutters() {
+    const isH = this.layout !== "vertical";
+    for (let i8 = 0; i8 < this._panels.length - 1; i8++) {
+      const gutter = document.createElement("div");
+      gutter.className = "uwc-splitter__gutter";
+      gutter.setAttribute("role", "separator");
+      gutter.setAttribute("aria-orientation", isH ? "vertical" : "horizontal");
+      gutter.setAttribute("aria-valuenow", String(Math.round(this._sizes[i8])));
+      gutter.setAttribute("aria-valuemin", String(this._panels[i8].minSize));
+      gutter.setAttribute("aria-valuemax", String(100 - this._panels[i8 + 1].minSize));
+      gutter.setAttribute("aria-label", `Resize panel ${i8 + 1}`);
+      gutter.setAttribute("tabindex", "0");
+      gutter.style.flexBasis = `${this.gutterSize}px`;
+      gutter.style.backgroundColor = "var(--uwc-splitter-gutter-bg, transparent)";
+      gutter.style.transition = "background-color 180ms ease";
+      if (isH) {
+        gutter.style.width = `${this.gutterSize}px`;
+        gutter.style.height = "100%";
+        gutter.style.cursor = "col-resize";
+      } else {
+        gutter.style.height = `${this.gutterSize}px`;
+        gutter.style.width = "100%";
+        gutter.style.cursor = "row-resize";
+      }
+      const handle = document.createElement("div");
+      handle.className = "uwc-splitter__handle";
+      handle.style.cssText = `
+        pointer-events: none;
+        border-radius:  9999px;
+        background:     var(--uwc-splitter-handle-color, rgba(0,0,0,0.18));
+        transition:     background 200ms ease, transform 200ms ease;
+        ${isH ? "width: 3px; height: 36px;" : "width: 36px; height: 3px;"}
+      `;
+      gutter.appendChild(handle);
+      gutter.addEventListener("mouseenter", () => {
+        if (this._draggingIndex >= 0) return;
+        gutter.style.backgroundColor = "var(--uwc-splitter-gutter-hover-bg, rgba(99,102,241,0.07))";
+        handle.style.background = "var(--uwc-splitter-handle-hover, #6366f1)";
+        handle.style.transform = isH ? "scaleX(1.75)" : "scaleY(1.75)";
+      });
+      gutter.addEventListener("mouseleave", () => {
+        if (this._draggingIndex >= 0) return;
+        gutter.style.backgroundColor = "var(--uwc-splitter-gutter-bg, transparent)";
+        handle.style.background = "var(--uwc-splitter-handle-color, rgba(0,0,0,0.18))";
+        handle.style.transform = "";
+      });
+      gutter.addEventListener("mousedown", (e9) => {
+        e9.preventDefault();
+        this._startMouseDrag(e9, i8);
+      });
+      gutter.addEventListener("touchstart", (e9) => {
+        e9.preventDefault();
+        this._startTouchDrag(e9, i8);
+      }, { passive: false });
+      gutter.addEventListener("keydown", (e9) => this._onGutterKeydown(e9, i8));
+      this._panels[i8].insertAdjacentElement("afterend", gutter);
+      this._gutters.push(gutter);
+      this._handles.push(handle);
+    }
+  }
+  // ── Drag — mouse ──────────────────────────────────────────────────────────
+  _startMouseDrag(e9, index) {
+    const isH = this.layout !== "vertical";
+    this._beginDrag(index, isH ? e9.clientX : e9.clientY);
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = isH ? "col-resize" : "row-resize";
+    const onMove = (ev) => {
+      this._moveDrag(index, isH ? ev.clientX : ev.clientY);
+    };
+    const onUp = () => {
+      this._endDrag(index);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }
+  // ── Drag — touch ──────────────────────────────────────────────────────────
+  _startTouchDrag(e9, index) {
+    const isH = this.layout !== "vertical";
+    const touch = e9.touches[0];
+    this._beginDrag(index, isH ? touch.clientX : touch.clientY);
+    const onMove = (ev) => {
+      const t6 = ev.touches[0];
+      this._moveDrag(index, isH ? t6.clientX : t6.clientY);
+    };
+    const onEnd = () => {
+      this._endDrag(index);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+    };
+    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchend", onEnd);
+  }
+  // ── Drag — shared helpers ─────────────────────────────────────────────────
+  _beginDrag(index, pos) {
+    this._draggingIndex = index;
+    this._startPos = pos;
+    this._startSizeA = this._sizes[index];
+    this._startSizeB = this._sizes[index + 1];
+    const isH = this.layout !== "vertical";
+    const gutter = this._gutters[index];
+    const handle = this._handles[index];
+    if (gutter) gutter.style.backgroundColor = "var(--uwc-splitter-gutter-active-bg, rgba(99,102,241,0.12))";
+    if (handle) {
+      handle.style.background = "var(--uwc-splitter-handle-active, #6366f1)";
+      handle.style.transform = isH ? "scaleX(2.25)" : "scaleY(2.25)";
+    }
+    emit(this, "uwc-resize-start", { detail: { sizes: [...this._sizes] } });
+  }
+  _moveDrag(index, pos) {
+    const isH = this.layout !== "vertical";
+    const containerRect = this.getBoundingClientRect();
+    const containerSize = isH ? containerRect.width : containerRect.height;
+    const gutterTotal = (this._panels.length - 1) * this.gutterSize;
+    const available = containerSize - gutterTotal;
+    if (available <= 0) return;
+    const deltaPct = (pos - this._startPos) / available * 100;
+    const minA = this._panels[index].minSize;
+    const minB = this._panels[index + 1].minSize;
+    const total = this._startSizeA + this._startSizeB;
+    const newA = Math.max(minA, Math.min(total - minB, this._startSizeA + deltaPct));
+    const newB = total - newA;
+    this._sizes[index] = newA;
+    this._sizes[index + 1] = newB;
+    this._applyPanelStyles();
+    const gutter = this._gutters[index];
+    if (gutter) gutter.setAttribute("aria-valuenow", String(Math.round(newA)));
+    emit(this, "uwc-resize", { detail: { sizes: [...this._sizes] } });
+  }
+  _endDrag(index) {
+    this._draggingIndex = -1;
+    const gutter = this._gutters[index];
+    const handle = this._handles[index];
+    if (gutter) gutter.style.backgroundColor = "var(--uwc-splitter-gutter-bg, transparent)";
+    if (handle) {
+      handle.style.background = "var(--uwc-splitter-handle-color, rgba(0,0,0,0.18))";
+      handle.style.transform = "";
+    }
+    this._saveState();
+    emit(this, "uwc-resize-end", { detail: { sizes: [...this._sizes] } });
+  }
+  // ── Keyboard ──────────────────────────────────────────────────────────────
+  _onGutterKeydown(e9, index) {
+    const isH = this.layout !== "vertical";
+    const minA = this._panels[index].minSize;
+    const minB = this._panels[index + 1].minSize;
+    const total = this._sizes[index] + this._sizes[index + 1];
+    let delta = 0;
+    if (isH) {
+      if (e9.key === "ArrowLeft") delta = -this.step;
+      if (e9.key === "ArrowRight") delta = +this.step;
+      if (e9.key === "Home") delta = -(this._sizes[index] - minA);
+      if (e9.key === "End") delta = total - minB - this._sizes[index];
+    } else {
+      if (e9.key === "ArrowUp") delta = -this.step;
+      if (e9.key === "ArrowDown") delta = +this.step;
+      if (e9.key === "Home") delta = -(this._sizes[index] - minA);
+      if (e9.key === "End") delta = total - minB - this._sizes[index];
+    }
+    if (!delta) return;
+    e9.preventDefault();
+    const newA = Math.max(minA, Math.min(total - minB, this._sizes[index] + delta));
+    this._sizes[index] = newA;
+    this._sizes[index + 1] = total - newA;
+    this._applyPanelStyles();
+    const gutter = this._gutters[index];
+    if (gutter) gutter.setAttribute("aria-valuenow", String(Math.round(newA)));
+    this._saveState();
+    emit(this, "uwc-resize", { detail: { sizes: [...this._sizes] } });
+  }
+  // ── State persistence ─────────────────────────────────────────────────────
+  _loadState() {
+    if (!this.stateKey) return null;
+    try {
+      const storage = this.stateStorage === "session" ? sessionStorage : localStorage;
+      const raw = storage.getItem(this.stateKey);
+      if (raw) return JSON.parse(raw);
+    } catch {
+    }
+    return null;
+  }
+  _saveState() {
+    if (!this.stateKey) return;
+    try {
+      const storage = this.stateStorage === "session" ? sessionStorage : localStorage;
+      storage.setItem(this.stateKey, JSON.stringify(this._sizes));
+    } catch {
+    }
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  /** Return a copy of the current panel sizes (percentages). */
+  getSizes() {
+    return [...this._sizes];
+  }
+  /**
+   * Reset panels to their initial `size` attribute values (or equal split) and
+   * clear any persisted state.
+   */
+  resetSizes() {
+    if (this.stateKey) {
+      const storage = this.stateStorage === "session" ? sessionStorage : localStorage;
+      storage.removeItem(this.stateKey);
+    }
+    this._cleanup();
+    this._sizes = this._defaultSizes();
+    this._applyPanelStyles();
+    this._injectGutters();
+    emit(this, "uwc-resize-end", { detail: { sizes: [...this._sizes] } });
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    return b2`<slot @slotchange=${this._onSlotChange}></slot>`;
+  }
+  /**
+   * Fired when slotted children change. Only re-initialize when the number of
+   * actual panels changes (not when we inject/remove gutters, which are plain
+   * divs filtered out by the instanceof check).
+   */
+  _onSlotChange() {
+    const newPanels = Array.from(this.children).filter(
+      (el) => el instanceof UwcSplitterPanel
+    );
+    if (newPanels.length !== this._panels.length) {
+      this._cleanup();
+      this._setup();
+    }
+  }
+};
+UwcSplitter.styles = splitterStyles;
+__decorateClass([
+  n4({ reflect: true })
+], UwcSplitter.prototype, "layout", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "gutter-size" })
+], UwcSplitter.prototype, "gutterSize", 2);
+__decorateClass([
+  n4({ attribute: "state-key" })
+], UwcSplitter.prototype, "stateKey", 2);
+__decorateClass([
+  n4({ attribute: "state-storage" })
+], UwcSplitter.prototype, "stateStorage", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcSplitter.prototype, "step", 2);
+
 // src/checkbox/styles.ts
 var styles_default2 = [
   hostReset,
@@ -1562,69 +3179,6 @@ var styles_default3 = [
     }
   `
 ];
-
-// src/utils/dom.utils.ts
-function deepQueryById(root, id) {
-  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
-  if (direct) return direct;
-  for (const el of Array.from(root.querySelectorAll("*"))) {
-    if (el.shadowRoot) {
-      const found = deepQueryById(
-        el.shadowRoot,
-        id
-      );
-      if (found) return found;
-    }
-  }
-  return null;
-}
-function computeCoords(tRect, pRect, placement, offset) {
-  const [side, align = "center"] = placement.split("-");
-  let top = 0, left = 0;
-  switch (side) {
-    case "top":
-      top = tRect.top - pRect.height - offset;
-      break;
-    case "bottom":
-      top = tRect.bottom + offset;
-      break;
-    case "left":
-      left = tRect.left - pRect.width - offset;
-      break;
-    case "right":
-      left = tRect.right + offset;
-      break;
-  }
-  if (side === "top" || side === "bottom") {
-    if (align === "start") left = tRect.left;
-    else if (align === "end") left = tRect.right - pRect.width;
-    else left = tRect.left + (tRect.width - pRect.width) / 2;
-  } else {
-    if (align === "start") top = tRect.top;
-    else if (align === "end") top = tRect.bottom - pRect.height;
-    else top = tRect.top + (tRect.height - pRect.height) / 2;
-  }
-  return { top, left };
-}
-function clampToViewport({ top, left }, pRect, margin = 8) {
-  return {
-    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
-    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
-  };
-}
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-function emit(host, name, detail, opts = {}) {
-  const event = new CustomEvent(name, {
-    detail,
-    bubbles: true,
-    composed: true,
-    ...opts
-  });
-  host.dispatchEvent(event);
-  return event;
-}
 
 // src/dialog/index.ts
 var UwcDialog = class extends i4 {
@@ -6042,6 +7596,52 @@ var t5 = class extends e8 {
 t5.directiveName = "unsafeSVG", t5.resultType = 2;
 var o9 = e6(t5);
 
+// src/icon/sprite.ts
+var bundleRegistry = /* @__PURE__ */ new Map();
+async function loadIconBundle(library) {
+  const entry = bundleRegistry.get(library);
+  if (!entry) return;
+  if (entry.loaded) return;
+  if (entry.loading) {
+    await entry.loading;
+    return;
+  }
+  entry.loading = (async () => {
+    const r7 = await fetch(entry.url);
+    const data = await r7.json();
+    _parseInto(data, entry.icons);
+    entry.loaded = true;
+  })();
+  await entry.loading;
+}
+function getBundledIconSvg(library, name) {
+  return bundleRegistry.get(library)?.icons.get(name);
+}
+function isBundleRegistered(library) {
+  return bundleRegistry.has(library);
+}
+function isBundleLoaded(library) {
+  return bundleRegistry.get(library)?.loaded ?? false;
+}
+function _parseInto(data, out) {
+  const defaultW = data.width ?? 24;
+  const defaultH = data.height ?? 24;
+  for (const [name, icon] of Object.entries(data.icons)) {
+    const w2 = icon.width ?? defaultW;
+    const h4 = icon.height ?? defaultH;
+    out.set(name, _wrapSvg(icon.body, w2, h4));
+  }
+  if (data.aliases) {
+    for (const [alias, meta] of Object.entries(data.aliases)) {
+      const parent = out.get(meta.parent);
+      if (parent) out.set(alias, parent);
+    }
+  }
+}
+function _wrapSvg(body, w2, h4) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w2} ${h4}">${body}</svg>`;
+}
+
 // src/icon/library.ts
 var registry = /* @__PURE__ */ new Map();
 var localRegistry = /* @__PURE__ */ new Map();
@@ -6117,6 +7717,15 @@ var UwcIcon = class extends i4 {
     if (hasLocalIcon(this.name)) {
       this.loadLocalIcon();
       return;
+    }
+    if (isBundleRegistered(this.library)) {
+      if (!isBundleLoaded(this.library)) await loadIconBundle(this.library);
+      const bundleSvg = getBundledIconSvg(this.library, this.name);
+      if (bundleSvg) {
+        this.svgContent = this.cleanSvg(bundleSvg);
+        this.dispatchEvent(new CustomEvent("uwc-load", { detail: { source: "bundle" } }));
+        return;
+      }
     }
     const url = this.resolveUrl();
     if (url) {
@@ -8919,6 +10528,12 @@ customElements.define("uwc-radiobutton", UwcRadioButton);
 customElements.define("uwc-togglebutton", UwcToggleButton);
 customElements.define("uwc-toggleswitch", UwcToggleSwitch);
 customElements.define("uwc-tooltip", UwcTooltip);
+customElements.define("uwc-accordion", UwcAccordion);
+customElements.define("uwc-accordion-panel", UwcAccordionPanel);
+customElements.define("uwc-tabs", UwcTabs);
+customElements.define("uwc-tab-panel", UwcTabPanel);
+customElements.define("uwc-splitter", UwcSplitter);
+customElements.define("uwc-splitter-panel", UwcSplitterPanel);
 /*! Bundled license information:
 
 @lit/reactive-element/css-tag.js:
