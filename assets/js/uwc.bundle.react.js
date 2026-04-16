@@ -6173,6 +6173,52 @@ var t5 = class extends e8 {
 t5.directiveName = "unsafeSVG", t5.resultType = 2;
 var o9 = e6(t5);
 
+// src/icon/sprite.ts
+var bundleRegistry = /* @__PURE__ */ new Map();
+async function loadIconBundle(library) {
+  const entry = bundleRegistry.get(library);
+  if (!entry) return;
+  if (entry.loaded) return;
+  if (entry.loading) {
+    await entry.loading;
+    return;
+  }
+  entry.loading = (async () => {
+    const r7 = await fetch(entry.url);
+    const data = await r7.json();
+    _parseInto(data, entry.icons);
+    entry.loaded = true;
+  })();
+  await entry.loading;
+}
+function getBundledIconSvg(library, name) {
+  return bundleRegistry.get(library)?.icons.get(name);
+}
+function isBundleRegistered(library) {
+  return bundleRegistry.has(library);
+}
+function isBundleLoaded(library) {
+  return bundleRegistry.get(library)?.loaded ?? false;
+}
+function _parseInto(data, out) {
+  const defaultW = data.width ?? 24;
+  const defaultH = data.height ?? 24;
+  for (const [name, icon] of Object.entries(data.icons)) {
+    const w2 = icon.width ?? defaultW;
+    const h4 = icon.height ?? defaultH;
+    out.set(name, _wrapSvg(icon.body, w2, h4));
+  }
+  if (data.aliases) {
+    for (const [alias, meta] of Object.entries(data.aliases)) {
+      const parent = out.get(meta.parent);
+      if (parent) out.set(alias, parent);
+    }
+  }
+}
+function _wrapSvg(body, w2, h4) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w2} ${h4}">${body}</svg>`;
+}
+
 // src/icon/library.ts
 var registry = /* @__PURE__ */ new Map();
 var localRegistry = /* @__PURE__ */ new Map();
@@ -6248,6 +6294,15 @@ var UwcIcon = class extends i4 {
     if (hasLocalIcon(this.name)) {
       this.loadLocalIcon();
       return;
+    }
+    if (isBundleRegistered(this.library)) {
+      if (!isBundleLoaded(this.library)) await loadIconBundle(this.library);
+      const bundleSvg = getBundledIconSvg(this.library, this.name);
+      if (bundleSvg) {
+        this.svgContent = this.cleanSvg(bundleSvg);
+        this.dispatchEvent(new CustomEvent("uwc-load", { detail: { source: "bundle" } }));
+        return;
+      }
     }
     const url = this.resolveUrl();
     if (url) {
@@ -9188,6 +9243,630 @@ var UwcTooltip2 = createComponent18({
     onUwcHide: "uwc-hide"
   }
 });
+
+// src/tabs/react.ts
+import { createComponent as createComponent19 } from "@lit/react";
+import React19 from "react";
+
+// src/tabs/styles.ts
+var tabPanelStyles = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+    }
+    /* Hidden when not active — parent sets [active] attribute */
+    :host(:not([active])) {
+      display: none !important;
+    }
+  `
+];
+var tabsStyles = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+    }
+
+    /* ── Root layout ──────────────────────────────────────────────────────── */
+    .uwc-tabs {
+      display:        flex;
+      flex-direction: column;
+    }
+
+    /* ── Nav wrap: holds optional scroll buttons + nav container ─────────── */
+    .uwc-tabs__nav-wrap {
+      display:     flex;
+      align-items: center;
+      position:    relative;
+      border-bottom: 1px solid var(--uwc-tabs-nav-border, ${border});
+    }
+
+    /* ── Nav container: clips overflow, positions the ink bar ────────────── */
+    .uwc-tabs__nav-container {
+      flex:      1;
+      min-width: 0;
+      position:  relative;
+      overflow:  hidden;
+    }
+
+    /* ── Tab list ────────────────────────────────────────────────────────── */
+    .uwc-tabs__nav {
+      display:     flex;
+      align-items: stretch;
+      overflow-x:  auto;
+      /* Hide scrollbar — navigation is via JS scroll buttons */
+      scrollbar-width:    none;
+      -ms-overflow-style: none;
+    }
+    .uwc-tabs__nav::-webkit-scrollbar { display: none; }
+
+    /* ── Individual tab (uses role="tab" on a <div> so we can nest a
+         <button> for the close action without nesting interactive HTML) ─── */
+    .uwc-tabs__tab {
+      position:    relative;
+      display:     inline-flex;
+      align-items: center;
+      gap:         var(--uwc-tabs-tab-gap, 0.375rem);
+      padding:     var(--uwc-tabs-tab-padding, 0.625rem 1rem);
+      cursor:      pointer;
+      white-space: nowrap;
+      user-select: none;
+      outline:     none;
+
+      color:       var(--uwc-tabs-tab-color,       ${textSecondary});
+      font-size:   var(--uwc-tabs-tab-font-size,    ${fontSizeMd});
+      font-weight: var(--uwc-tabs-tab-font-weight,  ${fontWeightMedium});
+      line-height: 1.4;
+
+      transition:
+        color      ${durationBase} ease,
+        background ${durationBase} ease;
+    }
+
+    .uwc-tabs__tab:hover:not(.uwc-tabs__tab--disabled):not(.uwc-tabs__tab--active) {
+      color:      var(--uwc-tabs-tab-hover-color, ${text});
+      background: var(--uwc-tabs-tab-hover-bg,    ${hoverBg});
+    }
+
+    .uwc-tabs__tab:focus-visible {
+      outline:        2px solid var(--uwc-color-primary, ${primary});
+      outline-offset: -2px;
+      border-radius:  ${radiusSm};
+    }
+
+    .uwc-tabs__tab--active {
+      color:       var(--uwc-tabs-tab-active-color,       ${primary});
+      font-weight: var(--uwc-tabs-tab-active-font-weight, ${fontWeightSemibold});
+    }
+
+    .uwc-tabs__tab--disabled {
+      color:          var(--uwc-tabs-tab-disabled-color, ${textDisabled});
+      cursor:         not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── Tab label ───────────────────────────────────────────────────────── */
+    .uwc-tabs__tab-label {
+      flex:          1;
+      min-width:     0;
+      overflow:      hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Tab icon ────────────────────────────────────────────────────────── */
+    .uwc-tabs__tab-icon {
+      flex-shrink: 0;
+    }
+
+    /* ── Close button ─────────────────────────────────────────────────────
+       Sits inside the role="tab" <div> — valid because <div> is not an
+       interactive element. Focusable via mouse; keyboard uses Delete key.
+    ──────────────────────────────────────────────────────────────────────── */
+    .uwc-tabs__close-btn {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           18px;
+      height:          18px;
+      margin-left:     0.125rem;
+      padding:         0;
+      border:          none;
+      border-radius:   ${radiusSm};
+      background:      transparent;
+      cursor:          pointer;
+      color:           currentColor;
+      opacity:         0.45;
+      transition:
+        opacity    ${durationBase} ease,
+        background ${durationBase} ease;
+    }
+    .uwc-tabs__close-btn:hover {
+      opacity:    1;
+      background: color-mix(in oklab, currentColor 14%, transparent);
+    }
+
+    /* ── Animated ink bar ─────────────────────────────────────────────────
+       Position is set by JS after measuring the active tab's offsetLeft
+       and offsetWidth. Transitions produce the sliding effect.
+    ──────────────────────────────────────────────────────────────────────── */
+    .uwc-tabs__ink-bar {
+      position:      absolute;
+      bottom:        0;
+      left:          0;
+      height:        var(--uwc-tabs-ink-bar-size,  2px);
+      width:         0;
+      background:    var(--uwc-tabs-ink-bar-color, ${primary});
+      border-radius: ${radiusFull};
+      pointer-events: none;
+      transition:
+        left   220ms ${easingStandard},
+        width  220ms ${easingStandard},
+        top    220ms ${easingStandard},
+        height 220ms ${easingStandard};
+    }
+
+    /* ── Scroll buttons ──────────────────────────────────────────────────── */
+    .uwc-tabs__scroll-btn {
+      flex-shrink:     0;
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           28px;
+      height:          100%;
+      min-height:      38px;
+      border:          none;
+      padding:         0;
+      background:      var(--uwc-tabs-scroll-btn-bg, ${surface});
+      color:           var(--uwc-tabs-scroll-btn-color, ${textSecondary});
+      cursor:          pointer;
+      transition:
+        color      ${durationBase} ease,
+        background ${durationBase} ease;
+    }
+    .uwc-tabs__scroll-btn:hover {
+      color:      ${text};
+      background: ${hoverBg};
+    }
+
+    /* ── Panels container ────────────────────────────────────────────────── */
+    .uwc-tabs__panels {
+      padding: var(--uwc-tabs-panels-padding, 1.25rem 0 0);
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TAB POSITIONS
+       CSS-driven layout shifts with the ink-bar repositioned via JS.
+    ══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Bottom ──────────────────────────────────────────────────────────── */
+    :host([tab-position="bottom"]) .uwc-tabs {
+      flex-direction: column-reverse;
+    }
+    :host([tab-position="bottom"]) .uwc-tabs__nav-wrap {
+      border-bottom: none;
+      border-top:    1px solid var(--uwc-tabs-nav-border, ${border});
+    }
+    :host([tab-position="bottom"]) .uwc-tabs__ink-bar {
+      bottom: auto;
+      top:    0;
+    }
+    :host([tab-position="bottom"]) .uwc-tabs__panels {
+      padding: 0 0 1.25rem;
+    }
+
+    /* ── Left ────────────────────────────────────────────────────────────── */
+    :host([tab-position="left"]) .uwc-tabs {
+      flex-direction: row;
+      align-items:    stretch;
+    }
+    :host([tab-position="left"]) .uwc-tabs__nav-wrap {
+      flex-direction: column;
+      align-items:    stretch;
+      border-bottom:  none;
+      border-right:   1px solid var(--uwc-tabs-nav-border, ${border});
+      width:          var(--uwc-tabs-vertical-width, 168px);
+      flex-shrink:    0;
+    }
+    :host([tab-position="left"]) .uwc-tabs__nav {
+      flex-direction: column;
+      overflow-x:     hidden;
+      overflow-y:     auto;
+    }
+    :host([tab-position="left"]) .uwc-tabs__tab {
+      justify-content: flex-start;
+    }
+    :host([tab-position="left"]) .uwc-tabs__ink-bar {
+      /* Vertical bar on the right edge of the nav */
+      bottom:     auto;
+      top:        0;
+      left:       auto;
+      right:      -1px;
+      width:      var(--uwc-tabs-ink-bar-size, 2px);
+      height:     0;
+    }
+    :host([tab-position="left"]) .uwc-tabs__panels {
+      flex:    1;
+      min-width: 0;
+      padding: 0 0 0 1.25rem;
+    }
+
+    /* ── Right ───────────────────────────────────────────────────────────── */
+    :host([tab-position="right"]) .uwc-tabs {
+      flex-direction: row-reverse;
+      align-items:    stretch;
+    }
+    :host([tab-position="right"]) .uwc-tabs__nav-wrap {
+      flex-direction: column;
+      align-items:    stretch;
+      border-bottom:  none;
+      border-left:    1px solid var(--uwc-tabs-nav-border, ${border});
+      width:          var(--uwc-tabs-vertical-width, 168px);
+      flex-shrink:    0;
+    }
+    :host([tab-position="right"]) .uwc-tabs__nav {
+      flex-direction: column;
+      overflow-x:     hidden;
+      overflow-y:     auto;
+    }
+    :host([tab-position="right"]) .uwc-tabs__tab {
+      justify-content: flex-start;
+    }
+    :host([tab-position="right"]) .uwc-tabs__ink-bar {
+      /* Vertical bar on the left edge of the nav */
+      bottom:     auto;
+      top:        0;
+      left:       -1px;
+      right:      auto;
+      width:      var(--uwc-tabs-ink-bar-size, 2px);
+      height:     0;
+    }
+    :host([tab-position="right"]) .uwc-tabs__panels {
+      flex:      1;
+      min-width: 0;
+      padding:   0 1.25rem 0 0;
+    }
+
+    /* ── Reduced motion ──────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-tabs__tab     { transition: none; }
+      .uwc-tabs__ink-bar { transition: none; }
+    }
+  `
+];
+
+// src/tabs/index.ts
+var PANEL_CONNECTED = "uwc-tab-panel-connected";
+var UwcTabPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.header = "";
+    this.value = "";
+    this.icon = "";
+    this.disabled = false;
+    this.closable = false;
+    this.active = false;
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    this.dispatchEvent(new CustomEvent(PANEL_CONNECTED, {
+      bubbles: true,
+      composed: true
+    }));
+  }
+  render() {
+    return b2`<slot part="panel"></slot>`;
+  }
+};
+UwcTabPanel.styles = tabPanelStyles;
+__decorateClass([
+  n4()
+], UwcTabPanel.prototype, "header", 2);
+__decorateClass([
+  n4()
+], UwcTabPanel.prototype, "value", 2);
+__decorateClass([
+  n4()
+], UwcTabPanel.prototype, "icon", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabPanel.prototype, "disabled", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabPanel.prototype, "closable", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabPanel.prototype, "active", 2);
+var UwcTabs = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.value = "";
+    this.scrollable = false;
+    this.tabPosition = "top";
+    this._panels = [];
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener(PANEL_CONNECTED, this._onPanelConnect);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener(PANEL_CONNECTED, this._onPanelConnect);
+  }
+  firstUpdated() {
+    this._syncPanels();
+    this._initActiveTab();
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("value")) {
+      this._syncActiveState();
+    }
+    requestAnimationFrame(() => this._updateInkBar());
+  }
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  /**
+   * Collects direct `uwc-tab-panel` children and stamps ARIA attributes on
+   * their host elements so `aria-controls` (in shadow DOM) can reference them
+   * by id across the shadow boundary.
+   */
+  _syncPanels() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcTabPanel
+    );
+    this._panels.forEach((p4) => {
+      p4.id = `uwc-tabpanel-${p4.value}`;
+      p4.setAttribute("role", "tabpanel");
+      p4.setAttribute("tabindex", "0");
+      p4.setAttribute("aria-labelledby", `uwc-tab-${p4.value}`);
+    });
+  }
+  /** Auto-selects the first non-disabled panel if `value` is not set. */
+  _initActiveTab() {
+    if (!this.value) {
+      const first = this._panels.find((p4) => !p4.disabled);
+      if (first) this.value = first.value;
+    }
+    this._syncActiveState();
+    requestAnimationFrame(() => this._updateInkBar());
+  }
+  /** Sets `active` on every panel to match the current `value`. */
+  _syncActiveState() {
+    this._panels.forEach((p4) => {
+      p4.active = p4.value === this.value;
+    });
+  }
+  /**
+   * Measures the active tab button's position and sizes the ink bar to match.
+   * Runs after every render via `requestAnimationFrame` so layout is complete.
+   */
+  _updateInkBar() {
+    const inkBar = this._inkBar;
+    const nav = this._nav;
+    if (!inkBar || !nav) return;
+    const activeEl = this.shadowRoot.querySelector(
+      '[role="tab"][aria-selected="true"]'
+    );
+    if (!activeEl) return;
+    const isVertical = this.tabPosition === "left" || this.tabPosition === "right";
+    if (isVertical) {
+      inkBar.style.top = `${activeEl.offsetTop}px`;
+      inkBar.style.height = `${activeEl.offsetHeight}px`;
+      inkBar.style.left = "";
+      inkBar.style.width = "";
+    } else {
+      inkBar.style.left = `${activeEl.offsetLeft - nav.scrollLeft}px`;
+      inkBar.style.width = `${activeEl.offsetWidth}px`;
+      inkBar.style.top = "";
+      inkBar.style.height = "";
+    }
+  }
+  // ── Event handlers ────────────────────────────────────────────────────────
+  _onPanelConnect() {
+    this._syncPanels();
+    this._initActiveTab();
+  }
+  _onSlotChange() {
+    this._syncPanels();
+    this._initActiveTab();
+  }
+  /** Make `value` the active tab and fire `uwc-change`. */
+  _selectTab(value) {
+    if (value === this.value) return;
+    const previousValue = this.value;
+    this.value = value;
+    emit(this, "uwc-change", { value, previousValue });
+  }
+  /**
+   * Fire `uwc-close` (cancelable). If not prevented, removes the panel from
+   * the DOM and selects the next available tab.
+   */
+  _closeTab(panelValue, e9) {
+    e9.stopPropagation();
+    const evt = new CustomEvent("uwc-close", {
+      detail: { value: panelValue },
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    });
+    this.dispatchEvent(evt);
+    if (evt.defaultPrevented) return;
+    const panel = this._panels.find((p4) => p4.value === panelValue);
+    if (!panel) return;
+    panel.remove();
+    this._syncPanels();
+    if (this.value === panelValue) {
+      const next = this._panels.find((p4) => !p4.disabled);
+      this.value = next?.value ?? "";
+      if (next) emit(this, "uwc-change", { value: this.value, previousValue: panelValue });
+    }
+  }
+  /**
+   * WAI-ARIA Tabs keyboard pattern:
+   *   Arrow Right / Down  — next tab
+   *   Arrow Left  / Up    — previous tab
+   *   Home                — first tab
+   *   End                 — last tab
+   *   Delete              — close tab (if closable)
+   */
+  _onTabKeydown(e9, panelValue) {
+    const enabled = this._panels.filter((p4) => !p4.disabled);
+    const idx = enabled.findIndex((p4) => p4.value === panelValue);
+    const isVertical = this.tabPosition === "left" || this.tabPosition === "right";
+    const nextKeys = isVertical ? ["ArrowDown", "ArrowRight"] : ["ArrowRight", "ArrowDown"];
+    const prevKeys = isVertical ? ["ArrowUp", "ArrowLeft"] : ["ArrowLeft", "ArrowUp"];
+    let nextIdx = idx;
+    if (nextKeys.includes(e9.key)) {
+      e9.preventDefault();
+      nextIdx = (idx + 1) % enabled.length;
+    } else if (prevKeys.includes(e9.key)) {
+      e9.preventDefault();
+      nextIdx = (idx - 1 + enabled.length) % enabled.length;
+    } else if (e9.key === "Home") {
+      e9.preventDefault();
+      nextIdx = 0;
+    } else if (e9.key === "End") {
+      e9.preventDefault();
+      nextIdx = enabled.length - 1;
+    } else if (e9.key === "Delete") {
+      if (enabled[idx]?.closable) {
+        e9.preventDefault();
+        this._closeTab(panelValue, e9);
+      }
+      return;
+    } else {
+      return;
+    }
+    const target = enabled[nextIdx];
+    if (!target) return;
+    this._selectTab(target.value);
+    this.shadowRoot.querySelector(`#uwc-tab-${target.value}`)?.focus();
+  }
+  /** Scroll the tab list left (dir = -1) or right (dir = 1). */
+  _scrollNav(dir) {
+    this._nav?.scrollBy({ left: dir * 160, behavior: "smooth" });
+  }
+  // ── Render helpers ────────────────────────────────────────────────────────
+  _renderTab(panel) {
+    const isActive = panel.value === this.value;
+    return b2`
+      <div
+        id="uwc-tab-${panel.value}"
+        role="tab"
+        part="tab ${isActive ? "tab--active" : ""} ${panel.disabled ? "tab--disabled" : ""}"
+        class=${e7({
+      "uwc-tabs__tab": true,
+      "uwc-tabs__tab--active": isActive,
+      "uwc-tabs__tab--disabled": panel.disabled
+    })}
+        tabindex=${isActive ? "0" : "-1"}
+        aria-selected=${isActive ? "true" : "false"}
+        aria-controls="uwc-tabpanel-${panel.value}"
+        aria-disabled=${panel.disabled ? "true" : A}
+        @click=${panel.disabled ? null : () => this._selectTab(panel.value)}
+        @keydown=${(e9) => this._onTabKeydown(e9, panel.value)}
+      >
+        ${panel.icon ? b2`<uwc-icon
+                   name=${panel.icon}
+                   size="15px"
+                   class="uwc-tabs__tab-icon"
+                 ></uwc-icon>` : A}
+        <span class="uwc-tabs__tab-label">${panel.header || panel.value}</span>
+        ${panel.closable ? b2`
+          <button
+            class="uwc-tabs__close-btn"
+            tabindex="-1"
+            aria-label="Close ${panel.header || panel.value}"
+            @click=${(e9) => this._closeTab(panel.value, e9)}
+          ><uwc-icon name="x-lg" size="11px"></uwc-icon></button>
+        ` : A}
+      </div>
+    `;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    const isVertical = this.tabPosition === "left" || this.tabPosition === "right";
+    return b2`
+      <div class="uwc-tabs" part="base">
+
+        <!-- Tab strip: scroll buttons (optional) + tab list + ink bar -->
+        <div class="uwc-tabs__nav-wrap" part="nav-wrap">
+          ${this.scrollable ? b2`
+            <button
+              class="uwc-tabs__scroll-btn"
+              aria-hidden="true"
+              tabindex="-1"
+              @click=${() => this._scrollNav(-1)}
+            ><uwc-icon name="chevron-left"  size="14px"></uwc-icon></button>
+          ` : A}
+
+          <div class="uwc-tabs__nav-container">
+            <div
+              class="uwc-tabs__nav"
+              role="tablist"
+              aria-orientation=${isVertical ? "vertical" : "horizontal"}
+            >
+              ${this._panels.map((p4) => this._renderTab(p4))}
+            </div>
+            <div class="uwc-tabs__ink-bar" part="ink-bar"></div>
+          </div>
+
+          ${this.scrollable ? b2`
+            <button
+              class="uwc-tabs__scroll-btn"
+              aria-hidden="true"
+              tabindex="-1"
+              @click=${() => this._scrollNav(1)}
+            ><uwc-icon name="chevron-right" size="14px"></uwc-icon></button>
+          ` : A}
+        </div>
+
+        <!-- Panel content -->
+        <div class="uwc-tabs__panels" part="panels">
+          <slot @slotchange=${this._onSlotChange}></slot>
+        </div>
+
+      </div>
+    `;
+  }
+};
+UwcTabs.styles = tabsStyles;
+__decorateClass([
+  n4({ reflect: true })
+], UwcTabs.prototype, "value", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTabs.prototype, "scrollable", 2);
+__decorateClass([
+  n4({ attribute: "tab-position", reflect: true })
+], UwcTabs.prototype, "tabPosition", 2);
+__decorateClass([
+  r5()
+], UwcTabs.prototype, "_panels", 2);
+__decorateClass([
+  e5(".uwc-tabs__nav")
+], UwcTabs.prototype, "_nav", 2);
+__decorateClass([
+  e5(".uwc-tabs__ink-bar")
+], UwcTabs.prototype, "_inkBar", 2);
+
+// src/tabs/react.ts
+var UwcTabs2 = createComponent19({
+  tagName: "uwc-tabs",
+  elementClass: UwcTabs,
+  react: React19,
+  events: {
+    onUwcChange: "uwc-change",
+    onUwcClose: "uwc-close"
+  }
+});
+var UwcTabPanel2 = createComponent19({
+  tagName: "uwc-tab-panel",
+  elementClass: UwcTabPanel,
+  react: React19,
+  events: {}
+});
 export {
   UwcButton2 as UwcButton,
   UwcCheckbox2 as UwcCheckbox,
@@ -9204,6 +9883,8 @@ export {
   UwcPaginator2 as UwcPaginator,
   UwcPopover2 as UwcPopover,
   UwcRadioButton2 as UwcRadioButton,
+  UwcTabPanel2 as UwcTabPanel,
+  UwcTabs2 as UwcTabs,
   UwcToggleButton2 as UwcToggleButton,
   UwcToggleSwitch2 as UwcToggleSwitch,
   UwcTooltip2 as UwcTooltip

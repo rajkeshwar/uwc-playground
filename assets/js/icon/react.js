@@ -672,6 +672,52 @@ var o8 = e5(class extends i5 {
   }
 });
 
+// src/icon/sprite.ts
+var bundleRegistry = /* @__PURE__ */ new Map();
+async function loadIconBundle(library) {
+  const entry = bundleRegistry.get(library);
+  if (!entry) return;
+  if (entry.loaded) return;
+  if (entry.loading) {
+    await entry.loading;
+    return;
+  }
+  entry.loading = (async () => {
+    const r6 = await fetch(entry.url);
+    const data = await r6.json();
+    _parseInto(data, entry.icons);
+    entry.loaded = true;
+  })();
+  await entry.loading;
+}
+function getBundledIconSvg(library, name) {
+  return bundleRegistry.get(library)?.icons.get(name);
+}
+function isBundleRegistered(library) {
+  return bundleRegistry.has(library);
+}
+function isBundleLoaded(library) {
+  return bundleRegistry.get(library)?.loaded ?? false;
+}
+function _parseInto(data, out) {
+  const defaultW = data.width ?? 24;
+  const defaultH = data.height ?? 24;
+  for (const [name, icon] of Object.entries(data.icons)) {
+    const w2 = icon.width ?? defaultW;
+    const h3 = icon.height ?? defaultH;
+    out.set(name, _wrapSvg(icon.body, w2, h3));
+  }
+  if (data.aliases) {
+    for (const [alias, meta] of Object.entries(data.aliases)) {
+      const parent = out.get(meta.parent);
+      if (parent) out.set(alias, parent);
+    }
+  }
+}
+function _wrapSvg(body, w2, h3) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w2} ${h3}">${body}</svg>`;
+}
+
 // src/icon/library.ts
 var registry = /* @__PURE__ */ new Map();
 var localRegistry = /* @__PURE__ */ new Map();
@@ -747,6 +793,15 @@ var UwcIcon = class extends i4 {
     if (hasLocalIcon(this.name)) {
       this.loadLocalIcon();
       return;
+    }
+    if (isBundleRegistered(this.library)) {
+      if (!isBundleLoaded(this.library)) await loadIconBundle(this.library);
+      const bundleSvg = getBundledIconSvg(this.library, this.name);
+      if (bundleSvg) {
+        this.svgContent = this.cleanSvg(bundleSvg);
+        this.dispatchEvent(new CustomEvent("uwc-load", { detail: { source: "bundle" } }));
+        return;
+      }
     }
     const url = this.resolveUrl();
     if (url) {
