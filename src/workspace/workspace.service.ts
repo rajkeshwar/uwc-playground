@@ -35,6 +35,18 @@ export class WorkspaceService {
     this._buildLayout(layout, panels);
   }
 
+  /**
+   * Prepare the container for mobile single-panel view.
+   * Destroys any Split.js instances and resets the container to a plain flex row.
+   * The caller is responsible for showing/hiding individual panels.
+   */
+  prepareForMobile(panels: PanelElements): void {
+    this._destroySplits();
+    this._teardown(panels);
+    const C = this._container;
+    C.style.cssText = 'display:flex;flex-direction:row;height:100%;overflow:hidden;';
+  }
+
   private _destroySplits(): void {
     // destroy(false) removes inline Split.js width styles and removes gutters.
     try { this._outerSplit?.destroy(false); } catch { /* noop */ }
