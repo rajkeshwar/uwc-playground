@@ -11251,6 +11251,1422 @@ var UwcCarouselReact = createComponent22({
     onUwcAutoplay: "uwc-autoplay"
   }
 });
+
+// src/galleria/react.ts
+import React23 from "react";
+import { createComponent as createComponent23 } from "@lit/react";
+
+// src/galleria/styles.ts
+var styles_default20 = [
+  hostReset,
+  focusRing(".uwc-gal__item-wrapper", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-gal__thumb-item", "--uwc-color-primary", "#6366f1"),
+  i`
+    /* ── Host ───────────────────────────────────────────────────────── */
+    :host {
+      display: block;
+    }
+
+    /* ── Outer container ────────────────────────────────────────────── */
+    .uwc-gal {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── Content area (item + thumbnails) ────────────────────────── */
+    .uwc-gal__content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* Left / right thumbnail positions → row layout */
+    .uwc-gal__content--left,
+    .uwc-gal__content--right {
+      flex-direction: row;
+    }
+
+    /* ── Item section (item-wrapper + optional indicators) ────────── */
+    .uwc-gal__item-section {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Item wrapper (the focusable/draggable area) ─────────────── */
+    .uwc-gal__item-wrapper {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      user-select: none;
+      cursor: grab;
+      outline: none;
+      min-height: var(--uwc-gal-item-min-height, 300px);
+      display: flex;
+      flex-direction: column;
+    }
+    .uwc-gal__item-wrapper:active {
+      cursor: grabbing;
+    }
+
+    /* Hover-show nav: hide nav areas by default, show on hover/focus-within */
+    .uwc-gal__item-wrapper--has-hover-nav .uwc-gal__nav-area {
+      opacity: 0;
+    }
+    .uwc-gal__item-wrapper--has-hover-nav:hover .uwc-gal__nav-area,
+    .uwc-gal__item-wrapper--has-hover-nav:focus-within .uwc-gal__nav-area {
+      opacity: 1;
+    }
+
+    /* Hide fullscreen btn by default, show on wrapper hover/focus */
+    .uwc-gal__item-wrapper .uwc-gal__fullscreen-btn {
+      opacity: 0;
+      transition: opacity ${durationBase};
+    }
+    .uwc-gal__item-wrapper:hover .uwc-gal__fullscreen-btn,
+    .uwc-gal__item-wrapper:focus-within .uwc-gal__fullscreen-btn {
+      opacity: 1;
+    }
+
+    /* ── Single item ─────────────────────────────────────────────── */
+    .uwc-gal__item {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Default item image ──────────────────────────────────────── */
+    .uwc-gal__default-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* ── Fade animation ──────────────────────────────────────────── */
+    @keyframes uwc-gal-fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .uwc-gal__item.is-animating {
+      animation: uwc-gal-fade var(--uwc-gal-duration, 300ms) ${easingOut};
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-gal__item.is-animating {
+        animation: none;
+      }
+    }
+
+    /* ── Nav areas (prev/next overlay buttons) ───────────────────── */
+    .uwc-gal__nav-area {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+      z-index: 1;
+      transition: opacity ${durationBase};
+    }
+    .uwc-gal__nav-area--prev { left: 0; }
+    .uwc-gal__nav-area--next { right: 0; }
+
+    /* ── Fullscreen button ───────────────────────────────────────── */
+    .uwc-gal__fullscreen-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      z-index: 2;
+    }
+
+    /* ── Close button (inside fullscreen dialog) ─────────────────── */
+    .uwc-gal__close-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      z-index: 2;
+    }
+
+    /* ── Caption overlay ─────────────────────────────────────────── */
+    .uwc-gal__caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+      padding: ${space6} ${space4} ${space3};
+      pointer-events: none;
+    }
+    .uwc-gal__caption-title {
+      margin: 0 0 ${space1};
+      color: #fff;
+      font-size: ${fontSizeXl};
+      font-weight: ${fontWeightSemibold};
+      line-height: 1.3;
+    }
+    .uwc-gal__caption-desc {
+      margin: 0;
+      color: rgba(255,255,255,0.75);
+      font-size: ${fontSizeMd};
+      line-height: 1.5;
+    }
+
+    /* ── Indicators ──────────────────────────────────────────────── */
+    .uwc-gal__indicators {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: ${space2};
+      padding: ${space2} 0;
+      flex-shrink: 0;
+    }
+
+    /* Indicators overlaid on the item */
+    .uwc-gal__indicators--on-item {
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      padding: ${space2};
+    }
+    .uwc-gal__indicators--on-item.uwc-gal__indicators--top    { top: 0; }
+    .uwc-gal__indicators--on-item.uwc-gal__indicators--bottom { bottom: 0; }
+
+    /* Indicator dot button */
+    .uwc-gal__indicator {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: ${radiusFull};
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: background ${durationBase}, transform ${durationBase}, opacity ${durationBase};
+      flex-shrink: 0;
+      /* Default: dark-on-light (outside the item) */
+      background: rgba(0,0,0,0.2);
+    }
+    .uwc-gal__indicator:hover {
+      background: rgba(0,0,0,0.4);
+    }
+    .uwc-gal__indicator.is-active {
+      background: ${primary};
+      transform: scale(1.35);
+    }
+
+    /* On-item: light dots on dark background */
+    .uwc-gal__indicators--on-item .uwc-gal__indicator {
+      background: rgba(255,255,255,0.45);
+    }
+    .uwc-gal__indicators--on-item .uwc-gal__indicator:hover {
+      background: rgba(255,255,255,0.75);
+    }
+    .uwc-gal__indicators--on-item .uwc-gal__indicator.is-active {
+      background: #fff;
+      transform: scale(1.35);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-gal__indicator { transition: none; }
+    }
+
+    /* ── Thumbnail strip ─────────────────────────────────────────── */
+    .uwc-gal__thumbnails {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      background: var(--uwc-gal-thumb-bg, #111);
+      flex-shrink: 0;
+    }
+    .uwc-gal__thumbnails--vert {
+      flex-direction: column;
+      align-self: stretch;
+      height: 100%;
+    }
+
+    /* Thumbnail viewport (clips the track, hides scrollbar) */
+    .uwc-gal__thumb-viewport {
+      flex: 1;
+      overflow: hidden;
+      scrollbar-width: none;
+      min-width: 0;
+      min-height: 0;
+    }
+    .uwc-gal__thumb-viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Thumbnail track */
+    .uwc-gal__thumb-track {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .uwc-gal__thumb-track--vert {
+      flex-direction: column;
+    }
+
+    /* Individual thumbnail button */
+    .uwc-gal__thumb-item {
+      flex: 0 0 auto;
+      width: var(--uwc-gal-thumb-w, 80px);
+      height: var(--uwc-gal-thumb-h, 60px);
+      overflow: hidden;
+      border-radius: ${radiusSm};
+      cursor: pointer;
+      border: 2px solid transparent;
+      opacity: 0.6;
+      transition:
+        opacity      ${durationBase},
+        border-color ${durationBase};
+      padding: 0;
+      background: none;
+    }
+    .uwc-gal__thumb-item:hover {
+      opacity: 0.9;
+    }
+    .uwc-gal__thumb-item.is-active {
+      border-color: var(--uwc-gal-thumb-active, #fff);
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-gal__thumb-item { transition: none; }
+    }
+
+    /* Thumbnail image */
+    .uwc-gal__default-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* ── Fullscreen dialog ───────────────────────────────────────── */
+    dialog.uwc-gal__dialog {
+      border: none;
+      background: #000;
+      padding: 0;
+      margin: 0;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    dialog.uwc-gal__dialog::backdrop {
+      background: rgba(0,0,0,0.95);
+    }
+
+    /* Inside dialog: make content fill available space */
+    dialog.uwc-gal__dialog .uwc-gal__content {
+      flex: 1;
+      min-height: 0;
+    }
+    dialog.uwc-gal__dialog .uwc-gal__item-section {
+      flex: 1;
+      min-height: 0;
+    }
+    dialog.uwc-gal__dialog .uwc-gal__item-wrapper {
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
+    }
+    dialog.uwc-gal__dialog .uwc-gal__item {
+      height: 100%;
+    }
+    dialog.uwc-gal__dialog .uwc-gal__default-img {
+      object-fit: contain;
+    }
+  `
+];
+
+// src/galleria/index.ts
+var THUMB_W = 80;
+var THUMB_H = 60;
+var THUMB_GAP = 8;
+var UwcGalleria = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.items = [];
+    this.activeIndex = 0;
+    this.numVisible = 4;
+    this.circular = false;
+    this.autoPlay = false;
+    this.autoPlayInterval = 4e3;
+    this.showThumbnails = false;
+    this.showItemNavigators = false;
+    this.showItemNavigatorsOnHover = false;
+    this.showIndicators = false;
+    this.showIndicatorsOnItem = false;
+    this.showCaption = false;
+    this.thumbnailsPosition = "bottom";
+    this.indicatorsPosition = "bottom";
+    this.fullscreenEnabled = false;
+    this.changeOnIndicatorHover = false;
+    /** Responsive breakpoint overrides. */
+    this.responsiveOptions = [];
+    this._activeIndex = 0;
+    this._isFullscreen = false;
+    this._isAnimating = false;
+    this._liveLabel = "";
+    this._effectiveNumVisible = 4;
+    this._thumbAtStart = true;
+    this._thumbAtEnd = false;
+    this._pointerStartX = 0;
+    this._pointerStartY = 0;
+    this._pointerDragging = false;
+    this._isSwiping = false;
+  }
+  // ── Lifecycle ───────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this._activeIndex = this.activeIndex;
+    this._applyResponsive();
+    this._resizeObserver = new ResizeObserver(() => this._applyResponsive());
+    this._resizeObserver.observe(this);
+    if (this.autoPlay) this._startAutoplay();
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._resizeObserver?.disconnect();
+    this._stopAutoplay();
+  }
+  firstUpdated() {
+    this._updateThumbScrollState();
+  }
+  updated(changed) {
+    if (changed.has("activeIndex")) {
+      this._setActiveIndex(this.activeIndex, false);
+    }
+    if (changed.has("autoPlay") || changed.has("autoPlayInterval")) {
+      this._stopAutoplay();
+      if (this.autoPlay) this._startAutoplay();
+    }
+    if (changed.has("items") || changed.has("numVisible")) {
+      this._applyResponsive();
+    }
+    if (changed.has("_activeIndex")) {
+      this._scrollActiveThumbIntoView();
+    }
+  }
+  // ── Responsive ──────────────────────────────────────────────────────────────
+  _applyResponsive() {
+    const w2 = this.offsetWidth;
+    let nv = this.numVisible;
+    if (this.responsiveOptions.length) {
+      const sorted = [...this.responsiveOptions].sort(
+        (a3, b3) => parseInt(b3.breakpoint) - parseInt(a3.breakpoint)
+      );
+      for (const opt of sorted) {
+        if (w2 <= parseInt(opt.breakpoint)) {
+          nv = opt.numVisible;
+        }
+      }
+    }
+    this._effectiveNumVisible = Math.max(1, Math.min(nv, this.items.length || 1));
+    this._updateThumbScrollState();
+  }
+  // ── Navigation ──────────────────────────────────────────────────────────────
+  _setActiveIndex(index, animate = true) {
+    const len = this.items.length;
+    if (len === 0) return;
+    let next;
+    if (this.circular) {
+      next = (index % len + len) % len;
+    } else {
+      next = Math.max(0, Math.min(index, len - 1));
+    }
+    if (next === this._activeIndex) return;
+    if (animate) {
+      this._isAnimating = true;
+      setTimeout(() => {
+        this._isAnimating = false;
+      }, 400);
+    }
+    this._activeIndex = next;
+    this._liveLabel = `Image ${next + 1} of ${len}`;
+    emit(this, "uwc-change", { index: next });
+  }
+  /** Navigate to the previous item. */
+  prev() {
+    this._setActiveIndex(this._activeIndex - 1);
+  }
+  /** Navigate to the next item. */
+  next() {
+    this._setActiveIndex(this._activeIndex + 1);
+  }
+  /** Navigate to a specific item index (0-based). */
+  goTo(index) {
+    this._setActiveIndex(index);
+  }
+  get isPrevDisabled() {
+    return !this.circular && this._activeIndex === 0;
+  }
+  get isNextDisabled() {
+    return !this.circular && this._activeIndex >= this.items.length - 1;
+  }
+  // ── Autoplay ─────────────────────────────────────────────────────────────────
+  _startAutoplay() {
+    if (!this.autoPlay || this.autoPlayInterval <= 0) return;
+    this._autoplayTimer = setInterval(() => {
+      const len = this.items.length;
+      if (len === 0) return;
+      const next = this.circular ? (this._activeIndex + 1) % len : this._activeIndex < len - 1 ? this._activeIndex + 1 : 0;
+      this._setActiveIndex(next);
+    }, this.autoPlayInterval);
+  }
+  _stopAutoplay() {
+    if (this._autoplayTimer) {
+      clearInterval(this._autoplayTimer);
+      this._autoplayTimer = void 0;
+    }
+  }
+  // ── Thumbnail scroll ─────────────────────────────────────────────────────────
+  _scrollActiveThumbIntoView() {
+    requestAnimationFrame(() => {
+      this.renderRoot.querySelector(".uwc-gal__thumb-item.is-active")?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    });
+  }
+  _scrollThumbs(dir) {
+    const viewport = this.renderRoot.querySelector(".uwc-gal__thumb-viewport");
+    if (!viewport) return;
+    const isVert = this.thumbnailsPosition === "left" || this.thumbnailsPosition === "right";
+    const step = this._effectiveNumVisible * ((isVert ? THUMB_H : THUMB_W) + THUMB_GAP);
+    if (isVert) {
+      viewport.scrollBy({ top: dir === "next" ? step : -step, behavior: "smooth" });
+    } else {
+      viewport.scrollBy({ left: dir === "next" ? step : -step, behavior: "smooth" });
+    }
+  }
+  _updateThumbScrollState() {
+    const viewport = this.renderRoot.querySelector(".uwc-gal__thumb-viewport");
+    if (!viewport) return;
+    const isVert = this.thumbnailsPosition === "left" || this.thumbnailsPosition === "right";
+    const scrollPos = isVert ? viewport.scrollTop : viewport.scrollLeft;
+    const scrollSize = isVert ? viewport.scrollHeight : viewport.scrollWidth;
+    const clientSize = isVert ? viewport.clientHeight : viewport.clientWidth;
+    this._thumbAtStart = scrollPos <= 1;
+    this._thumbAtEnd = scrollPos + clientSize >= scrollSize - 1;
+  }
+  _onThumbScroll() {
+    this._updateThumbScrollState();
+  }
+  // ── Event handlers ───────────────────────────────────────────────────────────
+  _onKeyDown(e9) {
+    switch (e9.key) {
+      case "ArrowLeft":
+      case "ArrowUp":
+        e9.preventDefault();
+        this.prev();
+        break;
+      case "ArrowRight":
+      case "ArrowDown":
+        e9.preventDefault();
+        this.next();
+        break;
+      case "Home":
+        e9.preventDefault();
+        this._setActiveIndex(0);
+        break;
+      case "End":
+        e9.preventDefault();
+        this._setActiveIndex(this.items.length - 1);
+        break;
+      case "Escape":
+        if (this._isFullscreen) this._closeFullscreen();
+        break;
+    }
+  }
+  _onPointerDown(e9) {
+    if (e9.button !== 0) return;
+    this._pointerStartX = e9.clientX;
+    this._pointerStartY = e9.clientY;
+    this._pointerDragging = true;
+    this._isSwiping = false;
+    this._stopAutoplay();
+  }
+  _onPointerMove(e9) {
+    if (!this._pointerDragging || this._isSwiping) return;
+    const dx = Math.abs(e9.clientX - this._pointerStartX);
+    const dy = Math.abs(e9.clientY - this._pointerStartY);
+    if (dx > 8 && dx > dy) {
+      this._isSwiping = true;
+      e9.currentTarget.setPointerCapture(e9.pointerId);
+    }
+  }
+  _onPointerUp(e9) {
+    if (!this._pointerDragging) return;
+    this._pointerDragging = false;
+    if (this._isSwiping) {
+      this._isSwiping = false;
+      const dx = e9.clientX - this._pointerStartX;
+      const dy = e9.clientY - this._pointerStartY;
+      const threshold = 50;
+      if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= threshold) {
+        dx < 0 ? this.next() : this.prev();
+      }
+    }
+    if (this.autoPlay) this._startAutoplay();
+  }
+  _onPointerCancel() {
+    this._pointerDragging = false;
+    this._isSwiping = false;
+    if (this.autoPlay) this._startAutoplay();
+  }
+  // ── Fullscreen ───────────────────────────────────────────────────────────────
+  async _openFullscreen() {
+    this._isFullscreen = true;
+    await this.updateComplete;
+    this._dialog?.showModal();
+    this._dialog?.querySelector(".uwc-gal__close-btn uwc-button")?.focus();
+    emit(this, "uwc-fullscreen-open", {});
+  }
+  _closeFullscreen() {
+    this._dialog?.close();
+    this._isFullscreen = false;
+    emit(this, "uwc-fullscreen-close", {});
+  }
+  // ── Default templates ────────────────────────────────────────────────────────
+  _getItemSrc(item) {
+    const it = item;
+    return String(it["itemImageSrc"] ?? it["src"] ?? it["image"] ?? it["url"] ?? "");
+  }
+  _getItemAlt(item) {
+    const it = item;
+    return String(it["alt"] ?? it["title"] ?? "");
+  }
+  _defaultItemTpl(item) {
+    const src = this._getItemSrc(item);
+    const alt = this._getItemAlt(item);
+    return b2`<img class="uwc-gal__default-img" src=${src} alt=${alt} loading="lazy" draggable="false" />`;
+  }
+  _defaultThumbTpl(item) {
+    const it = item;
+    const src = String(it["thumbnailImageSrc"] ?? it["thumb"] ?? it["thumbnail"] ?? this._getItemSrc(item));
+    const alt = this._getItemAlt(item);
+    return b2`<img class="uwc-gal__default-thumb" src=${src} alt=${alt} loading="lazy" draggable="false" />`;
+  }
+  _defaultCaptionTpl(item) {
+    const it = item;
+    const title = it["title"] ? String(it["title"]) : "";
+    const desc = it["description"] ? String(it["description"]) : it["alt"] ? String(it["alt"]) : "";
+    return b2`
+      ${title ? b2`<p class="uwc-gal__caption-title">${title}</p>` : A}
+      ${desc ? b2`<p class="uwc-gal__caption-desc">${desc}</p>` : A}
+    `;
+  }
+  // ── Render helpers ───────────────────────────────────────────────────────────
+  _renderNavBtn(dir) {
+    const isPrev = dir === "prev";
+    const icon = isPrev ? "chevron-left" : "chevron-right";
+    const label = isPrev ? "Previous image" : "Next image";
+    const disabled = isPrev ? this.isPrevDisabled : this.isNextDisabled;
+    const handler = isPrev ? () => this.prev() : () => this.next();
+    return b2`
+      <uwc-button
+        icon=${icon}
+        icon-only
+        aria-label=${label}
+        rounded
+        variant="secondary"
+        outline
+        ?disabled=${disabled}
+        @uwc-click=${handler}
+      ></uwc-button>
+    `;
+  }
+  _renderIndicators(inItem = false) {
+    const posClass = `uwc-gal__indicators--${this.indicatorsPosition}`;
+    const classes = {
+      "uwc-gal__indicators": true,
+      "uwc-gal__indicators--on-item": inItem,
+      "uwc-gal__indicators--top": inItem && this.indicatorsPosition === "top",
+      "uwc-gal__indicators--bottom": inItem && this.indicatorsPosition === "bottom",
+      [posClass]: !inItem
+    };
+    return b2`
+      <div
+        class=${e7(classes)}
+        role="tablist"
+        aria-label="Gallery indicators"
+      >
+        ${c4(
+      this.items,
+      (_2, i8) => i8,
+      (_2, i8) => b2`
+            <button
+              type="button"
+              class=${e7({ "uwc-gal__indicator": true, "is-active": i8 === this._activeIndex })}
+              role="tab"
+              aria-selected=${i8 === this._activeIndex ? "true" : "false"}
+              aria-label="Go to image ${i8 + 1}"
+              @click=${() => this._setActiveIndex(i8)}
+              @mouseenter=${this.changeOnIndicatorHover ? () => this._setActiveIndex(i8) : A}
+            ></button>
+          `
+    )}
+      </div>
+    `;
+  }
+  _renderThumbnailStrip() {
+    const isVert = this.thumbnailsPosition === "left" || this.thumbnailsPosition === "right";
+    return b2`
+      <div class=${e7({ "uwc-gal__thumbnails": true, "uwc-gal__thumbnails--vert": isVert })}>
+        <!-- Scroll prev -->
+        <uwc-button
+          size="small"
+          text
+          icon-only
+          icon=${isVert ? "chevron-up" : "chevron-left"}
+          aria-label="Scroll thumbnails backward"
+          ?disabled=${this._thumbAtStart}
+          @uwc-click=${() => this._scrollThumbs("prev")}
+        ></uwc-button>
+
+        <!-- Viewport + track -->
+        <div class="uwc-gal__thumb-viewport" @scroll=${this._onThumbScroll}>
+          <div class=${e7({ "uwc-gal__thumb-track": true, "uwc-gal__thumb-track--vert": isVert })}>
+            ${c4(
+      this.items,
+      (_2, i8) => i8,
+      (item, i8) => b2`
+                <button
+                  type="button"
+                  class=${e7({ "uwc-gal__thumb-item": true, "is-active": i8 === this._activeIndex })}
+                  aria-label="View image ${i8 + 1}"
+                  aria-pressed=${i8 === this._activeIndex ? "true" : "false"}
+                  @click=${() => this._setActiveIndex(i8)}
+                >
+                  ${this.thumbnailTemplate ? this.thumbnailTemplate(item, i8) : this._defaultThumbTpl(item)}
+                </button>
+              `
+    )}
+          </div>
+        </div>
+
+        <!-- Scroll next -->
+        <uwc-button
+          size="small"
+          text
+          icon-only
+          icon=${isVert ? "chevron-down" : "chevron-right"}
+          aria-label="Scroll thumbnails forward"
+          ?disabled=${this._thumbAtEnd}
+          @uwc-click=${() => this._scrollThumbs("next")}
+        ></uwc-button>
+      </div>
+    `;
+  }
+  _renderItemSection(inFullscreen = false) {
+    const showNav = this.showItemNavigators || this.showItemNavigatorsOnHover;
+    const hoverNav = this.showItemNavigatorsOnHover && !this.showItemNavigators;
+    const activeItem = this.items[this._activeIndex];
+    const topIndicators = this.showIndicators && !this.showIndicatorsOnItem && this.indicatorsPosition === "top" ? this._renderIndicators(false) : A;
+    const bottomIndicators = this.showIndicators && !this.showIndicatorsOnItem && this.indicatorsPosition === "bottom" ? this._renderIndicators(false) : A;
+    const onItemIndicators = this.showIndicators && this.showIndicatorsOnItem ? this._renderIndicators(true) : A;
+    return b2`
+      <div class="uwc-gal__item-section">
+        ${topIndicators}
+
+        <div
+          class=${e7({
+      "uwc-gal__item-wrapper": true,
+      "uwc-gal__item-wrapper--has-hover-nav": hoverNav
+    })}
+          tabindex="0"
+          role="group"
+          aria-roledescription="gallery"
+          aria-label="Image gallery"
+          @keydown=${this._onKeyDown}
+          @pointerdown=${this._onPointerDown}
+          @pointermove=${this._onPointerMove}
+          @pointerup=${this._onPointerUp}
+          @pointercancel=${this._onPointerCancel}
+        >
+          <!-- Prev nav area -->
+          ${showNav ? b2`
+            <div class="uwc-gal__nav-area uwc-gal__nav-area--prev">
+              ${this._renderNavBtn("prev")}
+            </div>
+          ` : A}
+
+          <!-- Active item -->
+          <div
+            class=${e7({ "uwc-gal__item": true, "is-animating": this._isAnimating })}
+            role="img"
+            aria-label=${this._liveLabel || `Image ${this._activeIndex + 1} of ${this.items.length}`}
+          >
+            ${activeItem != null ? this.itemTemplate ? this.itemTemplate(activeItem, this._activeIndex) : this._defaultItemTpl(activeItem) : A}
+
+            <!-- Caption overlay -->
+            ${this.showCaption && activeItem != null ? b2`
+              <div class="uwc-gal__caption">
+                ${this.captionTemplate ? this.captionTemplate(activeItem, this._activeIndex) : this._defaultCaptionTpl(activeItem)}
+              </div>
+            ` : A}
+
+            <!-- On-item indicators -->
+            ${onItemIndicators}
+          </div>
+
+          <!-- Next nav area -->
+          ${showNav ? b2`
+            <div class="uwc-gal__nav-area uwc-gal__nav-area--next">
+              ${this._renderNavBtn("next")}
+            </div>
+          ` : A}
+
+          <!-- Fullscreen open button (only when not already in fullscreen) -->
+          ${this.fullscreenEnabled && !inFullscreen ? b2`
+            <div class="uwc-gal__fullscreen-btn">
+              <uwc-button
+                icon="arrows-fullscreen"
+                icon-only
+                size="small"
+                variant="secondary"
+                outline
+                aria-label="Open fullscreen"
+                @uwc-click=${this._openFullscreen}
+              ></uwc-button>
+            </div>
+          ` : A}
+
+          <!-- Close button (only when in fullscreen) -->
+          ${inFullscreen ? b2`
+            <div class="uwc-gal__close-btn">
+              <uwc-button
+                icon="x-lg"
+                icon-only
+                size="small"
+                variant="secondary"
+                outline
+                aria-label="Close fullscreen"
+                @uwc-click=${this._closeFullscreen}
+              ></uwc-button>
+            </div>
+          ` : A}
+        </div>
+
+        ${bottomIndicators}
+      </div>
+    `;
+  }
+  _renderContent(inFullscreen = false) {
+    const pos = this.thumbnailsPosition;
+    const isVert = pos === "left" || pos === "right";
+    const contentClasses = {
+      "uwc-gal__content": true,
+      "uwc-gal__content--left": pos === "left",
+      "uwc-gal__content--right": pos === "right"
+    };
+    const thumbStrip = this.showThumbnails ? this._renderThumbnailStrip() : A;
+    const itemSection = this._renderItemSection(inFullscreen);
+    if (pos === "top") {
+      return b2`
+        <div class=${e7(contentClasses)}>
+          ${thumbStrip}
+          ${itemSection}
+        </div>
+      `;
+    }
+    if (pos === "left") {
+      return b2`
+        <div class=${e7(contentClasses)}>
+          ${thumbStrip}
+          ${itemSection}
+        </div>
+      `;
+    }
+    if (pos === "right") {
+      return b2`
+        <div class=${e7(contentClasses)}>
+          ${itemSection}
+          ${thumbStrip}
+        </div>
+      `;
+    }
+    return b2`
+      <div class=${e7(contentClasses)}>
+        ${itemSection}
+        ${thumbStrip}
+      </div>
+    `;
+  }
+  // ── Render ────────────────────────────────────────────────────────────────────
+  render() {
+    return b2`
+      <!-- Live region for screen readers -->
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap"
+      >${this._liveLabel}</div>
+
+      <slot name="header"></slot>
+
+      <div class="uwc-gal">
+        ${this._renderContent()}
+      </div>
+
+      <slot name="footer"></slot>
+
+      ${this._isFullscreen ? b2`
+        <dialog
+          class="uwc-gal__dialog"
+          @close=${this._closeFullscreen}
+          @keydown=${this._onKeyDown}
+        >
+          <div class="uwc-gal">
+            ${this._renderContent(true)}
+          </div>
+        </dialog>
+      ` : A}
+    `;
+  }
+};
+UwcGalleria.styles = styles_default20;
+__decorateClass([
+  n4({ type: Array })
+], UwcGalleria.prototype, "items", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "active-index" })
+], UwcGalleria.prototype, "activeIndex", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "num-visible" })
+], UwcGalleria.prototype, "numVisible", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcGalleria.prototype, "circular", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "auto-play" })
+], UwcGalleria.prototype, "autoPlay", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "auto-play-interval" })
+], UwcGalleria.prototype, "autoPlayInterval", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-thumbnails" })
+], UwcGalleria.prototype, "showThumbnails", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-item-navigators" })
+], UwcGalleria.prototype, "showItemNavigators", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-item-navigators-on-hover" })
+], UwcGalleria.prototype, "showItemNavigatorsOnHover", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-indicators" })
+], UwcGalleria.prototype, "showIndicators", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-indicators-on-item" })
+], UwcGalleria.prototype, "showIndicatorsOnItem", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-caption" })
+], UwcGalleria.prototype, "showCaption", 2);
+__decorateClass([
+  n4({ attribute: "thumbnails-position" })
+], UwcGalleria.prototype, "thumbnailsPosition", 2);
+__decorateClass([
+  n4({ attribute: "indicators-position" })
+], UwcGalleria.prototype, "indicatorsPosition", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "fullscreen-enabled" })
+], UwcGalleria.prototype, "fullscreenEnabled", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "change-on-indicator-hover" })
+], UwcGalleria.prototype, "changeOnIndicatorHover", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_activeIndex", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_isFullscreen", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_isAnimating", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_liveLabel", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_effectiveNumVisible", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_thumbAtStart", 2);
+__decorateClass([
+  r5()
+], UwcGalleria.prototype, "_thumbAtEnd", 2);
+__decorateClass([
+  e5("dialog")
+], UwcGalleria.prototype, "_dialog", 2);
+
+// src/galleria/react.ts
+var UwcGalleriaReact = createComponent23({
+  react: React23,
+  tagName: "uwc-galleria",
+  elementClass: UwcGalleria,
+  events: {
+    onUwcChange: "uwc-change",
+    onUwcFullscreenOpen: "uwc-fullscreen-open",
+    onUwcFullscreenClose: "uwc-fullscreen-close"
+  }
+});
+
+// src/splitter/react.ts
+import React24 from "react";
+import { createComponent as createComponent24 } from "@lit/react";
+
+// src/splitter/styles.ts
+var panelStyles2 = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+      overflow: auto;
+      min-width: 0;
+      min-height: 0;
+
+      /* Custom scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: ${border} transparent;
+    }
+    :host::-webkit-scrollbar       { width: 5px; height: 5px; }
+    :host::-webkit-scrollbar-thumb {
+      background:    ${border};
+      border-radius: ${radiusFull};
+    }
+  `
+];
+var splitterStyles = [
+  hostReset,
+  i`
+    :host {
+      display:   flex;
+      overflow:  hidden;
+      width:     100%;
+      height:    100%;
+    }
+
+    :host([layout='vertical']) {
+      flex-direction: column;
+    }
+
+    /* Slot is transparent — panels/gutters become direct flex children */
+    slot {
+      display: contents;
+    }
+
+    /* ── Slotted panels ────────────────────────────────────────────────── */
+    ::slotted(uwc-splitter-panel) {
+      flex-shrink: 0;
+      flex-grow:   0;
+      overflow:    hidden;
+      min-width:   0;
+      min-height:  0;
+    }
+
+    /* ── Gutters (injected as light-DOM divs, distributed via default slot) */
+    ::slotted(.uwc-splitter__gutter) {
+      flex-shrink:      0;
+      flex-grow:        0;
+      position:         relative;
+      display:          flex;
+      align-items:      center;
+      justify-content:  center;
+      z-index:          1;
+      outline:          none;
+      /* background / cursor set via inline styles (dynamic) */
+    }
+
+    ::slotted(.uwc-splitter__gutter:focus-visible) {
+      background-color: var(--uwc-splitter-gutter-focus-bg, ${selectedBg}) !important;
+    }
+  `
+];
+
+// src/splitter/index.ts
+var UwcSplitterPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.size = null;
+    this.minSize = 0;
+  }
+  render() {
+    return b2`<slot></slot>`;
+  }
+};
+UwcSplitterPanel.styles = panelStyles2;
+__decorateClass([
+  n4({ type: Number })
+], UwcSplitterPanel.prototype, "size", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "min-size" })
+], UwcSplitterPanel.prototype, "minSize", 2);
+var UwcSplitter = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.layout = "horizontal";
+    this.gutterSize = 6;
+    this.stateKey = "";
+    this.stateStorage = "local";
+    this.step = 5;
+    // ── Private state ─────────────────────────────────────────────────────────
+    this._panels = [];
+    this._sizes = [];
+    this._gutters = [];
+    this._handles = [];
+    this._draggingIndex = -1;
+    this._startPos = 0;
+    this._startSizeA = 0;
+    this._startSizeB = 0;
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._cleanup();
+  }
+  firstUpdated() {
+    this._setup();
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("layout") || changed.has("gutterSize")) {
+      this._cleanup();
+      this._setup();
+    }
+  }
+  // ── Setup / teardown ──────────────────────────────────────────────────────
+  _setup() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcSplitterPanel
+    );
+    if (this._panels.length < 2) return;
+    this._sizes = this._loadState() ?? this._defaultSizes();
+    this._applyPanelStyles();
+    this._injectGutters();
+  }
+  _cleanup() {
+    this._gutters.forEach((g2) => g2.remove());
+    this._gutters = [];
+    this._handles = [];
+  }
+  _defaultSizes() {
+    let defined = 0;
+    const raw = this._panels.map((p4) => {
+      if (p4.size != null) {
+        defined += p4.size;
+        return p4.size;
+      }
+      return -1;
+    });
+    const unset = raw.filter((s5) => s5 < 0).length;
+    const perUnset = unset > 0 ? (100 - defined) / unset : 0;
+    return raw.map((s5) => s5 < 0 ? perUnset : s5);
+  }
+  /**
+   * Applies flex-basis to each panel using the split.js formula:
+   *   calc(X% - X/100 * totalGutterPx)
+   * This ensures panels + gutters always sum to exactly 100% of the container.
+   */
+  _applyPanelStyles() {
+    const isH = this.layout !== "vertical";
+    const totalGutterPx = (this._panels.length - 1) * this.gutterSize;
+    this._panels.forEach((p4, i8) => {
+      const pct = this._sizes[i8];
+      const gutterAdj = pct / 100 * totalGutterPx;
+      const basis = `calc(${pct}% - ${gutterAdj}px)`;
+      p4.style.flexBasis = basis;
+      if (isH) {
+        p4.style.width = basis;
+        p4.style.height = "100%";
+        p4.style.minWidth = p4.minSize > 0 ? `calc(${p4.minSize}% - ${p4.minSize / 100 * totalGutterPx}px)` : "";
+        p4.style.minHeight = "";
+      } else {
+        p4.style.height = basis;
+        p4.style.width = "100%";
+        p4.style.minHeight = p4.minSize > 0 ? `calc(${p4.minSize}% - ${p4.minSize / 100 * totalGutterPx}px)` : "";
+        p4.style.minWidth = "";
+      }
+    });
+  }
+  _injectGutters() {
+    const isH = this.layout !== "vertical";
+    for (let i8 = 0; i8 < this._panels.length - 1; i8++) {
+      const gutter = document.createElement("div");
+      gutter.className = "uwc-splitter__gutter";
+      gutter.setAttribute("role", "separator");
+      gutter.setAttribute("aria-orientation", isH ? "vertical" : "horizontal");
+      gutter.setAttribute("aria-valuenow", String(Math.round(this._sizes[i8])));
+      gutter.setAttribute("aria-valuemin", String(this._panels[i8].minSize));
+      gutter.setAttribute("aria-valuemax", String(100 - this._panels[i8 + 1].minSize));
+      gutter.setAttribute("aria-label", `Resize panel ${i8 + 1}`);
+      gutter.setAttribute("tabindex", "0");
+      gutter.style.flexBasis = `${this.gutterSize}px`;
+      gutter.style.backgroundColor = "var(--uwc-splitter-gutter-bg, transparent)";
+      gutter.style.transition = "background-color 180ms ease";
+      if (isH) {
+        gutter.style.width = `${this.gutterSize}px`;
+        gutter.style.height = "100%";
+        gutter.style.cursor = "col-resize";
+      } else {
+        gutter.style.height = `${this.gutterSize}px`;
+        gutter.style.width = "100%";
+        gutter.style.cursor = "row-resize";
+      }
+      const handle = document.createElement("div");
+      handle.className = "uwc-splitter__handle";
+      handle.style.cssText = `
+        pointer-events: none;
+        border-radius:  9999px;
+        background:     var(--uwc-splitter-handle-color, rgba(0,0,0,0.18));
+        transition:     background 200ms ease, transform 200ms ease;
+        ${isH ? "width: 3px; height: 36px;" : "width: 36px; height: 3px;"}
+      `;
+      gutter.appendChild(handle);
+      gutter.addEventListener("mouseenter", () => {
+        if (this._draggingIndex >= 0) return;
+        gutter.style.backgroundColor = "var(--uwc-splitter-gutter-hover-bg, rgba(99,102,241,0.07))";
+        handle.style.background = "var(--uwc-splitter-handle-hover, #6366f1)";
+        handle.style.transform = isH ? "scaleX(1.75)" : "scaleY(1.75)";
+      });
+      gutter.addEventListener("mouseleave", () => {
+        if (this._draggingIndex >= 0) return;
+        gutter.style.backgroundColor = "var(--uwc-splitter-gutter-bg, transparent)";
+        handle.style.background = "var(--uwc-splitter-handle-color, rgba(0,0,0,0.18))";
+        handle.style.transform = "";
+      });
+      gutter.addEventListener("mousedown", (e9) => {
+        e9.preventDefault();
+        this._startMouseDrag(e9, i8);
+      });
+      gutter.addEventListener("touchstart", (e9) => {
+        e9.preventDefault();
+        this._startTouchDrag(e9, i8);
+      }, { passive: false });
+      gutter.addEventListener("keydown", (e9) => this._onGutterKeydown(e9, i8));
+      this._panels[i8].insertAdjacentElement("afterend", gutter);
+      this._gutters.push(gutter);
+      this._handles.push(handle);
+    }
+  }
+  // ── Drag — mouse ──────────────────────────────────────────────────────────
+  _startMouseDrag(e9, index) {
+    const isH = this.layout !== "vertical";
+    this._beginDrag(index, isH ? e9.clientX : e9.clientY);
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = isH ? "col-resize" : "row-resize";
+    const onMove = (ev) => {
+      this._moveDrag(index, isH ? ev.clientX : ev.clientY);
+    };
+    const onUp = () => {
+      this._endDrag(index);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }
+  // ── Drag — touch ──────────────────────────────────────────────────────────
+  _startTouchDrag(e9, index) {
+    const isH = this.layout !== "vertical";
+    const touch = e9.touches[0];
+    this._beginDrag(index, isH ? touch.clientX : touch.clientY);
+    const onMove = (ev) => {
+      const t6 = ev.touches[0];
+      this._moveDrag(index, isH ? t6.clientX : t6.clientY);
+    };
+    const onEnd = () => {
+      this._endDrag(index);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+    };
+    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchend", onEnd);
+  }
+  // ── Drag — shared helpers ─────────────────────────────────────────────────
+  _beginDrag(index, pos) {
+    this._draggingIndex = index;
+    this._startPos = pos;
+    this._startSizeA = this._sizes[index];
+    this._startSizeB = this._sizes[index + 1];
+    const isH = this.layout !== "vertical";
+    const gutter = this._gutters[index];
+    const handle = this._handles[index];
+    if (gutter) gutter.style.backgroundColor = "var(--uwc-splitter-gutter-active-bg, rgba(99,102,241,0.12))";
+    if (handle) {
+      handle.style.background = "var(--uwc-splitter-handle-active, #6366f1)";
+      handle.style.transform = isH ? "scaleX(2.25)" : "scaleY(2.25)";
+    }
+    emit(this, "uwc-resize-start", { detail: { sizes: [...this._sizes] } });
+  }
+  _moveDrag(index, pos) {
+    const isH = this.layout !== "vertical";
+    const containerRect = this.getBoundingClientRect();
+    const containerSize = isH ? containerRect.width : containerRect.height;
+    const gutterTotal = (this._panels.length - 1) * this.gutterSize;
+    const available = containerSize - gutterTotal;
+    if (available <= 0) return;
+    const deltaPct = (pos - this._startPos) / available * 100;
+    const minA = this._panels[index].minSize;
+    const minB = this._panels[index + 1].minSize;
+    const total = this._startSizeA + this._startSizeB;
+    const newA = Math.max(minA, Math.min(total - minB, this._startSizeA + deltaPct));
+    const newB = total - newA;
+    this._sizes[index] = newA;
+    this._sizes[index + 1] = newB;
+    this._applyPanelStyles();
+    const gutter = this._gutters[index];
+    if (gutter) gutter.setAttribute("aria-valuenow", String(Math.round(newA)));
+    emit(this, "uwc-resize", { detail: { sizes: [...this._sizes] } });
+  }
+  _endDrag(index) {
+    this._draggingIndex = -1;
+    const gutter = this._gutters[index];
+    const handle = this._handles[index];
+    if (gutter) gutter.style.backgroundColor = "var(--uwc-splitter-gutter-bg, transparent)";
+    if (handle) {
+      handle.style.background = "var(--uwc-splitter-handle-color, rgba(0,0,0,0.18))";
+      handle.style.transform = "";
+    }
+    this._saveState();
+    emit(this, "uwc-resize-end", { detail: { sizes: [...this._sizes] } });
+  }
+  // ── Keyboard ──────────────────────────────────────────────────────────────
+  _onGutterKeydown(e9, index) {
+    const isH = this.layout !== "vertical";
+    const minA = this._panels[index].minSize;
+    const minB = this._panels[index + 1].minSize;
+    const total = this._sizes[index] + this._sizes[index + 1];
+    let delta = 0;
+    if (isH) {
+      if (e9.key === "ArrowLeft") delta = -this.step;
+      if (e9.key === "ArrowRight") delta = +this.step;
+      if (e9.key === "Home") delta = -(this._sizes[index] - minA);
+      if (e9.key === "End") delta = total - minB - this._sizes[index];
+    } else {
+      if (e9.key === "ArrowUp") delta = -this.step;
+      if (e9.key === "ArrowDown") delta = +this.step;
+      if (e9.key === "Home") delta = -(this._sizes[index] - minA);
+      if (e9.key === "End") delta = total - minB - this._sizes[index];
+    }
+    if (!delta) return;
+    e9.preventDefault();
+    const newA = Math.max(minA, Math.min(total - minB, this._sizes[index] + delta));
+    this._sizes[index] = newA;
+    this._sizes[index + 1] = total - newA;
+    this._applyPanelStyles();
+    const gutter = this._gutters[index];
+    if (gutter) gutter.setAttribute("aria-valuenow", String(Math.round(newA)));
+    this._saveState();
+    emit(this, "uwc-resize", { detail: { sizes: [...this._sizes] } });
+  }
+  // ── State persistence ─────────────────────────────────────────────────────
+  _loadState() {
+    if (!this.stateKey) return null;
+    try {
+      const storage = this.stateStorage === "session" ? sessionStorage : localStorage;
+      const raw = storage.getItem(this.stateKey);
+      if (raw) return JSON.parse(raw);
+    } catch {
+    }
+    return null;
+  }
+  _saveState() {
+    if (!this.stateKey) return;
+    try {
+      const storage = this.stateStorage === "session" ? sessionStorage : localStorage;
+      storage.setItem(this.stateKey, JSON.stringify(this._sizes));
+    } catch {
+    }
+  }
+  // ── Public API ────────────────────────────────────────────────────────────
+  /** Return a copy of the current panel sizes (percentages). */
+  getSizes() {
+    return [...this._sizes];
+  }
+  /**
+   * Reset panels to their initial `size` attribute values (or equal split) and
+   * clear any persisted state.
+   */
+  resetSizes() {
+    if (this.stateKey) {
+      const storage = this.stateStorage === "session" ? sessionStorage : localStorage;
+      storage.removeItem(this.stateKey);
+    }
+    this._cleanup();
+    this._sizes = this._defaultSizes();
+    this._applyPanelStyles();
+    this._injectGutters();
+    emit(this, "uwc-resize-end", { detail: { sizes: [...this._sizes] } });
+  }
+  // ── Render ────────────────────────────────────────────────────────────────
+  render() {
+    return b2`<slot @slotchange=${this._onSlotChange}></slot>`;
+  }
+  /**
+   * Fired when slotted children change. Only re-initialize when the number of
+   * actual panels changes (not when we inject/remove gutters, which are plain
+   * divs filtered out by the instanceof check).
+   */
+  _onSlotChange() {
+    const newPanels = Array.from(this.children).filter(
+      (el) => el instanceof UwcSplitterPanel
+    );
+    if (newPanels.length !== this._panels.length) {
+      this._cleanup();
+      this._setup();
+    }
+  }
+};
+UwcSplitter.styles = splitterStyles;
+__decorateClass([
+  n4({ reflect: true })
+], UwcSplitter.prototype, "layout", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "gutter-size" })
+], UwcSplitter.prototype, "gutterSize", 2);
+__decorateClass([
+  n4({ attribute: "state-key" })
+], UwcSplitter.prototype, "stateKey", 2);
+__decorateClass([
+  n4({ attribute: "state-storage" })
+], UwcSplitter.prototype, "stateStorage", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcSplitter.prototype, "step", 2);
+
+// src/splitter/react.ts
+var UwcSplitterReact = createComponent24({
+  react: React24,
+  tagName: "uwc-splitter",
+  elementClass: UwcSplitter,
+  events: {
+    onUwcResizeStart: "uwc-resize-start",
+    onUwcResize: "uwc-resize",
+    onUwcResizeEnd: "uwc-resize-end"
+  }
+});
+var UwcSplitterPanelReact = createComponent24({
+  react: React24,
+  tagName: "uwc-splitter-panel",
+  elementClass: UwcSplitterPanel,
+  events: {}
+});
 export {
   UwcAccordionReact as UwcAccordion,
   UwcAccordionPanelReact as UwcAccordionPanel,
@@ -11263,6 +12679,7 @@ export {
   UwcDatepicker2 as UwcDatepicker,
   UwcDialog2 as UwcDialog,
   UwcDropdown2 as UwcDropdown,
+  UwcGalleriaReact as UwcGalleria,
   UwcIcon2 as UwcIcon,
   UwcInputText2 as UwcInputText,
   UwcListbox2 as UwcListbox,
@@ -11271,6 +12688,8 @@ export {
   UwcPaginator2 as UwcPaginator,
   UwcPopover2 as UwcPopover,
   UwcRadioButton2 as UwcRadioButton,
+  UwcSplitterReact as UwcSplitter,
+  UwcSplitterPanelReact as UwcSplitterPanel,
   UwcTabPanel2 as UwcTabPanel,
   UwcTabs2 as UwcTabs,
   UwcToggleButton2 as UwcToggleButton,
