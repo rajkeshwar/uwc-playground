@@ -1707,7 +1707,7 @@ var UwcCarousel = class extends i4 {
     this.circular = false;
     this.autoplayInterval = 0;
     this.orientation = "horizontal";
-    this.showNavigators = true;
+    this.showNavigators = false;
     this.showIndicators = true;
     this.prevIcon = "chevron-left";
     this.nextIcon = "chevron-right";
@@ -1729,7 +1729,10 @@ var UwcCarousel = class extends i4 {
   // ── Lifecycle ───────────────────────────────────────────────────────────────
   connectedCallback() {
     super.connectedCallback();
-    this._resizeObserver = new ResizeObserver(() => this._applyResponsive());
+    this._resizeObserver = new ResizeObserver(() => {
+      this._applyResponsive();
+      requestAnimationFrame(() => this._measureViewport());
+    });
     this._resizeObserver.observe(this);
     this._applyResponsive();
   }
@@ -1737,6 +1740,9 @@ var UwcCarousel = class extends i4 {
     super.disconnectedCallback();
     this._resizeObserver?.disconnect();
     this._stopAutoplay();
+  }
+  firstUpdated() {
+    this._measureViewport();
   }
   updated(changed) {
     if (changed.has("autoplayInterval")) {
@@ -1748,8 +1754,15 @@ var UwcCarousel = class extends i4 {
       const maxPage = this._maxPage;
       if (this._page > maxPage) this._page = maxPage;
     }
+    if (changed.has("orientation")) {
+      requestAnimationFrame(() => this._measureViewport());
+    }
   }
   // ── Responsive ─────────────────────────────────────────────────────────────
+  _measureViewport() {
+    const h4 = this._viewport?.offsetHeight ?? 0;
+    if (h4 > 0 && h4 !== this._viewportH) this._viewportH = h4;
+  }
   _applyResponsive() {
     const w2 = this.offsetWidth;
     let nv = this.numVisible;
@@ -1767,6 +1780,9 @@ var UwcCarousel = class extends i4 {
     }
     this._effectiveNumVisible = Math.max(1, Math.min(nv, this.items.length || 1));
     this._effectiveNumScroll = Math.max(1, ns);
+    if (this.orientation === "vertical") {
+      requestAnimationFrame(() => this._measureViewport());
+    }
   }
   // ── Pagination ──────────────────────────────────────────────────────────────
   get _totalPages() {
@@ -1815,6 +1831,31 @@ var UwcCarousel = class extends i4 {
   }
   _next() {
     this._goTo(this._page + 1);
+  }
+  // ── Public navigation API ────────────────────────────────────────────────────
+  /** Navigate to the previous page. No-op when already at the first page (non-circular). */
+  prev() {
+    this._prev();
+  }
+  /** Navigate to the next page. No-op when already at the last page (non-circular). */
+  next() {
+    this._next();
+  }
+  /** Navigate to an explicit page index (0-based). */
+  goTo(page) {
+    this._goTo(page);
+  }
+  /** Total number of pages for the current items / numVisible / numScroll configuration. */
+  get totalPages() {
+    return this._totalPages;
+  }
+  /** Whether the previous button would be disabled (first page, non-circular). */
+  get isPrevDisabled() {
+    return this._isPrevDisabled;
+  }
+  /** Whether the next button would be disabled (last page, non-circular). */
+  get isNextDisabled() {
+    return this._isNextDisabled;
   }
   // ── Autoplay ─────────────────────────────────────────────────────────────────
   _startAutoplay() {
@@ -1900,11 +1941,18 @@ var UwcCarousel = class extends i4 {
   }
   // ── Computed transform ───────────────────────────────────────────────────────
   get _trackStyle() {
+    if (this.orientation === "vertical") {
+      if (this._viewportH > 0) {
+        const itemH = this._viewportH / this._effectiveNumVisible;
+        const offsetPx = -(this._page * this._effectiveNumScroll * itemH);
+        return { transform: `translateY(${offsetPx}px)` };
+      }
+      const itemPct2 = 100 / this._effectiveNumVisible;
+      const offsetPct2 = -(this._page * this._effectiveNumScroll * itemPct2);
+      return { transform: `translateY(${offsetPct2}%)` };
+    }
     const itemPct = 100 / this._effectiveNumVisible;
     const offsetPct = -(this._page * this._effectiveNumScroll * itemPct);
-    if (this.orientation === "vertical") {
-      return { transform: `translateY(${offsetPct}%)` };
-    }
     return { transform: `translateX(${offsetPct}%)` };
   }
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -1912,7 +1960,8 @@ var UwcCarousel = class extends i4 {
     const itemPct = 100 / this._effectiveNumVisible;
     const isHoriz = this.orientation === "horizontal";
     const pages = this._totalPages;
-    const itemStyle = isHoriz ? { width: `${itemPct}%` } : { height: `${itemPct}%`, width: "100%" };
+    const itemH = !isHoriz && this._viewportH > 0 ? this._viewportH / this._effectiveNumVisible : null;
+    const itemStyle = isHoriz ? { width: `${itemPct}%` } : { height: itemH != null ? `${itemH}px` : `${itemPct}%`, width: "100%" };
     return b2`
       <!-- Live region for screen readers -->
       <div
