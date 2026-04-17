@@ -667,8 +667,155 @@ var e7 = e6(class extends i5 {
   }
 });
 
-// node_modules/lit-html/directives/if-defined.js
-var o6 = (o10) => o10 ?? A;
+// node_modules/lit-html/directive-helpers.js
+var { I: t4 } = j;
+var i6 = (o10) => o10;
+var r6 = (o10) => void 0 === o10.strings;
+var s4 = () => document.createComment("");
+var v2 = (o10, n6, e9) => {
+  const l4 = o10._$AA.parentNode, d3 = void 0 === n6 ? o10._$AB : n6._$AA;
+  if (void 0 === e9) {
+    const i8 = l4.insertBefore(s4(), d3), n7 = l4.insertBefore(s4(), d3);
+    e9 = new t4(i8, n7, o10, o10.options);
+  } else {
+    const t6 = e9._$AB.nextSibling, n7 = e9._$AM, c5 = n7 !== o10;
+    if (c5) {
+      let t7;
+      e9._$AQ?.(o10), e9._$AM = o10, void 0 !== e9._$AP && (t7 = o10._$AU) !== n7._$AU && e9._$AP(t7);
+    }
+    if (t6 !== d3 || c5) {
+      let o11 = e9._$AA;
+      for (; o11 !== t6; ) {
+        const t7 = i6(o11).nextSibling;
+        i6(l4).insertBefore(o11, d3), o11 = t7;
+      }
+    }
+  }
+  return e9;
+};
+var u3 = (o10, t6, i8 = o10) => (o10._$AI(t6, i8), o10);
+var m2 = {};
+var p3 = (o10, t6 = m2) => o10._$AH = t6;
+var M2 = (o10) => o10._$AH;
+var h3 = (o10) => {
+  o10._$AR(), o10._$AA.remove();
+};
+
+// node_modules/lit-html/directives/repeat.js
+var u4 = (e9, s5, t6) => {
+  const r7 = /* @__PURE__ */ new Map();
+  for (let l4 = s5; l4 <= t6; l4++) r7.set(e9[l4], l4);
+  return r7;
+};
+var c4 = e6(class extends i5 {
+  constructor(e9) {
+    if (super(e9), e9.type !== t3.CHILD) throw Error("repeat() can only be used in text expressions");
+  }
+  dt(e9, s5, t6) {
+    let r7;
+    void 0 === t6 ? t6 = s5 : void 0 !== s5 && (r7 = s5);
+    const l4 = [], o10 = [];
+    let i8 = 0;
+    for (const s6 of e9) l4[i8] = r7 ? r7(s6, i8) : i8, o10[i8] = t6(s6, i8), i8++;
+    return { values: o10, keys: l4 };
+  }
+  render(e9, s5, t6) {
+    return this.dt(e9, s5, t6).values;
+  }
+  update(s5, [t6, r7, c5]) {
+    const d3 = M2(s5), { values: p4, keys: a3 } = this.dt(t6, r7, c5);
+    if (!Array.isArray(d3)) return this.ut = a3, p4;
+    const h4 = this.ut ?? (this.ut = []), v3 = [];
+    let m3, y3, x2 = 0, j2 = d3.length - 1, k2 = 0, w2 = p4.length - 1;
+    for (; x2 <= j2 && k2 <= w2; ) if (null === d3[x2]) x2++;
+    else if (null === d3[j2]) j2--;
+    else if (h4[x2] === a3[k2]) v3[k2] = u3(d3[x2], p4[k2]), x2++, k2++;
+    else if (h4[j2] === a3[w2]) v3[w2] = u3(d3[j2], p4[w2]), j2--, w2--;
+    else if (h4[x2] === a3[w2]) v3[w2] = u3(d3[x2], p4[w2]), v2(s5, v3[w2 + 1], d3[x2]), x2++, w2--;
+    else if (h4[j2] === a3[k2]) v3[k2] = u3(d3[j2], p4[k2]), v2(s5, d3[x2], d3[j2]), j2--, k2++;
+    else if (void 0 === m3 && (m3 = u4(a3, k2, w2), y3 = u4(h4, x2, j2)), m3.has(h4[x2])) if (m3.has(h4[j2])) {
+      const e9 = y3.get(a3[k2]), t7 = void 0 !== e9 ? d3[e9] : null;
+      if (null === t7) {
+        const e10 = v2(s5, d3[x2]);
+        u3(e10, p4[k2]), v3[k2] = e10;
+      } else v3[k2] = u3(t7, p4[k2]), v2(s5, d3[x2], t7), d3[e9] = null;
+      k2++;
+    } else h3(d3[j2]), j2--;
+    else h3(d3[x2]), x2++;
+    for (; k2 <= w2; ) {
+      const e9 = v2(s5, v3[w2 + 1]);
+      u3(e9, p4[k2]), v3[k2++] = e9;
+    }
+    for (; x2 <= j2; ) {
+      const e9 = d3[x2++];
+      null !== e9 && h3(e9);
+    }
+    return this.ut = a3, p3(s5, v3), E;
+  }
+});
+
+// src/utils/dom.utils.ts
+function deepQueryById(root, id) {
+  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
+  if (direct) return direct;
+  for (const el of Array.from(root.querySelectorAll("*"))) {
+    if (el.shadowRoot) {
+      const found = deepQueryById(
+        el.shadowRoot,
+        id
+      );
+      if (found) return found;
+    }
+  }
+  return null;
+}
+function computeCoords(tRect, pRect, placement, offset) {
+  const [side, align = "center"] = placement.split("-");
+  let top = 0, left = 0;
+  switch (side) {
+    case "top":
+      top = tRect.top - pRect.height - offset;
+      break;
+    case "bottom":
+      top = tRect.bottom + offset;
+      break;
+    case "left":
+      left = tRect.left - pRect.width - offset;
+      break;
+    case "right":
+      left = tRect.right + offset;
+      break;
+  }
+  if (side === "top" || side === "bottom") {
+    if (align === "start") left = tRect.left;
+    else if (align === "end") left = tRect.right - pRect.width;
+    else left = tRect.left + (tRect.width - pRect.width) / 2;
+  } else {
+    if (align === "start") top = tRect.top;
+    else if (align === "end") top = tRect.bottom - pRect.height;
+    else top = tRect.top + (tRect.height - pRect.height) / 2;
+  }
+  return { top, left };
+}
+function clampToViewport({ top, left }, pRect, margin = 8) {
+  return {
+    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
+    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
+  };
+}
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+function emit(host, name, detail, opts = {}) {
+  const event = new CustomEvent(name, {
+    detail,
+    bubbles: true,
+    composed: true,
+    ...opts
+  });
+  host.dispatchEvent(event);
+  return event;
+}
 
 // src/styles/tokens.ts
 var primary = r("#6366f1");
@@ -796,8 +943,1972 @@ function focusRing(selector, colorVar = "--uwc-color-primary", colorDefault = "#
   `;
 }
 
-// src/button/styles.ts
+// src/stepper/styles.ts
+var INDICATOR_SIZE = r("2rem");
+var CONNECTOR_THICKNESS = r("2px");
+var panelStyles = [
+  hostReset,
+  focusRing(".uwc-sp__v-indicator", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-sp__v-header", "--uwc-color-primary", "#6366f1"),
+  i`
+    /* ── Host ─────────────────────────────────────────────────────── */
+    :host {
+      display: block;
+    }
+
+    /* Horizontal: hide inactive panels */
+    :host([orientation="horizontal"]:not([active])) {
+      display: none;
+    }
+
+    /* ── Horizontal content wrapper ───────────────────────────────── */
+    .uwc-sp__h-wrap {
+      padding: var(--uwc-step-content-padding, ${space5} 0 ${space3});
+    }
+
+    /* ── Vertical: full step row ───────────────────────────────────── */
+    .uwc-sp__v-row {
+      display:        flex;
+      align-items:    stretch;
+      gap:            0;
+    }
+
+    /* ── Vertical: left column (indicator + connector line) ───────── */
+    .uwc-sp__v-left {
+      display:        flex;
+      flex-direction: column;
+      align-items:    center;
+      flex-shrink:    0;
+      width:          ${INDICATOR_SIZE};
+      margin-right:   ${space4};
+    }
+
+    /* ── Step indicator circle ────────────────────────────────────── */
+    .uwc-sp__v-indicator {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           ${INDICATOR_SIZE};
+      height:          ${INDICATOR_SIZE};
+      border-radius:   ${radiusFull};
+      border:          var(--uwc-step-indicator-border, 2px solid ${border});
+      background:      var(--uwc-step-indicator-bg,     ${surface});
+      color:           var(--uwc-step-indicator-color,  ${textSecondary});
+      font-size:       ${fontSizeSm};
+      font-weight:     ${fontWeightSemibold};
+      flex-shrink:     0;
+      cursor:          default;
+      padding:         0;
+      transition:
+        background    ${durationBase},
+        border-color  ${durationBase},
+        color         ${durationBase},
+        box-shadow    ${durationBase};
+    }
+
+    :host([active]) .uwc-sp__v-indicator {
+      background:   var(--uwc-step-active-bg,    ${primary});
+      border-color: var(--uwc-step-active-border, ${primary});
+      color:        var(--uwc-step-active-color,  #fff);
+      box-shadow:   0 0 0 4px color-mix(in oklab, ${primary} 18%, transparent);
+    }
+
+    :host([completed]) .uwc-sp__v-indicator {
+      background:   var(--uwc-step-done-bg,    ${primary});
+      border-color: var(--uwc-step-done-border, ${primary});
+      color:        var(--uwc-step-done-color,  #fff);
+      box-shadow:   none;
+    }
+
+    :host([disabled]) .uwc-sp__v-indicator {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    /* Clickable indicator (non-linear mode) */
+    .uwc-sp__v-indicator.is-clickable {
+      cursor: pointer;
+    }
+    .uwc-sp__v-indicator.is-clickable:hover:not(:disabled) {
+      border-color: var(--uwc-color-primary, ${primary});
+      color:        var(--uwc-color-primary, ${primary});
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-sp__v-indicator { transition: none; }
+    }
+
+    /* ── Connector line (between indicator and next step) ─────────── */
+    .uwc-sp__v-connector {
+      flex:             1;
+      width:            ${CONNECTOR_THICKNESS};
+      min-height:       ${space6};
+      background:       var(--uwc-step-connector-color, ${border});
+      margin:           ${space1} 0;
+      border-radius:    ${radiusFull};
+      transition:       background ${durationBase};
+    }
+
+    .uwc-sp__v-connector.is-completed {
+      background: var(--uwc-step-connector-done, ${primary});
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-sp__v-connector { transition: none; }
+    }
+
+    /* ── Vertical: right column (header + animated content) ────────── */
+    .uwc-sp__v-right {
+      flex:       1;
+      min-width:  0;
+      padding-bottom: ${space4};
+    }
+
+    /* Last row: no bottom padding needed (no connector below) */
+    :host([is-last]) .uwc-sp__v-right {
+      padding-bottom: 0;
+    }
+
+    /* ── Step header button ────────────────────────────────────────── */
+    .uwc-sp__v-header {
+      display:     block;
+      width:       100%;
+      background:  transparent;
+      border:      none;
+      padding:     0 0 ${space2};
+      text-align:  left;
+      cursor:      default;
+      line-height: 1.3;
+    }
+
+    .uwc-sp__v-header.is-clickable { cursor: pointer; }
+
+    .uwc-sp__v-title {
+      display:     block;
+      font-size:   var(--uwc-step-title-font-size, ${fontSizeMd});
+      font-weight: var(--uwc-step-title-font-weight, ${fontWeightSemibold});
+      color:       var(--uwc-step-title-color, ${textSecondary});
+      transition:  color ${durationBase};
+      line-height: 1.4;
+    }
+
+    :host([active]) .uwc-sp__v-title {
+      color: var(--uwc-step-active-title-color, ${text});
+    }
+    :host([completed]) .uwc-sp__v-title {
+      color: var(--uwc-step-done-title-color, ${textSecondary});
+    }
+
+    .uwc-sp__v-subtitle {
+      display:    block;
+      font-size:  ${fontSizeSm};
+      color:      ${textMuted};
+      margin-top: ${space1};
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-sp__v-title { transition: none; }
+    }
+
+    /* ── Animated content wrapper (WAAPI-controlled) ──────────────── */
+    .uwc-sp__v-content-wrap {
+      /* height animated in JS; overflow set inline during animation */
+    }
+
+    .uwc-sp__v-content {
+      padding-bottom: ${space3};
+    }
+
+    /* ── Vertical nav buttons ──────────────────────────────────────── */
+    .uwc-sp__v-nav {
+      display:         flex;
+      align-items:     center;
+      gap:             ${space2};
+      padding-top:     ${space3};
+    }
+  `
+];
+var stepperStyles = [
+  hostReset,
+  focusRing(".uwc-step__button", "--uwc-color-primary", "#6366f1"),
+  i`
+    :host {
+      display: block;
+    }
+
+    /* ── Horizontal layout ────────────────────────────────────────── */
+    .uwc-stepper--horizontal {
+      display:        flex;
+      flex-direction: column;
+    }
+
+    /* Step nav bar */
+    .uwc-stepper__nav {
+      display:     flex;
+      align-items: center;
+      padding:     ${space2} 0 ${space5};
+      gap:         0;
+      overflow-x:  auto;
+      scrollbar-width: none;
+    }
+    .uwc-stepper__nav::-webkit-scrollbar { display: none; }
+
+    /* Individual step container (button + separator) */
+    .uwc-step {
+      display:     flex;
+      align-items: center;
+      flex:        1;
+      min-width:   0;
+    }
+
+    /* Last step: no flex grow on separator */
+    .uwc-step:last-child {
+      flex: 0 0 auto;
+    }
+
+    /* Step clickable button */
+    .uwc-step__button {
+      display:          inline-flex;
+      align-items:      center;
+      gap:              ${space2};
+      background:       transparent;
+      border:           none;
+      padding:          ${space1} ${space2} ${space1} 0;
+      cursor:           default;
+      white-space:      nowrap;
+      border-radius:    ${radiusMd};
+      transition:       background ${durationBase};
+      min-width:        0;
+    }
+
+    .uwc-step__button.is-clickable {
+      cursor: pointer;
+    }
+
+    .uwc-step__button.is-clickable:hover {
+      background: ${hoverBg};
+    }
+
+    /* ── Horizontal step indicator circle ─────────────────────────── */
+    .uwc-step__indicator {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           ${INDICATOR_SIZE};
+      height:          ${INDICATOR_SIZE};
+      border-radius:   ${radiusFull};
+      border:          var(--uwc-step-indicator-border, 2px solid ${border});
+      background:      var(--uwc-step-indicator-bg,     ${surface});
+      color:           var(--uwc-step-indicator-color,  ${textSecondary});
+      font-size:       ${fontSizeSm};
+      font-weight:     ${fontWeightSemibold};
+      flex-shrink:     0;
+      transition:
+        background    ${durationBase},
+        border-color  ${durationBase},
+        color         ${durationBase},
+        box-shadow    ${durationBase};
+    }
+
+    .uwc-step__indicator--active {
+      background:  var(--uwc-step-active-bg,    ${primary});
+      border-color:var(--uwc-step-active-border, ${primary});
+      color:       var(--uwc-step-active-color,  #fff);
+      box-shadow:  0 0 0 4px color-mix(in oklab, ${primary} 18%, transparent);
+    }
+
+    .uwc-step__indicator--completed {
+      background:   var(--uwc-step-done-bg,    ${primary});
+      border-color: var(--uwc-step-done-border, ${primary});
+      color:        var(--uwc-step-done-color,  #fff);
+      box-shadow:   none;
+    }
+
+    .uwc-step__indicator--disabled {
+      opacity: 0.38;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-step__indicator { transition: none; }
+    }
+
+    /* ── Step title / subtitle ────────────────────────────────────── */
+    .uwc-step__info {
+      display:    flex;
+      flex-direction: column;
+      gap:        1px;
+      min-width:  0;
+    }
+
+    .uwc-step__title {
+      font-size:   var(--uwc-step-title-font-size,   ${fontSizeMd});
+      font-weight: var(--uwc-step-title-font-weight,  ${fontWeightSemibold});
+      color:       var(--uwc-step-title-color,        ${textSecondary});
+      line-height: 1.3;
+      transition:  color ${durationBase};
+      white-space: nowrap;
+      overflow:    hidden;
+      text-overflow: ellipsis;
+    }
+
+    .uwc-step__title--active    { color: var(--uwc-step-active-title-color, ${text}); }
+    .uwc-step__title--completed { color: var(--uwc-step-done-title-color, ${textSecondary}); }
+
+    .uwc-step__subtitle {
+      font-size:  ${fontSizeSm};
+      color:      ${textMuted};
+      white-space: nowrap;
+      overflow:   hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-step__title { transition: none; }
+    }
+
+    /* ── Separator (line between steps) ───────────────────────────── */
+    .uwc-step__separator {
+      flex:       1;
+      min-width:  ${space4};
+      height:     ${CONNECTOR_THICKNESS};
+      background: var(--uwc-step-connector-color, ${border});
+      margin:     0 ${space2};
+      border-radius: ${radiusFull};
+      transition: background ${durationBase};
+    }
+
+    .uwc-step__separator--completed {
+      background: var(--uwc-step-connector-done, ${primary});
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-step__separator { transition: none; }
+    }
+
+    /* ── Content area ─────────────────────────────────────────────── */
+    .uwc-stepper__content {
+      border-top: 1px solid var(--uwc-step-divider, ${borderSubtle});
+      padding-top: ${space4};
+    }
+
+    /* ── Footer (nav buttons — horizontal) ────────────────────────── */
+    .uwc-stepper__footer {
+      display:         flex;
+      align-items:     center;
+      justify-content: space-between;
+      padding-top:     ${space5};
+      border-top:      1px solid var(--uwc-step-divider, ${borderSubtle});
+      margin-top:      ${space4};
+    }
+
+    /* ── Vertical layout ──────────────────────────────────────────── */
+    .uwc-stepper--vertical {
+      display: block;
+    }
+  `
+];
+
+// src/stepper/index.ts
+var PANEL_CONNECTED = "uwc-stepper-panel-connected";
+var STEP_ACTION = "uwc-stepper-action";
+var UwcStepperPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.header = "";
+    this.subheader = "";
+    this.disabled = false;
+    this.active = false;
+    this.completed = false;
+    this.orientation = "horizontal";
+    this.isLast = false;
+    this.isClickable = false;
+    this.noNav = false;
+    // ── Zero-based index within the stepper (set by stepper) ──────────────────
+    this._stepIndex = 0;
+  }
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.dispatchEvent(new CustomEvent(PANEL_CONNECTED, { bubbles: true, composed: true }));
+  }
+  firstUpdated() {
+    if (this.orientation === "vertical" && !this.active) {
+      const wrap = this._wrap;
+      if (wrap) {
+        wrap.style.height = "0px";
+        wrap.style.overflow = "hidden";
+      }
+    }
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (!changed.has("active")) return;
+    if (this.orientation === "vertical") {
+      this.active ? this._animateOpen() : this._animateClose();
+    }
+  }
+  // ── WAAPI animation (vertical mode) ───────────────────────────────────────
+  _animateOpen() {
+    const wrap = this._wrap;
+    if (!wrap) return;
+    const fromH = this._currentAnimation ? wrap.getBoundingClientRect().height : 0;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    const toH = wrap.scrollHeight;
+    const anim = wrap.animate(
+      [
+        { height: `${fromH}px`, overflow: "hidden" },
+        { height: `${toH}px`, overflow: "hidden" }
+      ],
+      { duration: this._dur(), easing: "ease", fill: "both" }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      wrap.style.removeProperty("height");
+      wrap.style.removeProperty("overflow");
+      anim.cancel();
+      this._currentAnimation = void 0;
+    }, { once: true });
+  }
+  _animateClose() {
+    const wrap = this._wrap;
+    if (!wrap) return;
+    const fromH = wrap.getBoundingClientRect().height;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    const anim = wrap.animate(
+      [
+        { height: `${fromH}px`, overflow: "hidden" },
+        { height: "0px", overflow: "hidden" }
+      ],
+      { duration: this._dur(), easing: "ease", fill: "both" }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      wrap.style.height = "0px";
+      wrap.style.overflow = "hidden";
+      this._currentAnimation = void 0;
+    }, { once: true });
+  }
+  _dur() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
+  }
+  // ── Event dispatchers ──────────────────────────────────────────────────────
+  /** Fires when the user clicks the step header/indicator in vertical mode. */
+  _onHeaderClick() {
+    if (this.disabled) return;
+    this.dispatchEvent(new CustomEvent(STEP_ACTION, {
+      bubbles: true,
+      composed: true,
+      detail: { action: "select", stepIndex: this._stepIndex }
+    }));
+  }
+  /** Fires when the built-in "Back" button inside a vertical step is clicked. */
+  _onPrev() {
+    this.dispatchEvent(new CustomEvent(STEP_ACTION, {
+      bubbles: true,
+      composed: true,
+      detail: { action: "prev" }
+    }));
+  }
+  /** Fires when the built-in "Next" button inside a vertical step is clicked. */
+  _onNext() {
+    this.dispatchEvent(new CustomEvent(STEP_ACTION, {
+      bubbles: true,
+      composed: true,
+      detail: { action: "next" }
+    }));
+  }
+  // ── Render helpers ─────────────────────────────────────────────────────────
+  _renderIndicatorContent() {
+    if (this.completed) return b2`<uwc-icon name="check-lg" size="12px"></uwc-icon>`;
+    if (this.icon) return b2`<uwc-icon name=${this.icon} size="14px"></uwc-icon>`;
+    return b2`${this._stepIndex + 1}`;
+  }
+  // ── Render: vertical layout ────────────────────────────────────────────────
+  _renderVertical() {
+    return b2`
+      <div class=${e7({
+      "uwc-sp__v-row": true,
+      "is-active": this.active,
+      "is-completed": this.completed
+    })}>
+
+        <!-- Left column: circle + vertical line -->
+        <div class="uwc-sp__v-left">
+          <button
+            type="button"
+            class=${e7({
+      "uwc-sp__v-indicator": true,
+      "is-clickable": this.isClickable && !this.disabled
+    })}
+            aria-label=${`Step ${this._stepIndex + 1}: ${this.header}${this.completed ? " (completed)" : this.active ? " (current)" : ""}`}
+            aria-current=${this.active ? "step" : A}
+            ?disabled=${this.disabled}
+            tabindex=${this.isClickable && !this.disabled ? "0" : "-1"}
+            @click=${this._onHeaderClick}
+          >${this._renderIndicatorContent()}</button>
+
+          ${!this.isLast ? b2`
+            <div class=${e7({
+      "uwc-sp__v-connector": true,
+      "is-completed": this.completed
+    })}></div>
+          ` : A}
+        </div>
+
+        <!-- Right column: title + animated content -->
+        <div class="uwc-sp__v-right">
+          <button
+            type="button"
+            class=${e7({
+      "uwc-sp__v-header": true,
+      "is-clickable": this.isClickable && !this.disabled
+    })}
+            aria-expanded=${this.active ? "true" : "false"}
+            aria-disabled=${this.disabled ? "true" : A}
+            tabindex=${this.isClickable && !this.disabled ? "0" : "-1"}
+            @click=${this._onHeaderClick}
+          >
+            <span class=${e7({
+      "uwc-sp__v-title": true,
+      "is-active": this.active,
+      "is-completed": this.completed
+    })}>${this.header}</span>
+            ${this.subheader ? b2`<span class="uwc-sp__v-subtitle">${this.subheader}</span>` : A}
+          </button>
+
+          <!-- Animated content -->
+          <!-- inert keeps keyboard focus out while closed; height is always
+               measured correctly because the nav is always in the DOM -->
+          <div class="uwc-sp__v-content-wrap" role="region"
+               aria-labelledby=${`uwc-sp-title-${this._stepIndex}`}
+               ?inert=${!this.active}>
+            <div class="uwc-sp__v-content">
+              <slot></slot>
+              ${!this.noNav ? b2`
+                <div class="uwc-sp__v-nav">
+                  <uwc-button
+                    variant="secondary"
+                    outline
+                    icon="arrow-left"
+                    ?disabled=${this._stepIndex === 0}
+                    @uwc-click=${this._onPrev}
+                  >Back</uwc-button>
+                  <uwc-button
+                    icon="arrow-right"
+                    icon-pos="right"
+                    @uwc-click=${this._onNext}
+                  >${this.isLast ? "Finish" : "Next"}</uwc-button>
+                </div>
+              ` : A}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  // ── Render: horizontal layout (content only) ───────────────────────────────
+  _renderHorizontal() {
+    return b2`
+      <div
+        class="uwc-sp__h-wrap"
+        role="tabpanel"
+        id=${`uwc-sp-panel-${this._stepIndex}`}
+        aria-labelledby=${`uwc-sp-tab-${this._stepIndex}`}
+      >
+        <slot></slot>
+      </div>
+    `;
+  }
+  // ── Render ─────────────────────────────────────────────────────────────────
+  render() {
+    return this.orientation === "vertical" ? this._renderVertical() : this._renderHorizontal();
+  }
+};
+UwcStepperPanel.styles = panelStyles;
+__decorateClass([
+  n4()
+], UwcStepperPanel.prototype, "header", 2);
+__decorateClass([
+  n4()
+], UwcStepperPanel.prototype, "subheader", 2);
+__decorateClass([
+  n4()
+], UwcStepperPanel.prototype, "icon", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcStepperPanel.prototype, "disabled", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcStepperPanel.prototype, "active", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcStepperPanel.prototype, "completed", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcStepperPanel.prototype, "orientation", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true, attribute: "is-last" })
+], UwcStepperPanel.prototype, "isLast", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "is-clickable" })
+], UwcStepperPanel.prototype, "isClickable", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "no-nav" })
+], UwcStepperPanel.prototype, "noNav", 2);
+__decorateClass([
+  e5(".uwc-sp__v-content-wrap")
+], UwcStepperPanel.prototype, "_wrap", 2);
+var UwcStepper = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.activeStep = 0;
+    this.orientation = "horizontal";
+    this.linear = false;
+    this.noNav = false;
+    this._panels = [];
+    this._activeIndex = 0;
+  }
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener(PANEL_CONNECTED, this._onPanelConnect);
+    this.addEventListener(STEP_ACTION, this._onStepAction);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener(PANEL_CONNECTED, this._onPanelConnect);
+    this.removeEventListener(STEP_ACTION, this._onStepAction);
+  }
+  firstUpdated() {
+    this._syncPanels();
+    this._apply(this.activeStep, false);
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (changed.has("activeStep") && !changed.has("_activeIndex")) {
+      this._apply(this.activeStep, false);
+    }
+    if (changed.has("orientation") || changed.has("linear") || changed.has("noNav")) {
+      this._updatePanelMeta();
+    }
+  }
+  // ── Panel management ───────────────────────────────────────────────────────
+  _syncPanels() {
+    this._panels = Array.from(this.children).filter(
+      (el) => el instanceof UwcStepperPanel
+    );
+    this._updatePanelMeta();
+  }
+  _updatePanelMeta() {
+    const n6 = this._panels.length;
+    this._panels.forEach((p4, i8) => {
+      p4._stepIndex = i8;
+      p4.isLast = i8 === n6 - 1;
+      p4.orientation = this.orientation;
+      p4.noNav = this.noNav;
+      p4.isClickable = !this.linear && !p4.disabled;
+    });
+  }
+  // ── Core navigation logic ──────────────────────────────────────────────────
+  _apply(index, fireEvent = true) {
+    const n6 = this._panels.length;
+    if (n6 === 0) return;
+    const next = Math.max(0, Math.min(index, n6 - 1));
+    const prev = this._activeIndex;
+    if (next === prev && fireEvent) return;
+    this._activeIndex = next;
+    this._panels.forEach((p4, i8) => {
+      p4.active = i8 === next;
+      p4.completed = i8 < next;
+    });
+    if (fireEvent) {
+      emit(this, "uwc-step-change", { step: next, prevStep: prev });
+    }
+  }
+  // ── Event handlers ─────────────────────────────────────────────────────────
+  _onPanelConnect() {
+    this._syncPanels();
+    this._apply(this._activeIndex, false);
+  }
+  _onStepAction(e9) {
+    const detail = e9.detail;
+    switch (detail.action) {
+      case "select":
+        if (!this.linear) {
+          this._apply(detail.stepIndex ?? this._activeIndex);
+        }
+        break;
+      case "prev":
+        this.prev();
+        break;
+      case "next":
+        this.next();
+        break;
+    }
+  }
+  _onSlotChange() {
+    this._syncPanels();
+    this._apply(this._activeIndex, false);
+  }
+  // ── Step header click (horizontal nav bar) ─────────────────────────────────
+  _onStepClick(i8) {
+    if (this.linear) return;
+    const panel = this._panels[i8];
+    if (!panel || panel.disabled) return;
+    this._apply(i8);
+  }
+  // ── Public API ─────────────────────────────────────────────────────────────
+  /** Advance to the next step. Emits `uwc-finish` when already on the last step. */
+  next() {
+    if (this._activeIndex >= this._panels.length - 1) {
+      emit(this, "uwc-finish", {});
+      return;
+    }
+    this._apply(this._activeIndex + 1);
+  }
+  /** Return to the previous step. No-op on the first step. */
+  prev() {
+    if (this._activeIndex <= 0) return;
+    this._apply(this._activeIndex - 1);
+  }
+  /** Jump to a specific step (zero-based). In linear mode only the current
+   *  step's Back/Next controls are respected; direct jumps are blocked. */
+  goTo(index) {
+    if (this.linear) return;
+    this._apply(index);
+  }
+  /** Returns the zero-based index of the currently active step. */
+  getActiveStep() {
+    return this._activeIndex;
+  }
+  /** Returns the total number of steps. */
+  getStepCount() {
+    return this._panels.length;
+  }
+  // ── Getters ────────────────────────────────────────────────────────────────
+  get _isFirst() {
+    return this._activeIndex === 0;
+  }
+  get _isLast() {
+    return this._activeIndex >= this._panels.length - 1;
+  }
+  // ── Render helpers ─────────────────────────────────────────────────────────
+  _renderIndicatorContent(panel, i8) {
+    const isCompleted = panel.completed && i8 < this._activeIndex;
+    if (isCompleted) return b2`<uwc-icon name="check-lg" size="12px"></uwc-icon>`;
+    if (panel.icon) return b2`<uwc-icon name=${panel.icon} size="14px"></uwc-icon>`;
+    return b2`${i8 + 1}`;
+  }
+  _renderHorizontalNav() {
+    return b2`
+      <nav
+        part="nav"
+        class="uwc-stepper__nav"
+        role="tablist"
+        aria-label="Steps"
+      >
+        ${c4(this._panels, (_2, i8) => i8, (panel, i8) => {
+      const isActive = i8 === this._activeIndex;
+      const isCompleted = panel.completed && i8 < this._activeIndex;
+      const isFuture = i8 > this._activeIndex;
+      const isDisabled = panel.disabled || this.linear && isFuture;
+      const isClickable = !this.linear && !panel.disabled;
+      return b2`
+            <div class="uwc-step">
+              <button
+                type="button"
+                id=${`uwc-sp-tab-${i8}`}
+                class=${e7({
+        "uwc-step__button": true,
+        "is-clickable": isClickable
+      })}
+                role="tab"
+                aria-selected=${isActive ? "true" : "false"}
+                aria-controls=${`uwc-sp-panel-${i8}`}
+                aria-disabled=${isDisabled ? "true" : "false"}
+                aria-label=${`Step ${i8 + 1}: ${panel.header}${isCompleted ? " (completed)" : isActive ? " (current)" : ""}`}
+                tabindex=${isActive ? "0" : "-1"}
+                @click=${() => this._onStepClick(i8)}
+              >
+                <span class=${e7({
+        "uwc-step__indicator": true,
+        "uwc-step__indicator--active": isActive,
+        "uwc-step__indicator--completed": isCompleted,
+        "uwc-step__indicator--disabled": isDisabled
+      })}>${this._renderIndicatorContent(panel, i8)}</span>
+
+                <div class="uwc-step__info">
+                  <span class=${e7({
+        "uwc-step__title": true,
+        "uwc-step__title--active": isActive,
+        "uwc-step__title--completed": isCompleted
+      })}>${panel.header}</span>
+                  ${panel.subheader ? b2`
+                    <span class="uwc-step__subtitle">${panel.subheader}</span>
+                  ` : A}
+                </div>
+              </button>
+
+              ${i8 < this._panels.length - 1 ? b2`
+                <div class=${e7({
+        "uwc-step__separator": true,
+        "uwc-step__separator--completed": isCompleted || isActive && i8 < this._activeIndex
+      })} aria-hidden="true"></div>
+              ` : A}
+            </div>
+          `;
+    })}
+      </nav>
+    `;
+  }
+  _renderHorizontalFooter() {
+    if (this.noNav) return b2``;
+    return b2`
+      <div part="footer" class="uwc-stepper__footer">
+        <uwc-button
+          variant="secondary"
+          outline
+          icon="arrow-left"
+          ?disabled=${this._isFirst}
+          @uwc-click=${() => this.prev()}
+        >Back</uwc-button>
+
+        <uwc-button
+          icon="arrow-right"
+          icon-pos="right"
+          @uwc-click=${() => this.next()}
+        >${this._isLast ? "Finish" : "Next"}</uwc-button>
+      </div>
+    `;
+  }
+  // ── Render ─────────────────────────────────────────────────────────────────
+  render() {
+    if (this.orientation === "vertical") {
+      return b2`
+        <div class="uwc-stepper--vertical">
+          <slot @slotchange=${this._onSlotChange}></slot>
+        </div>
+      `;
+    }
+    return b2`
+      <div class="uwc-stepper--horizontal">
+        ${this._renderHorizontalNav()}
+
+        <div part="content" class="uwc-stepper__content" aria-live="polite">
+          <slot @slotchange=${this._onSlotChange}></slot>
+        </div>
+
+        ${this._renderHorizontalFooter()}
+      </div>
+    `;
+  }
+};
+UwcStepper.styles = stepperStyles;
+__decorateClass([
+  n4({ type: Number, attribute: "active-step" })
+], UwcStepper.prototype, "activeStep", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcStepper.prototype, "orientation", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcStepper.prototype, "linear", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "no-nav" })
+], UwcStepper.prototype, "noNav", 2);
+__decorateClass([
+  r5()
+], UwcStepper.prototype, "_panels", 2);
+__decorateClass([
+  r5()
+], UwcStepper.prototype, "_activeIndex", 2);
+
+// src/panel/styles.ts
 var styles_default = [
+  hostReset,
+  i`
+    /* ── Host ───────────────────────────────────────────────────────── */
+    :host {
+      display: block;
+      border:        var(--uwc-panel-border,  1px solid ${border});
+      border-radius: var(--uwc-panel-radius,  ${radiusLg});
+      background:    var(--uwc-panel-bg,      ${surface});
+      box-shadow:    var(--uwc-panel-shadow,  ${shadowSm});
+      overflow:      hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────── */
+    .uwc-panel__header {
+      display:         flex;
+      align-items:     center;
+      gap:             ${space2};
+      padding:         var(--uwc-panel-header-padding, ${space3} ${space5});
+      background:      var(--uwc-panel-header-bg,      transparent);
+      border-bottom:   var(--uwc-panel-header-border,  1px solid ${border});
+      color:           var(--uwc-panel-header-color,   ${text});
+      font-size:       var(--uwc-panel-header-font-size, ${fontSizeLg});
+      font-weight:     var(--uwc-panel-header-font-weight, ${fontWeightSemibold});
+      line-height:     1.4;
+      min-height:      3rem;
+    }
+
+    /* When collapsed, header has no bottom border (content is hidden) */
+    :host([collapsed]) .uwc-panel__header {
+      border-bottom-color: transparent;
+    }
+
+    /* ── Header icon ─────────────────────────────────────────────────── */
+    .uwc-panel__header-icon {
+      display:         inline-flex;
+      align-items:     center;
+      flex-shrink:     0;
+      color:           var(--uwc-panel-icon-color, ${primary});
+    }
+
+    /* ── Header title ────────────────────────────────────────────────── */
+    .uwc-panel__title {
+      flex:          1;
+      min-width:     0;
+      overflow:      hidden;
+      text-overflow: ellipsis;
+      white-space:   nowrap;
+    }
+
+    /* ── Header icons slot (custom actions) ──────────────────────────── */
+    .uwc-panel__header-actions {
+      display:     inline-flex;
+      align-items: center;
+      gap:         ${space1};
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* ── Toggle button ───────────────────────────────────────────────── */
+    .uwc-panel__toggler {
+      display:          inline-flex;
+      align-items:      center;
+      justify-content:  center;
+      width:            1.75rem;
+      height:           1.75rem;
+      border-radius:    ${radiusFull};
+      border:           1px solid ${border};
+      background:       transparent;
+      color:            var(--uwc-panel-toggler-color, ${textSecondary});
+      cursor:           pointer;
+      padding:          0;
+      flex-shrink:      0;
+      transition:
+        background    ${durationBase},
+        border-color  ${durationBase},
+        color         ${durationBase};
+    }
+
+    .uwc-panel__toggler:hover {
+      background:    ${hoverBg};
+      border-color:  var(--uwc-color-primary, ${primary});
+      color:         var(--uwc-color-primary, ${primary});
+    }
+
+    .uwc-panel__toggler:focus-visible {
+      outline:        2px solid var(--uwc-color-primary, ${primary});
+      outline-offset: 2px;
+    }
+
+    /* Chevron rotation — open state */
+    .uwc-panel__toggler-icon {
+      display:    inline-flex;
+      transform:  rotate(0deg);
+      transition: transform 250ms ease;
+    }
+
+    :host(:not([collapsed])) .uwc-panel__toggler-icon {
+      transform: rotate(180deg);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-panel__toggler-icon { transition: none; }
+      .uwc-panel__toggler      { transition: none; }
+    }
+
+    /* ── Content wrapper (WAAPI animated) ───────────────────────────── */
+    .uwc-panel__content-wrap {
+      /* Height animated by JS; overflow applied inline during animation */
+    }
+
+    /* ── Content body ────────────────────────────────────────────────── */
+    .uwc-panel__content {
+      padding:    var(--uwc-panel-content-padding, ${space4} ${space5});
+      color:      var(--uwc-panel-content-color,   ${text});
+      font-size:  var(--uwc-panel-content-font-size, ${fontSizeMd});
+      line-height: 1.6;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    .uwc-panel__footer {
+      padding:      var(--uwc-panel-footer-padding, ${space3} ${space5});
+      background:   var(--uwc-panel-footer-bg,      transparent);
+      border-top:   var(--uwc-panel-footer-border,  1px solid ${border});
+      font-size:    ${fontSizeMd};
+      color:        ${textSecondary};
+    }
+
+    /* Footer hidden when slot is empty */
+    .uwc-panel__footer--hidden {
+      display: none;
+    }
+
+    /* ── No-header mode ──────────────────────────────────────────────── */
+    :host([no-header]) .uwc-panel__header {
+      display: none;
+    }
+  `
+];
+
+// src/panel/index.ts
+var UwcPanel = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.header = "";
+    this.toggleable = false;
+    this.collapsed = false;
+    this.noHeader = false;
+    this._hasFooter = false;
+  }
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  firstUpdated() {
+    if (this._wrap && this.collapsed) {
+      this._wrap.style.height = "0px";
+      this._wrap.style.overflow = "hidden";
+    }
+  }
+  updated(changed) {
+    super.updated(changed);
+    if (!changed.has("collapsed") || !this._wrap) return;
+    if (this.collapsed) {
+      this._animateClose();
+    } else {
+      this._animateOpen();
+    }
+  }
+  // ── WAAPI animations ───────────────────────────────────────────────────────
+  _animateOpen() {
+    const wrap = this._wrap;
+    if (!wrap) return;
+    const fromHeight = this._currentAnimation ? wrap.getBoundingClientRect().height : 0;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    wrap.style.removeProperty("height");
+    wrap.style.removeProperty("overflow");
+    const toHeight = wrap.scrollHeight;
+    const anim = wrap.animate(
+      [
+        { height: `${fromHeight}px`, overflow: "hidden" },
+        { height: `${toHeight}px`, overflow: "hidden" }
+      ],
+      { duration: this._duration(), easing: "ease", fill: "both" }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      wrap.style.removeProperty("height");
+      wrap.style.removeProperty("overflow");
+      this._currentAnimation = void 0;
+      emit(this, "uwc-expand");
+    }, { once: true });
+  }
+  _animateClose() {
+    const wrap = this._wrap;
+    if (!wrap) return;
+    const fromHeight = wrap.getBoundingClientRect().height;
+    this._currentAnimation?.cancel();
+    this._currentAnimation = void 0;
+    const anim = wrap.animate(
+      [
+        { height: `${fromHeight}px`, overflow: "hidden" },
+        { height: "0px", overflow: "hidden" }
+      ],
+      { duration: this._duration(), easing: "ease", fill: "both" }
+    );
+    this._currentAnimation = anim;
+    anim.addEventListener("finish", () => {
+      if (this._currentAnimation !== anim) return;
+      anim.cancel();
+      wrap.style.height = "0px";
+      wrap.style.overflow = "hidden";
+      this._currentAnimation = void 0;
+      emit(this, "uwc-collapse");
+    }, { once: true });
+  }
+  _duration() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
+  }
+  // ── Handlers ───────────────────────────────────────────────────────────────
+  _onToggle() {
+    this.collapsed = !this.collapsed;
+    emit(this, "uwc-toggle", { collapsed: this.collapsed });
+  }
+  _onFooterSlotChange(e9) {
+    const slot = e9.target;
+    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+  // ── Public API ─────────────────────────────────────────────────────────────
+  /** Expand the panel. No-op if already expanded. */
+  expand() {
+    if (!this.collapsed) return;
+    this.collapsed = false;
+    emit(this, "uwc-toggle", { collapsed: false });
+  }
+  /** Collapse the panel. No-op if already collapsed. */
+  collapse() {
+    if (this.collapsed) return;
+    this.collapsed = true;
+    emit(this, "uwc-toggle", { collapsed: true });
+  }
+  /** Toggle the panel open/closed. */
+  toggle() {
+    this._onToggle();
+  }
+  // ── Render helpers ─────────────────────────────────────────────────────────
+  _renderHeader() {
+    return b2`
+      <div part="header" class="uwc-panel__header">
+        ${this.icon ? b2`
+          <span part="header-icon" class="uwc-panel__header-icon" aria-hidden="true">
+            <uwc-icon name=${this.icon} size="18px"></uwc-icon>
+          </span>
+        ` : A}
+
+        <slot name="header">
+          <span part="title" class="uwc-panel__title">${this.header}</span>
+        </slot>
+
+        <span part="actions" class="uwc-panel__header-actions">
+          <slot name="icons"></slot>
+        </span>
+
+        ${this.toggleable ? b2`
+          <button
+            type="button"
+            part="toggler"
+            class="uwc-panel__toggler"
+            aria-label=${this.collapsed ? "Expand panel" : "Collapse panel"}
+            aria-expanded=${!this.collapsed ? "true" : "false"}
+            aria-controls="uwc-panel-content"
+            @click=${this._onToggle}
+          >
+            <span class="uwc-panel__toggler-icon" aria-hidden="true">
+              <uwc-icon name="chevron-down" size="14px"></uwc-icon>
+            </span>
+          </button>
+        ` : A}
+      </div>
+    `;
+  }
+  // ── Render ─────────────────────────────────────────────────────────────────
+  render() {
+    return b2`
+      <div part="panel" class="uwc-panel">
+        ${!this.noHeader ? this._renderHeader() : A}
+
+        <div
+          part="content-wrap"
+          class="uwc-panel__content-wrap"
+          id="uwc-panel-content"
+          role="region"
+          aria-labelledby="uwc-panel-header-title"
+        >
+          <div part="content" class="uwc-panel__content">
+            <slot></slot>
+          </div>
+        </div>
+
+        <div
+          part="footer"
+          class=${e7({ "uwc-panel__footer": true, "uwc-panel__footer--hidden": !this._hasFooter })}
+        >
+          <slot name="footer" @slotchange=${this._onFooterSlotChange}></slot>
+        </div>
+      </div>
+    `;
+  }
+};
+UwcPanel.styles = styles_default;
+__decorateClass([
+  n4()
+], UwcPanel.prototype, "header", 2);
+__decorateClass([
+  n4()
+], UwcPanel.prototype, "icon", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcPanel.prototype, "toggleable", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcPanel.prototype, "collapsed", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true, attribute: "no-header" })
+], UwcPanel.prototype, "noHeader", 2);
+__decorateClass([
+  e5(".uwc-panel__content-wrap")
+], UwcPanel.prototype, "_wrap", 2);
+__decorateClass([
+  r5()
+], UwcPanel.prototype, "_hasFooter", 2);
+
+// src/message/styles.ts
+var styles_default2 = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+    }
+
+    /* ── Base layout ─────────────────────────────────────────────────────────── */
+    .uwc-msg {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: ${radiusLg};
+      background: var(--_bg, #e0f2fe);
+      border: var(--_border, none);
+      animation: uwc-msg-in ${durationBase} ease-out both;
+    }
+
+    /* ── Severity modifiers ──────────────────────────────────────────────────── */
+    .uwc-msg--info {
+      --_bg:           #e0f2fe;
+      --_color:        #0369a1;
+      --_border-color: #38bdf8;
+    }
+
+    .uwc-msg--success {
+      --_bg:           #dcfce7;
+      --_color:        #166534;
+      --_border-color: #22c55e;
+    }
+
+    .uwc-msg--warn {
+      --_bg:           #fef9c3;
+      --_color:        #b45309;
+      --_border-color: #f59e0b;
+    }
+
+    .uwc-msg--error {
+      --_bg:           #fee2e2;
+      --_color:        #b91c1c;
+      --_border-color: #ef4444;
+    }
+
+    .uwc-msg--secondary {
+      --_bg:           #f1f5f9;
+      --_color:        #475569;
+      --_border-color: #94a3b8;
+    }
+
+    .uwc-msg--contrast {
+      --_bg:           #1e293b;
+      --_color:        #f8fafc;
+      --_border-color: #475569;
+    }
+
+    /* ── Variant modifiers ───────────────────────────────────────────────────── */
+
+    /* filled (default) — tinted bg, no border */
+    .uwc-msg--filled {
+      --_border: none;
+      background: var(--_bg);
+    }
+
+    /* outlined — white bg, 1px colored border */
+    .uwc-msg--outlined {
+      background: #ffffff;
+      --_border: 1px solid var(--_border-color);
+      border: 1px solid var(--_border-color);
+    }
+
+    /* simple — transparent, no border */
+    .uwc-msg--simple {
+      background: transparent;
+      --_border: none;
+      border: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* ── Icon area ───────────────────────────────────────────────────────────── */
+    .uwc-msg__icon-wrap {
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 1.1rem;
+      color: var(--_color);
+      display: flex;
+      align-items: center;
+    }
+
+    .uwc-msg__icon {
+      color: var(--_color);
+    }
+
+    /* ── Body ────────────────────────────────────────────────────────────────── */
+    .uwc-msg__body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .uwc-msg__text {
+      font-weight: ${fontWeightSemibold};
+      font-size: ${fontSizeMd};
+      color: var(--_color);
+      line-height: 1.4;
+    }
+
+    .uwc-msg__detail {
+      font-size: ${fontSizeMd};
+      color: var(--_color);
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+
+    /* ── Close button ────────────────────────────────────────────────────────── */
+    .uwc-msg__close {
+      flex-shrink: 0;
+      margin-left: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.6;
+      padding: 2px;
+      border-radius: ${radiusSm};
+      color: var(--_color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity ${durationBase}, background ${durationBase};
+    }
+
+    .uwc-msg__close:hover {
+      opacity: 1;
+      background: color-mix(in oklab, var(--_color) 12%, transparent);
+    }
+
+    .uwc-msg__close:focus-visible {
+      outline: 2px solid var(--_color);
+      outline-offset: 2px;
+    }
+
+    /* ── Animations ──────────────────────────────────────────────────────────── */
+    @keyframes uwc-msg-in {
+      from {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes uwc-msg-out {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+    }
+
+    .uwc-msg--closing {
+      animation: uwc-msg-out ${durationBase} ease-in forwards;
+    }
+
+    /* ── Reduced motion ──────────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-msg {
+        animation: none;
+      }
+      .uwc-msg--closing {
+        animation: none;
+        opacity: 0;
+      }
+    }
+  `
+];
+
+// src/message/index.ts
+var _UwcMessage = class _UwcMessage extends i4 {
+  constructor() {
+    super(...arguments);
+    this.severity = "info";
+    this.text = "";
+    this.detail = "";
+    this.closable = false;
+    this.variant = "filled";
+    this._closing = false;
+    this._closed = false;
+  }
+  _getIcon() {
+    return this.icon ?? _UwcMessage._ICONS[this.severity] ?? "info-circle-fill";
+  }
+  _dismiss() {
+    this._closing = true;
+    const el = this.renderRoot.querySelector(".uwc-msg");
+    const done = () => {
+      this._closed = true;
+      emit(this, "uwc-close", {});
+    };
+    if (el) {
+      el.addEventListener("animationend", done, { once: true });
+    } else {
+      done();
+    }
+  }
+  render() {
+    if (this._closed) return A;
+    const classes = {
+      "uwc-msg": true,
+      [`uwc-msg--${this.severity}`]: true,
+      [`uwc-msg--${this.variant}`]: true,
+      "uwc-msg--closing": this._closing
+    };
+    return b2`
+      <div
+        class=${e7(classes)}
+        role="alert"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span class="uwc-msg__icon-wrap" aria-hidden="true">
+          <uwc-icon name=${this._getIcon()} class="uwc-msg__icon"></uwc-icon>
+        </span>
+
+        <div class="uwc-msg__body">
+          ${this.contentTemplate ? this.contentTemplate() : b2`
+              ${this.text ? b2`<span class="uwc-msg__text">${this.text}</span>` : A}
+              ${this.detail ? b2`<span class="uwc-msg__detail">${this.detail}</span>` : A}
+              <slot></slot>
+            `}
+        </div>
+
+        ${this.closable ? b2`
+          <button
+            type="button"
+            class="uwc-msg__close"
+            aria-label="Dismiss message"
+            @click=${this._dismiss}
+          >
+            <uwc-icon name="x-lg"></uwc-icon>
+          </button>
+        ` : A}
+      </div>
+    `;
+  }
+};
+_UwcMessage.styles = styles_default2;
+_UwcMessage._ICONS = {
+  info: "info-circle-fill",
+  success: "check-circle-fill",
+  warn: "exclamation-triangle-fill",
+  error: "x-circle-fill",
+  secondary: "info-circle",
+  contrast: "info-circle-fill"
+};
+__decorateClass([
+  n4()
+], _UwcMessage.prototype, "severity", 2);
+__decorateClass([
+  n4()
+], _UwcMessage.prototype, "text", 2);
+__decorateClass([
+  n4()
+], _UwcMessage.prototype, "detail", 2);
+__decorateClass([
+  n4()
+], _UwcMessage.prototype, "icon", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], _UwcMessage.prototype, "closable", 2);
+__decorateClass([
+  n4()
+], _UwcMessage.prototype, "variant", 2);
+__decorateClass([
+  r5()
+], _UwcMessage.prototype, "_closing", 2);
+__decorateClass([
+  r5()
+], _UwcMessage.prototype, "_closed", 2);
+var UwcMessage = _UwcMessage;
+
+// node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i7 = " !" + n5;
+var o6 = e6(class extends i5 {
+  constructor(t6) {
+    if (super(t6), t6.type !== t3.ATTRIBUTE || "style" !== t6.name || t6.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t6) {
+    return Object.keys(t6).reduce((e9, r7) => {
+      const s5 = t6[r7];
+      return null == s5 ? e9 : e9 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
+    }, "");
+  }
+  update(e9, [r7]) {
+    const { style: s5 } = e9.element;
+    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
+    for (const t6 of this.ft) null == r7[t6] && (this.ft.delete(t6), t6.includes("-") ? s5.removeProperty(t6) : s5[t6] = null);
+    for (const t6 in r7) {
+      const e10 = r7[t6];
+      if (null != e10) {
+        this.ft.add(t6);
+        const r8 = "string" == typeof e10 && e10.endsWith(i7);
+        t6.includes("-") || r8 ? s5.setProperty(t6, r8 ? e10.slice(0, -11) : e10, r8 ? n5 : "") : s5[t6] = e10;
+      }
+    }
+    return E;
+  }
+});
+
+// src/toast/styles.ts
+var styles_default3 = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+    }
+
+    /* ── Toast container ─────────────────────────────────────────────────────── */
+    .uwc-toast-container {
+      position: fixed;
+      z-index: ${zFloat};
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+      padding: 1rem;
+    }
+
+    /* ── Position variants ───────────────────────────────────────────────────── */
+    :host([position="top-right"]) .uwc-toast-container {
+      top: 0;
+      right: 0;
+      align-items: flex-end;
+    }
+
+    :host([position="top-left"]) .uwc-toast-container {
+      top: 0;
+      left: 0;
+      align-items: flex-start;
+    }
+
+    :host([position="top-center"]) .uwc-toast-container {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      align-items: center;
+    }
+
+    :host([position="bottom-right"]) .uwc-toast-container {
+      bottom: 0;
+      right: 0;
+      align-items: flex-end;
+      flex-direction: column-reverse;
+    }
+
+    :host([position="bottom-left"]) .uwc-toast-container {
+      bottom: 0;
+      left: 0;
+      align-items: flex-start;
+      flex-direction: column-reverse;
+    }
+
+    :host([position="bottom-center"]) .uwc-toast-container {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      align-items: center;
+      flex-direction: column-reverse;
+    }
+
+    :host([position="center"]) .uwc-toast-container {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      align-items: center;
+    }
+
+    /* ── Individual toast item ───────────────────────────────────────────────── */
+    .uwc-toast-item {
+      pointer-events: all;
+      min-width: 280px;
+      max-width: 480px;
+      border-radius: ${radiusLg};
+      overflow: hidden;
+      box-shadow: ${shadowLg};
+      background: var(--_bg, #e0f2fe);
+      border: var(--_border, none);
+    }
+
+    /* Default (top-right) animation */
+    :host([position="top-right"]) .uwc-toast-item {
+      animation: uwc-toast-in-right 220ms ${easingStandard} both;
+    }
+
+    :host([position="bottom-right"]) .uwc-toast-item {
+      animation: uwc-toast-in-right 220ms ${easingStandard} both;
+    }
+
+    :host([position="top-left"]) .uwc-toast-item {
+      animation: uwc-toast-in-left 220ms ${easingStandard} both;
+    }
+
+    :host([position="bottom-left"]) .uwc-toast-item {
+      animation: uwc-toast-in-left 220ms ${easingStandard} both;
+    }
+
+    :host([position="top-center"]) .uwc-toast-item {
+      animation: uwc-toast-in-top 220ms ${easingStandard} both;
+    }
+
+    :host([position="bottom-center"]) .uwc-toast-item {
+      animation: uwc-toast-in-bottom 220ms ${easingStandard} both;
+    }
+
+    :host([position="center"]) .uwc-toast-item {
+      animation: uwc-toast-in-center 220ms ${easingStandard} both;
+    }
+
+    /* Closing animation overrides all enter animations */
+    .uwc-toast-item.is-closing {
+      animation: uwc-toast-out 180ms ease-in forwards !important;
+    }
+
+    /* ── Severity modifiers ──────────────────────────────────────────────────── */
+    .uwc-toast-item--info {
+      --_bg:           #e0f2fe;
+      --_color:        #0369a1;
+      --_border-color: #38bdf8;
+      --_progress-color: #38bdf8;
+    }
+
+    .uwc-toast-item--success {
+      --_bg:           #dcfce7;
+      --_color:        #166534;
+      --_border-color: #22c55e;
+      --_progress-color: #22c55e;
+    }
+
+    .uwc-toast-item--warn {
+      --_bg:           #fef9c3;
+      --_color:        #b45309;
+      --_border-color: #f59e0b;
+      --_progress-color: #f59e0b;
+    }
+
+    .uwc-toast-item--error {
+      --_bg:           #fee2e2;
+      --_color:        #b91c1c;
+      --_border-color: #ef4444;
+      --_progress-color: #ef4444;
+    }
+
+    /* ── Inner layout (mirrors uwc-message) ─────────────────────────────────── */
+    .uwc-toast-item__inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+    }
+
+    .uwc-toast-item__icon-wrap {
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 1.1rem;
+      color: var(--_color);
+      display: flex;
+      align-items: center;
+    }
+
+    .uwc-toast-item__icon {
+      color: var(--_color);
+    }
+
+    .uwc-toast-item__body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .uwc-toast-item__summary {
+      font-weight: ${fontWeightSemibold};
+      font-size: ${fontSizeMd};
+      color: var(--_color);
+      line-height: 1.4;
+    }
+
+    .uwc-toast-item__detail {
+      font-size: ${fontSizeMd};
+      color: var(--_color);
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+
+    .uwc-toast-item__close {
+      flex-shrink: 0;
+      margin-left: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.6;
+      padding: 2px;
+      border-radius: ${radiusSm};
+      color: var(--_color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity ${durationBase}, background ${durationBase};
+    }
+
+    .uwc-toast-item__close:hover {
+      opacity: 1;
+      background: color-mix(in oklab, var(--_color) 12%, transparent);
+    }
+
+    .uwc-toast-item__close:focus-visible {
+      outline: 2px solid var(--_color);
+      outline-offset: 2px;
+    }
+
+    /* ── Progress bar ────────────────────────────────────────────────────────── */
+    .uwc-toast-item__progress {
+      height: 3px;
+      border-radius: 0 0 ${radiusLg} ${radiusLg};
+      width: 100%;
+      animation: uwc-progress-shrink linear forwards;
+      background: var(--_progress-color, #38bdf8);
+    }
+
+    /* ── Animations ──────────────────────────────────────────────────────────── */
+    @keyframes uwc-toast-in-right {
+      from { opacity: 0; transform: translateX(100%); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes uwc-toast-in-left {
+      from { opacity: 0; transform: translateX(-100%); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes uwc-toast-in-top {
+      from { opacity: 0; transform: translateY(-100%); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes uwc-toast-in-bottom {
+      from { opacity: 0; transform: translateY(100%); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes uwc-toast-in-center {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes uwc-toast-out {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0; transform: scale(0.95); }
+    }
+
+    @keyframes uwc-progress-shrink {
+      from { width: 100%; }
+      to   { width: 0; }
+    }
+
+    /* ── Reduced motion ──────────────────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-toast-item {
+        animation: none !important;
+      }
+      .uwc-toast-item.is-closing {
+        animation: none !important;
+        opacity: 0;
+      }
+      .uwc-toast-item__progress {
+        animation: none;
+        width: 0;
+      }
+    }
+  `
+];
+
+// src/toast/index.ts
+var _UwcToast = class _UwcToast extends i4 {
+  constructor() {
+    super(...arguments);
+    this.position = "top-right";
+    this.life = 3e3;
+    this.sticky = false;
+    this._messages = [];
+    this._timers = /* @__PURE__ */ new Map();
+    this._counter = 0;
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._timers.forEach((t6) => clearTimeout(t6));
+    this._timers.clear();
+  }
+  // ── Public API ─────────────────────────────────────────────────────────────
+  add(msg) {
+    const list = Array.isArray(msg) ? msg : [msg];
+    for (const m3 of list) {
+      const id = m3.id ?? ++this._counter;
+      const life = m3.life ?? this.life;
+      const sticky = m3.sticky ?? this.sticky;
+      const closable = m3.closable ?? true;
+      const internal = {
+        id,
+        severity: m3.severity ?? "info",
+        summary: m3.summary ?? "",
+        detail: m3.detail ?? "",
+        life,
+        sticky,
+        closable,
+        icon: m3.icon,
+        contentTemplate: m3.contentTemplate,
+        closing: false
+      };
+      this._messages = [...this._messages, internal];
+      if (!sticky && life > 0) {
+        const timer = setTimeout(() => this._expire(id), life);
+        this._timers.set(id, timer);
+      }
+    }
+  }
+  clear() {
+    this._timers.forEach((t6) => clearTimeout(t6));
+    this._timers.clear();
+    this._messages = [];
+  }
+  remove(id) {
+    this._startClose(id);
+  }
+  // ── Internal ──────────────────────────────────────────────────────────────
+  _expire(id) {
+    emit(this, "uwc-life-end", { id });
+    this._startClose(id);
+  }
+  _startClose(id) {
+    clearTimeout(this._timers.get(id));
+    this._timers.delete(id);
+    this._messages = this._messages.map(
+      (m3) => m3.id === id ? { ...m3, closing: true } : m3
+    );
+    setTimeout(() => {
+      const msg = this._messages.find((m3) => m3.id === id);
+      this._messages = this._messages.filter((m3) => m3.id !== id);
+      if (msg) emit(this, "uwc-close", { id: msg.id, severity: msg.severity, summary: msg.summary });
+    }, 200);
+  }
+  _getIcon(m3) {
+    return m3.icon ?? _UwcToast._ICONS[m3.severity] ?? "info-circle-fill";
+  }
+  _renderMessage(m3) {
+    const classes = {
+      "uwc-toast-item": true,
+      [`uwc-toast-item--${m3.severity}`]: true,
+      "is-closing": m3.closing
+    };
+    const progressStyle = !m3.sticky && m3.life > 0 ? { animationDuration: `${m3.life}ms` } : {};
+    return b2`
+      <div
+        class=${e7(classes)}
+        role="alert"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <div class="uwc-toast-item__inner">
+          <span class="uwc-toast-item__icon-wrap" aria-hidden="true">
+            <uwc-icon name=${this._getIcon(m3)} class="uwc-toast-item__icon"></uwc-icon>
+          </span>
+
+          <div class="uwc-toast-item__body">
+            ${m3.contentTemplate ? m3.contentTemplate(m3) : b2`
+                ${m3.summary ? b2`<span class="uwc-toast-item__summary">${m3.summary}</span>` : A}
+                ${m3.detail ? b2`<span class="uwc-toast-item__detail">${m3.detail}</span>` : A}
+              `}
+          </div>
+
+          ${m3.closable ? b2`
+            <button
+              type="button"
+              class="uwc-toast-item__close"
+              aria-label="Dismiss notification"
+              @click=${() => this._startClose(m3.id)}
+            >
+              <uwc-icon name="x-lg"></uwc-icon>
+            </button>
+          ` : A}
+        </div>
+
+        ${!m3.sticky && m3.life > 0 ? b2`
+          <div
+            class="uwc-toast-item__progress uwc-toast-item__progress--${m3.severity}"
+            style=${o6(progressStyle)}
+          ></div>
+        ` : A}
+      </div>
+    `;
+  }
+  render() {
+    return b2`
+      <div class="uwc-toast-container" role="region" aria-label="Notifications" aria-live="polite">
+        ${c4(
+      this._messages,
+      (m3) => m3.id,
+      (m3) => this._renderMessage(m3)
+    )}
+      </div>
+    `;
+  }
+};
+_UwcToast.styles = styles_default3;
+_UwcToast._ICONS = {
+  info: "info-circle-fill",
+  success: "check-circle-fill",
+  warn: "exclamation-triangle-fill",
+  error: "x-circle-fill"
+};
+__decorateClass([
+  n4({ reflect: true })
+], _UwcToast.prototype, "position", 2);
+__decorateClass([
+  n4({ type: Number })
+], _UwcToast.prototype, "life", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], _UwcToast.prototype, "sticky", 2);
+__decorateClass([
+  r5()
+], _UwcToast.prototype, "_messages", 2);
+var UwcToast = _UwcToast;
+
+// node_modules/lit-html/directives/if-defined.js
+var o7 = (o10) => o10 ?? A;
+
+// src/button/styles.ts
+var styles_default4 = [
   hostReset,
   i`
     :host {
@@ -1066,9 +3177,9 @@ var UwcButton = class extends i4 {
         class=${classes}
         type=${this.type}
         ?disabled=${this.disabled || this.loading}
-        aria-label=${o6(this.ariaLabel ?? this.label)}
+        aria-label=${o7(this.ariaLabel ?? this.label)}
         aria-busy=${this.loading ? "true" : "false"}
-        tabindex=${o6(this.tabindex)}
+        tabindex=${o7(this.tabindex)}
         ?autofocus=${this.autofocus}
         @click=${this._handleClick}
         @focus=${() => this.dispatchEvent(new CustomEvent("uwc-focus", { bubbles: true, composed: true }))}
@@ -1078,7 +3189,7 @@ var UwcButton = class extends i4 {
       </button>`;
   }
 };
-UwcButton.styles = [styles_default];
+UwcButton.styles = [styles_default4];
 __decorateClass([
   n4()
 ], UwcButton.prototype, "label", 2);
@@ -1144,7 +3255,7 @@ __decorateClass([
 ], UwcButton.prototype, "autofocus", 2);
 
 // src/card/styles.ts
-var styles_default2 = [
+var styles_default5 = [
   hostReset,
   i`
     /* ── Host ────────────────────────────────────────────────────────── */
@@ -1330,7 +3441,7 @@ var UwcCard = class extends i4 {
     `;
   }
 };
-UwcCard.styles = styles_default2;
+UwcCard.styles = styles_default5;
 __decorateClass([
   n4({ reflect: true })
 ], UwcCard.prototype, "title", 2);
@@ -1347,187 +3458,8 @@ __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcCard.prototype, "horizontal", 2);
 
-// node_modules/lit-html/directives/style-map.js
-var n5 = "important";
-var i6 = " !" + n5;
-var o7 = e6(class extends i5 {
-  constructor(t6) {
-    if (super(t6), t6.type !== t3.ATTRIBUTE || "style" !== t6.name || t6.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
-  }
-  render(t6) {
-    return Object.keys(t6).reduce((e9, r7) => {
-      const s5 = t6[r7];
-      return null == s5 ? e9 : e9 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
-    }, "");
-  }
-  update(e9, [r7]) {
-    const { style: s5 } = e9.element;
-    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
-    for (const t6 of this.ft) null == r7[t6] && (this.ft.delete(t6), t6.includes("-") ? s5.removeProperty(t6) : s5[t6] = null);
-    for (const t6 in r7) {
-      const e10 = r7[t6];
-      if (null != e10) {
-        this.ft.add(t6);
-        const r8 = "string" == typeof e10 && e10.endsWith(i6);
-        t6.includes("-") || r8 ? s5.setProperty(t6, r8 ? e10.slice(0, -11) : e10, r8 ? n5 : "") : s5[t6] = e10;
-      }
-    }
-    return E;
-  }
-});
-
-// node_modules/lit-html/directive-helpers.js
-var { I: t4 } = j;
-var i7 = (o10) => o10;
-var r6 = (o10) => void 0 === o10.strings;
-var s4 = () => document.createComment("");
-var v2 = (o10, n6, e9) => {
-  const l4 = o10._$AA.parentNode, d3 = void 0 === n6 ? o10._$AB : n6._$AA;
-  if (void 0 === e9) {
-    const i8 = l4.insertBefore(s4(), d3), n7 = l4.insertBefore(s4(), d3);
-    e9 = new t4(i8, n7, o10, o10.options);
-  } else {
-    const t6 = e9._$AB.nextSibling, n7 = e9._$AM, c5 = n7 !== o10;
-    if (c5) {
-      let t7;
-      e9._$AQ?.(o10), e9._$AM = o10, void 0 !== e9._$AP && (t7 = o10._$AU) !== n7._$AU && e9._$AP(t7);
-    }
-    if (t6 !== d3 || c5) {
-      let o11 = e9._$AA;
-      for (; o11 !== t6; ) {
-        const t7 = i7(o11).nextSibling;
-        i7(l4).insertBefore(o11, d3), o11 = t7;
-      }
-    }
-  }
-  return e9;
-};
-var u3 = (o10, t6, i8 = o10) => (o10._$AI(t6, i8), o10);
-var m2 = {};
-var p3 = (o10, t6 = m2) => o10._$AH = t6;
-var M2 = (o10) => o10._$AH;
-var h3 = (o10) => {
-  o10._$AR(), o10._$AA.remove();
-};
-
-// node_modules/lit-html/directives/repeat.js
-var u4 = (e9, s5, t6) => {
-  const r7 = /* @__PURE__ */ new Map();
-  for (let l4 = s5; l4 <= t6; l4++) r7.set(e9[l4], l4);
-  return r7;
-};
-var c4 = e6(class extends i5 {
-  constructor(e9) {
-    if (super(e9), e9.type !== t3.CHILD) throw Error("repeat() can only be used in text expressions");
-  }
-  dt(e9, s5, t6) {
-    let r7;
-    void 0 === t6 ? t6 = s5 : void 0 !== s5 && (r7 = s5);
-    const l4 = [], o10 = [];
-    let i8 = 0;
-    for (const s6 of e9) l4[i8] = r7 ? r7(s6, i8) : i8, o10[i8] = t6(s6, i8), i8++;
-    return { values: o10, keys: l4 };
-  }
-  render(e9, s5, t6) {
-    return this.dt(e9, s5, t6).values;
-  }
-  update(s5, [t6, r7, c5]) {
-    const d3 = M2(s5), { values: p4, keys: a3 } = this.dt(t6, r7, c5);
-    if (!Array.isArray(d3)) return this.ut = a3, p4;
-    const h4 = this.ut ?? (this.ut = []), v3 = [];
-    let m3, y3, x2 = 0, j2 = d3.length - 1, k2 = 0, w2 = p4.length - 1;
-    for (; x2 <= j2 && k2 <= w2; ) if (null === d3[x2]) x2++;
-    else if (null === d3[j2]) j2--;
-    else if (h4[x2] === a3[k2]) v3[k2] = u3(d3[x2], p4[k2]), x2++, k2++;
-    else if (h4[j2] === a3[w2]) v3[w2] = u3(d3[j2], p4[w2]), j2--, w2--;
-    else if (h4[x2] === a3[w2]) v3[w2] = u3(d3[x2], p4[w2]), v2(s5, v3[w2 + 1], d3[x2]), x2++, w2--;
-    else if (h4[j2] === a3[k2]) v3[k2] = u3(d3[j2], p4[k2]), v2(s5, d3[x2], d3[j2]), j2--, k2++;
-    else if (void 0 === m3 && (m3 = u4(a3, k2, w2), y3 = u4(h4, x2, j2)), m3.has(h4[x2])) if (m3.has(h4[j2])) {
-      const e9 = y3.get(a3[k2]), t7 = void 0 !== e9 ? d3[e9] : null;
-      if (null === t7) {
-        const e10 = v2(s5, d3[x2]);
-        u3(e10, p4[k2]), v3[k2] = e10;
-      } else v3[k2] = u3(t7, p4[k2]), v2(s5, d3[x2], t7), d3[e9] = null;
-      k2++;
-    } else h3(d3[j2]), j2--;
-    else h3(d3[x2]), x2++;
-    for (; k2 <= w2; ) {
-      const e9 = v2(s5, v3[w2 + 1]);
-      u3(e9, p4[k2]), v3[k2++] = e9;
-    }
-    for (; x2 <= j2; ) {
-      const e9 = d3[x2++];
-      null !== e9 && h3(e9);
-    }
-    return this.ut = a3, p3(s5, v3), E;
-  }
-});
-
-// src/utils/dom.utils.ts
-function deepQueryById(root, id) {
-  const direct = root.querySelector(`[id="${CSS.escape(id)}"]`);
-  if (direct) return direct;
-  for (const el of Array.from(root.querySelectorAll("*"))) {
-    if (el.shadowRoot) {
-      const found = deepQueryById(
-        el.shadowRoot,
-        id
-      );
-      if (found) return found;
-    }
-  }
-  return null;
-}
-function computeCoords(tRect, pRect, placement, offset) {
-  const [side, align = "center"] = placement.split("-");
-  let top = 0, left = 0;
-  switch (side) {
-    case "top":
-      top = tRect.top - pRect.height - offset;
-      break;
-    case "bottom":
-      top = tRect.bottom + offset;
-      break;
-    case "left":
-      left = tRect.left - pRect.width - offset;
-      break;
-    case "right":
-      left = tRect.right + offset;
-      break;
-  }
-  if (side === "top" || side === "bottom") {
-    if (align === "start") left = tRect.left;
-    else if (align === "end") left = tRect.right - pRect.width;
-    else left = tRect.left + (tRect.width - pRect.width) / 2;
-  } else {
-    if (align === "start") top = tRect.top;
-    else if (align === "end") top = tRect.bottom - pRect.height;
-    else top = tRect.top + (tRect.height - pRect.height) / 2;
-  }
-  return { top, left };
-}
-function clampToViewport({ top, left }, pRect, margin = 8) {
-  return {
-    top: Math.max(margin, Math.min(top, window.innerHeight - pRect.height - margin)),
-    left: Math.max(margin, Math.min(left, window.innerWidth - pRect.width - margin))
-  };
-}
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-function emit(host, name, detail, opts = {}) {
-  const event = new CustomEvent(name, {
-    detail,
-    bubbles: true,
-    composed: true,
-    ...opts
-  });
-  host.dispatchEvent(event);
-  return event;
-}
-
 // src/carousel/styles.ts
-var styles_default3 = [
+var styles_default6 = [
   hostReset,
   focusRing(".uwc-car__prev", "--uwc-color-primary", "#6366f1"),
   focusRing(".uwc-car__next", "--uwc-color-primary", "#6366f1"),
@@ -1994,7 +3926,7 @@ var UwcCarousel = class extends i4 {
         >
           <div
             class=${e7({ "uwc-car__track": true, "is-animating": this._animating })}
-            style=${o7(this._trackStyle)}
+            style=${o6(this._trackStyle)}
             aria-live="off"
           >
             ${c4(
@@ -2003,7 +3935,7 @@ var UwcCarousel = class extends i4 {
       (item, index) => b2`
                 <div
                   class="uwc-car__item"
-                  style=${o7(itemStyle)}
+                  style=${o6(itemStyle)}
                   role="group"
                   aria-roledescription="slide"
                   aria-label="Slide ${index + 1} of ${this.items.length}"
@@ -2061,7 +3993,7 @@ var UwcCarousel = class extends i4 {
     `;
   }
 };
-UwcCarousel.styles = styles_default3;
+UwcCarousel.styles = styles_default6;
 __decorateClass([
   n4({ type: Array })
 ], UwcCarousel.prototype, "items", 2);
@@ -2118,7 +4050,7 @@ __decorateClass([
 ], UwcCarousel.prototype, "_viewport", 2);
 
 // src/galleria/styles.ts
-var styles_default4 = [
+var styles_default7 = [
   hostReset,
   focusRing(".uwc-gal__item-wrapper", "--uwc-color-primary", "#6366f1"),
   focusRing(".uwc-gal__thumb-item", "--uwc-color-primary", "#6366f1"),
@@ -2243,6 +4175,45 @@ var styles_default4 = [
     }
     .uwc-gal__nav-area--prev { left: 0; }
     .uwc-gal__nav-area--next { right: 0; }
+
+    /* ── Nav button (native <button> replacing uwc-button) ──────── */
+    .uwc-gal__nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: ${radiusFull};
+      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      cursor: pointer;
+      padding: 0;
+      transition:
+        background ${durationBase},
+        border-color ${durationBase},
+        opacity ${durationBase};
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .uwc-gal__nav-btn:hover:not(:disabled) {
+      background: rgba(0,0,0,0.6);
+      border-color: rgba(255,255,255,0.8);
+    }
+    .uwc-gal__nav-btn:focus-visible {
+      outline: 2px solid var(--uwc-color-primary, #6366f1);
+      outline-offset: 2px;
+    }
+    .uwc-gal__nav-btn:disabled,
+    .uwc-gal__nav-btn--disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-gal__nav-btn { transition: none; }
+    }
 
     /* ── Fullscreen button ───────────────────────────────────────── */
     .uwc-gal__fullscreen-btn {
@@ -2739,16 +4710,15 @@ var UwcGalleria = class extends i4 {
     const disabled = isPrev ? this.isPrevDisabled : this.isNextDisabled;
     const handler = isPrev ? () => this.prev() : () => this.next();
     return b2`
-      <uwc-button
-        icon=${icon}
-        icon-only
+      <button
+        type="button"
+        class=${e7({ "uwc-gal__nav-btn": true, "uwc-gal__nav-btn--disabled": disabled })}
         aria-label=${label}
-        rounded
-        variant="secondary"
-        outline
         ?disabled=${disabled}
-        @uwc-click=${handler}
-      ></uwc-button>
+        @click=${handler}
+      >
+        <uwc-icon name=${icon} size="18px"></uwc-icon>
+      </button>
     `;
   }
   _renderIndicators(inItem = false) {
@@ -3000,7 +4970,7 @@ var UwcGalleria = class extends i4 {
     `;
   }
 };
-UwcGalleria.styles = styles_default4;
+UwcGalleria.styles = styles_default7;
 __decorateClass([
   n4({ type: Array })
 ], UwcGalleria.prototype, "items", 2);
@@ -3075,7 +5045,7 @@ __decorateClass([
 ], UwcGalleria.prototype, "_dialog", 2);
 
 // src/accordion/styles.ts
-var panelStyles = [
+var panelStyles2 = [
   hostReset,
   i`
     :host {
@@ -3431,7 +5401,7 @@ var UwcAccordionPanel = class extends i4 {
     `;
   }
 };
-UwcAccordionPanel.styles = panelStyles;
+UwcAccordionPanel.styles = panelStyles2;
 __decorateClass([
   n4()
 ], UwcAccordionPanel.prototype, "header", 2);
@@ -3892,7 +5862,7 @@ var tabsStyles = [
 ];
 
 // src/tabs/index.ts
-var PANEL_CONNECTED = "uwc-tab-panel-connected";
+var PANEL_CONNECTED2 = "uwc-tab-panel-connected";
 var UwcTabPanel = class extends i4 {
   constructor() {
     super(...arguments);
@@ -3905,7 +5875,7 @@ var UwcTabPanel = class extends i4 {
   }
   connectedCallback() {
     super.connectedCallback();
-    this.dispatchEvent(new CustomEvent(PANEL_CONNECTED, {
+    this.dispatchEvent(new CustomEvent(PANEL_CONNECTED2, {
       bubbles: true,
       composed: true
     }));
@@ -3944,11 +5914,11 @@ var UwcTabs = class extends i4 {
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener(PANEL_CONNECTED, this._onPanelConnect);
+    this.addEventListener(PANEL_CONNECTED2, this._onPanelConnect);
   }
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener(PANEL_CONNECTED, this._onPanelConnect);
+    this.removeEventListener(PANEL_CONNECTED2, this._onPanelConnect);
   }
   firstUpdated() {
     this._syncPanels();
@@ -4208,7 +6178,7 @@ __decorateClass([
 ], UwcTabs.prototype, "_inkBar", 2);
 
 // src/splitter/styles.ts
-var panelStyles2 = [
+var panelStyles3 = [
   hostReset,
   i`
     :host {
@@ -4286,7 +6256,7 @@ var UwcSplitterPanel = class extends i4 {
     return b2`<slot></slot>`;
   }
 };
-UwcSplitterPanel.styles = panelStyles2;
+UwcSplitterPanel.styles = panelStyles3;
 __decorateClass([
   n4({ type: Number })
 ], UwcSplitterPanel.prototype, "size", 2);
@@ -4629,7 +6599,7 @@ __decorateClass([
 ], UwcSplitter.prototype, "step", 2);
 
 // src/checkbox/styles.ts
-var styles_default5 = [
+var styles_default8 = [
   hostReset,
   i`
     :host {
@@ -4776,7 +6746,7 @@ var UwcCheckbox = class extends i4 {
             .checked=${this.checked}
             .indeterminate=${this.indeterminate}
             value=${this.value}
-            name=${o6(this.name)}
+            name=${o7(this.name)}
             ?disabled=${this.disabled}
             @change=${this._onChange}
           />
@@ -4788,7 +6758,7 @@ var UwcCheckbox = class extends i4 {
     `;
   }
 };
-UwcCheckbox.styles = [styles_default5];
+UwcCheckbox.styles = [styles_default8];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcCheckbox.prototype, "checked", 2);
@@ -4815,7 +6785,7 @@ __decorateClass([
 ], UwcCheckbox.prototype, "variant", 2);
 
 // src/dialog/styles.ts
-var styles_default6 = [
+var styles_default9 = [
   hostReset,
   i`
     :host { display: contents; }
@@ -5350,7 +7320,7 @@ var UwcDialog = class extends i4 {
     `;
   }
 };
-UwcDialog.styles = [styles_default6];
+UwcDialog.styles = [styles_default9];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcDialog.prototype, "open", 2);
@@ -5401,7 +7371,7 @@ __decorateClass([
 ], UwcDialog.prototype, "_dialog", 2);
 
 // src/colorpicker/styles.ts
-var styles_default7 = [
+var styles_default10 = [
   hostReset,
   // Panel enters/exits via the floatingPanel mixin — same as dropdown/popover/tooltip
   floatingPanel(".uwc-cp__panel", { durationVar: "--uwc-cp-duration", durationDefault: "140ms" }),
@@ -6168,7 +8138,7 @@ var UwcColorPicker = class extends i4 {
         >
           <div class="uwc-cp__area-hue"></div>
           <div class="uwc-cp__area-dark"></div>
-          <div class="uwc-cp__cursor" style=${o7({
+          <div class="uwc-cp__cursor" style=${o6({
       left: `${this._hsv.s}%`,
       top: `${100 - this._hsv.v}%`
     })}></div>
@@ -6180,16 +8150,16 @@ var UwcColorPicker = class extends i4 {
           <div class="uwc-cp__sliders">
             <!-- Hue -->
             <div class="uwc-cp__hue-track" @pointerdown=${this._huePointerDown}>
-              <div class="uwc-cp__thumb" style=${o7({
+              <div class="uwc-cp__thumb" style=${o6({
       left: `${this._hsv.h / 360 * 100}%`
     })}></div>
             </div>
             <!-- Alpha (optional) -->
             ${this.showAlpha ? b2`
               <div class="uwc-cp__alpha-track"
-                style=${o7({ "--_alpha-color": `rgb(${rgb.r},${rgb.g},${rgb.b})` })}
+                style=${o6({ "--_alpha-color": `rgb(${rgb.r},${rgb.g},${rgb.b})` })}
                 @pointerdown=${this._alphaPointerDown}>
-                <div class="uwc-cp__thumb" style=${o7({
+                <div class="uwc-cp__thumb" style=${o6({
       left: `${this._alpha * 100}%`
     })}></div>
               </div>` : A}
@@ -6213,7 +8183,7 @@ var UwcColorPicker = class extends i4 {
     `;
   }
 };
-UwcColorPicker.styles = [styles_default7];
+UwcColorPicker.styles = [styles_default10];
 __decorateClass([
   n4({ reflect: true })
 ], UwcColorPicker.prototype, "placement", 2);
@@ -6255,7 +8225,7 @@ __decorateClass([
 ], UwcColorPicker.prototype, "_alphaEl", 2);
 
 // src/datatable/styles.ts
-var styles_default8 = [
+var styles_default11 = [
   hostReset,
   i`
     :host { display: block; }
@@ -7323,7 +9293,7 @@ var UwcDatatable = class extends i4 {
   }
 };
 // ── Styles ────────────────────────────────────────────────────────────────
-UwcDatatable.styles = [styles_default8];
+UwcDatatable.styles = [styles_default11];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatatable.prototype, "data", 2);
@@ -7410,7 +9380,7 @@ __decorateClass([
 ], UwcDatatable.prototype, "_resizeStartW", 2);
 
 // src/datepicker/styles.ts
-var styles_default9 = [
+var styles_default12 = [
   hostReset,
   floatingPanel(".dp-panel", { durationVar: "--uwc-dp-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -8569,7 +10539,7 @@ var UwcDatepicker = class extends i4 {
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
 // ═══════════════════════════════════════════════════════════════════════════
-UwcDatepicker.styles = [styles_default9];
+UwcDatepicker.styles = [styles_default12];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatepicker.prototype, "value", 2);
@@ -8680,7 +10650,7 @@ __decorateClass([
 ], UwcDatepicker.prototype, "_panel", 2);
 
 // src/dropdown/styles.ts
-var styles_default10 = [
+var styles_default13 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-dd-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -9264,7 +11234,7 @@ var UwcDropdown = class extends i4 {
       </div>`;
   }
 };
-UwcDropdown.styles = [styles_default10];
+UwcDropdown.styles = [styles_default13];
 __decorateClass([
   n4({ type: Array })
 ], UwcDropdown.prototype, "options", 2);
@@ -9544,7 +11514,7 @@ var UwcIcon = class extends i4 {
     return b2`
       <div 
         class="${containerClass}" 
-        style=${o7(containerStyles)}
+        style=${o6(containerStyles)}
         role="img"
         aria-hidden="true"
         data-source="${this.isLocalIcon ? "local" : "remote"}"
@@ -9611,7 +11581,7 @@ __decorateClass([
 ], UwcIcon.prototype, "isLocalIcon", 2);
 
 // src/inputtext/styles.ts
-var styles_default11 = [
+var styles_default14 = [
   hostReset,
   i`
     :host {
@@ -9767,10 +11737,10 @@ var UwcInputText = class extends i4 {
           part="input"
           type=${this.type}
           .value=${this.value}
-          placeholder=${o6(this.placeholder)}
-          name=${o6(this.name)}
-          autocomplete=${o6(this.autocomplete)}
-          maxlength=${o6(this.maxlength)}
+          placeholder=${o7(this.placeholder)}
+          name=${o7(this.name)}
+          autocomplete=${o7(this.autocomplete)}
+          maxlength=${o7(this.maxlength)}
           ?disabled=${this.disabled}
           ?readonly=${this.readonly}
           @input=${this._onInput}
@@ -9783,7 +11753,7 @@ var UwcInputText = class extends i4 {
     `;
   }
 };
-UwcInputText.styles = [styles_default11];
+UwcInputText.styles = [styles_default14];
 __decorateClass([
   n4()
 ], UwcInputText.prototype, "value", 2);
@@ -9828,7 +11798,7 @@ __decorateClass([
 ], UwcInputText.prototype, "_hasSuffix", 2);
 
 // src/listbox/styles.ts
-var styles_default12 = [
+var styles_default15 = [
   hostReset,
   i`
     :host {
@@ -10122,7 +12092,7 @@ var UwcListbox = class extends i4 {
     `;
   }
 };
-UwcListbox.styles = [styles_default12];
+UwcListbox.styles = [styles_default15];
 __decorateClass([
   n4({ type: Array })
 ], UwcListbox.prototype, "options", 2);
@@ -10164,7 +12134,7 @@ __decorateClass([
 ], UwcListbox.prototype, "_focusedIdx", 2);
 
 // src/menu/styles.ts
-var styles_default13 = [
+var styles_default16 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-menu-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -10445,7 +12415,7 @@ var UwcMenu = class extends i4 {
       "item--focused": isFocused,
       "item--danger": !!item.danger
     })}
-        style=${item.style ? o7(item.style) : ""}
+        style=${item.style ? o6(item.style) : ""}
         data-menu-index=${idx}
         role="none"
         @mouseenter=${() => this._handleItemMouseEnter(idx, item)}
@@ -10566,7 +12536,7 @@ var UwcMenu = class extends i4 {
       </div>`;
   }
 };
-UwcMenu.styles = [styles_default13];
+UwcMenu.styles = [styles_default16];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcMenu.prototype, "triggerId", 2);
@@ -10590,7 +12560,7 @@ __decorateClass([
 ], UwcMenu.prototype, "_focusedIndex", 2);
 
 // src/overlay/styles.ts
-var styles_default14 = [
+var styles_default17 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-overlay-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -10723,7 +12693,7 @@ var UwcOverlay = class extends i4 {
       </div>`;
   }
 };
-UwcOverlay.styles = [styles_default14];
+UwcOverlay.styles = [styles_default17];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcOverlay.prototype, "triggerId", 2);
@@ -10750,7 +12720,7 @@ __decorateClass([
 ], UwcOverlay.prototype, "_backdrop", 2);
 
 // src/paginator/styles.ts
-var styles_default15 = [
+var styles_default18 = [
   hostReset,
   i`
     :host {
@@ -11212,7 +13182,7 @@ var UwcPaginator = class extends i4 {
     return this.currentPageReportTemplate.replace("{currentPage}", String(cur + 1)).replace("{totalPages}", String(pc)).replace("{first}", String(first)).replace("{last}", String(last)).replace("{totalRecords}", String(this.totalRecords));
   }
 };
-UwcPaginator.styles = styles_default15;
+UwcPaginator.styles = styles_default18;
 __decorateClass([
   n4({ type: Number, reflect: true })
 ], UwcPaginator.prototype, "first", 2);
@@ -11257,7 +13227,7 @@ __decorateClass([
 ], UwcPaginator.prototype, "_jumpValue", 2);
 
 // src/popover/styles.ts
-var styles_default16 = [
+var styles_default19 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-popover-duration", durationDefault: "160ms" }),
   placementOrigins,
@@ -11455,7 +13425,7 @@ var UwcPopover = class extends i4 {
       </div>`;
   }
 };
-UwcPopover.styles = [styles_default16];
+UwcPopover.styles = [styles_default19];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcPopover.prototype, "triggerId", 2);
@@ -11488,7 +13458,7 @@ __decorateClass([
 ], UwcPopover.prototype, "_arrow", 2);
 
 // src/radiobutton/styles.ts
-var styles_default17 = [
+var styles_default20 = [
   hostReset,
   i`
     :host {
@@ -11616,8 +13586,8 @@ var UwcRadioButton = class extends i4 {
           <input
             type="radio"
             .checked=${this.checked}
-            value=${o6(this.value)}
-            name=${o6(this.name)}
+            value=${o7(this.value)}
+            name=${o7(this.name)}
             ?disabled=${this.disabled}
             @change=${this._onChange}
           />
@@ -11628,7 +13598,7 @@ var UwcRadioButton = class extends i4 {
     `;
   }
 };
-UwcRadioButton.styles = [styles_default17];
+UwcRadioButton.styles = [styles_default20];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcRadioButton.prototype, "checked", 2);
@@ -11652,7 +13622,7 @@ __decorateClass([
 ], UwcRadioButton.prototype, "variant", 2);
 
 // src/togglebutton/styles.ts
-var styles_default18 = [
+var styles_default21 = [
   hostReset,
   i`
     :host {
@@ -11815,7 +13785,7 @@ var UwcToggleButton = class extends i4 {
         <input
           type="checkbox"
           .checked=${this.checked}
-          name=${o6(this.name)}
+          name=${o7(this.name)}
           ?disabled=${this.disabled}
           @change=${this._onChange}
         />
@@ -11825,7 +13795,7 @@ var UwcToggleButton = class extends i4 {
     `;
   }
 };
-UwcToggleButton.styles = [styles_default18];
+UwcToggleButton.styles = [styles_default21];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleButton.prototype, "checked", 2);
@@ -11855,7 +13825,7 @@ __decorateClass([
 ], UwcToggleButton.prototype, "disabled", 2);
 
 // src/toggleswitch/styles.ts
-var styles_default19 = [
+var styles_default22 = [
   hostReset,
   i`
     :host {
@@ -11979,7 +13949,7 @@ var UwcToggleSwitch = class extends i4 {
           <input
             type="checkbox"
             .checked=${this.checked}
-            name=${o6(this.name)}
+            name=${o7(this.name)}
             ?disabled=${this.disabled}
             @change=${this._onChange}
           />
@@ -11990,7 +13960,7 @@ var UwcToggleSwitch = class extends i4 {
     `;
   }
 };
-UwcToggleSwitch.styles = [styles_default19];
+UwcToggleSwitch.styles = [styles_default22];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleSwitch.prototype, "checked", 2);
@@ -12011,7 +13981,7 @@ __decorateClass([
 ], UwcToggleSwitch.prototype, "invalid", 2);
 
 // src/tooltip/styles.ts
-var styles_default20 = [
+var styles_default23 = [
   hostReset,
   floatingPanel(".panel", {
     scaleFrom: "scale(0.93)",
@@ -12231,7 +14201,7 @@ var UwcTooltip = class extends i4 {
       </div>`;
   }
 };
-UwcTooltip.styles = [styles_default20];
+UwcTooltip.styles = [styles_default23];
 __decorateClass([
   n4({ type: String })
 ], UwcTooltip.prototype, "triggerId", 2);
@@ -12270,6 +14240,11 @@ __decorateClass([
 ], UwcTooltip.prototype, "_arrow", 2);
 
 // src/index.ts
+customElements.define("uwc-stepper", UwcStepper);
+customElements.define("uwc-stepper-panel", UwcStepperPanel);
+customElements.define("uwc-panel", UwcPanel);
+customElements.define("uwc-message", UwcMessage);
+customElements.define("uwc-toast", UwcToast);
 customElements.define("uwc-button", UwcButton);
 customElements.define("uwc-card", UwcCard);
 customElements.define("uwc-carousel", UwcCarousel);
@@ -12343,8 +14318,8 @@ lit-html/is-server.js:
    *)
 
 lit-html/directives/class-map.js:
-lit-html/directives/if-defined.js:
 lit-html/directives/style-map.js:
+lit-html/directives/if-defined.js:
   (**
    * @license
    * Copyright 2018 Google LLC
