@@ -578,12 +578,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -719,7 +721,7 @@ var styles_default = [
       color: ${text};
     }
     .dt-toolbar-btn.active {
-      background:   var(--uwc-dt-primary-lt, rgba(99,102,241,0.08));
+      background:   var(--uwc-dt-primary-lt, ${selectedBg});
       border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
       color:        var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
     }
@@ -731,7 +733,7 @@ var styles_default = [
     .dt-sel-badge {
       padding: ${space1} 10px;
       background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
-      color: #fff;
+      color: ${colorWhite};
       border-radius: ${radiusFull};
       font-size:   ${fontSizeXs};
       font-weight: ${fontWeightSemibold};
@@ -814,7 +816,7 @@ var styles_default = [
       font-size:   9px;
       font-weight: ${fontWeightBold};
       background:  var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
-      color:       #fff;
+      color:       ${colorWhite};
       border-radius: ${radiusXs};
       padding: 0 3px;
       line-height: 1.4;
@@ -885,7 +887,7 @@ var styles_default = [
       transition: all ${durationFast};
     }
     .dt-expand-btn:hover { border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); }
-    .dt-expand-btn.open { background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); color: #fff; }
+    .dt-expand-btn.open { background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); color: ${colorWhite}; }
 
     /* ── Cell types ─────────────────────────────────────────────────────────── */
     .dt-badge {
@@ -922,7 +924,7 @@ var styles_default = [
       width: 52px; height: 52px;
       border-radius: ${radiusFull};
       background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
-      color: #fff;
+      color: ${colorWhite};
       display: flex;
       align-items: center;
       justify-content: center;

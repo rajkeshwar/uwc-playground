@@ -610,12 +610,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -693,7 +695,7 @@ var styles_default = [
     /* ── Button ─────────────────────────────────────────────────────────────── */
     .uwc-tb {
       --_bg:        var(--uwc-togglebtn-bg,         ${surface});
-      --_border:    var(--uwc-togglebtn-border,      1px solid #d1d5db);
+      --_border:    var(--uwc-togglebtn-border,      1px solid ${borderControl});
       --_color:     var(--uwc-togglebtn-color,       ${text});
       --_radius:    var(--uwc-togglebtn-radius,      ${radiusMd});
       --_font-size: var(--uwc-togglebtn-font-size,   ${fontSizeMd});
@@ -701,7 +703,7 @@ var styles_default = [
       --_py:        var(--uwc-togglebtn-padding-y,   0.5rem);
       --_gap:       var(--uwc-togglebtn-gap,         0.375rem);
       --_active-bg: var(--uwc-togglebtn-active-bg,   var(--uwc-color-primary, ${primary}));
-      --_active-color: var(--uwc-togglebtn-active-color, #fff);
+      --_active-color: var(--uwc-togglebtn-active-color, ${colorWhite});
 
       position: relative;
       overflow: hidden;

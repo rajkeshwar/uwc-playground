@@ -9,9 +9,9 @@ var __decorateClass = (decorators, target, key, kind) => {
   return result;
 };
 
-// src/panel/react.ts
-import React from "react";
+// src/rating/react.ts
 import { createComponent } from "@lit/react";
+import React from "react";
 
 // node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
@@ -19,16 +19,16 @@ var e = t.ShadowRoot && (void 0 === t.ShadyCSS || t.ShadyCSS.nativeShadow) && "a
 var s = /* @__PURE__ */ Symbol();
 var o = /* @__PURE__ */ new WeakMap();
 var n = class {
-  constructor(t4, e8, o6) {
+  constructor(t4, e7, o6) {
     if (this._$cssResult$ = true, o6 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
-    this.cssText = t4, this.t = e8;
+    this.cssText = t4, this.t = e7;
   }
   get styleSheet() {
     let t4 = this.o;
     const s4 = this.t;
     if (e && void 0 === t4) {
-      const e8 = void 0 !== s4 && 1 === s4.length;
-      e8 && (t4 = o.get(s4)), void 0 === t4 && ((this.o = t4 = new CSSStyleSheet()).replaceSync(this.cssText), e8 && o.set(s4, t4));
+      const e7 = void 0 !== s4 && 1 === s4.length;
+      e7 && (t4 = o.get(s4)), void 0 === t4 && ((this.o = t4 = new CSSStyleSheet()).replaceSync(this.cssText), e7 && o.set(s4, t4));
     }
     return t4;
   }
@@ -37,8 +37,8 @@ var n = class {
   }
 };
 var r = (t4) => new n("string" == typeof t4 ? t4 : t4 + "", void 0, s);
-var i = (t4, ...e8) => {
-  const o6 = 1 === t4.length ? t4[0] : e8.reduce((e9, s4, o7) => e9 + ((t5) => {
+var i = (t4, ...e7) => {
+  const o6 = 1 === t4.length ? t4[0] : e7.reduce((e8, s4, o7) => e8 + ((t5) => {
     if (true === t5._$cssResult$) return t5.cssText;
     if ("number" == typeof t5) return t5;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + t5 + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
@@ -47,15 +47,15 @@ var i = (t4, ...e8) => {
 };
 var S = (s4, o6) => {
   if (e) s4.adoptedStyleSheets = o6.map((t4) => t4 instanceof CSSStyleSheet ? t4 : t4.styleSheet);
-  else for (const e8 of o6) {
+  else for (const e7 of o6) {
     const o7 = document.createElement("style"), n5 = t.litNonce;
-    void 0 !== n5 && o7.setAttribute("nonce", n5), o7.textContent = e8.cssText, s4.appendChild(o7);
+    void 0 !== n5 && o7.setAttribute("nonce", n5), o7.textContent = e7.cssText, s4.appendChild(o7);
   }
 };
 var c = e ? (t4) => t4 : (t4) => t4 instanceof CSSStyleSheet ? ((t5) => {
-  let e8 = "";
-  for (const s4 of t5.cssRules) e8 += s4.cssText;
-  return r(e8);
+  let e7 = "";
+  for (const s4 of t5.cssRules) e7 += s4.cssText;
+  return r(e7);
 })(t4) : t4;
 
 // node_modules/@lit/reactive-element/reactive-element.js
@@ -111,13 +111,13 @@ var y = class extends HTMLElement {
     }
   }
   static getPropertyDescriptor(t4, s4, i6) {
-    const { get: e8, set: r6 } = h(this.prototype, t4) ?? { get() {
+    const { get: e7, set: r6 } = h(this.prototype, t4) ?? { get() {
       return this[s4];
     }, set(t5) {
       this[s4] = t5;
     } };
-    return { get: e8, set(s5) {
-      const h3 = e8?.call(this);
+    return { get: e7, set(s5) {
+      const h3 = e7?.call(this);
       r6?.call(this, s5), this.requestUpdate(t4, h3, i6);
     }, configurable: true, enumerable: true };
   }
@@ -150,8 +150,8 @@ var y = class extends HTMLElement {
   static finalizeStyles(s4) {
     const i6 = [];
     if (Array.isArray(s4)) {
-      const e8 = new Set(s4.flat(1 / 0).reverse());
-      for (const s5 of e8) i6.unshift(c(s5));
+      const e7 = new Set(s4.flat(1 / 0).reverse());
+      for (const s5 of e7) i6.unshift(c(s5));
     } else void 0 !== s4 && i6.push(c(s4));
     return i6;
   }
@@ -192,31 +192,31 @@ var y = class extends HTMLElement {
     this._$AK(t4, i6);
   }
   _$ET(t4, s4) {
-    const i6 = this.constructor.elementProperties.get(t4), e8 = this.constructor._$Eu(t4, i6);
-    if (void 0 !== e8 && true === i6.reflect) {
+    const i6 = this.constructor.elementProperties.get(t4), e7 = this.constructor._$Eu(t4, i6);
+    if (void 0 !== e7 && true === i6.reflect) {
       const h3 = (void 0 !== i6.converter?.toAttribute ? i6.converter : u).toAttribute(s4, i6.type);
-      this._$Em = t4, null == h3 ? this.removeAttribute(e8) : this.setAttribute(e8, h3), this._$Em = null;
+      this._$Em = t4, null == h3 ? this.removeAttribute(e7) : this.setAttribute(e7, h3), this._$Em = null;
     }
   }
   _$AK(t4, s4) {
-    const i6 = this.constructor, e8 = i6._$Eh.get(t4);
-    if (void 0 !== e8 && this._$Em !== e8) {
-      const t5 = i6.getPropertyOptions(e8), h3 = "function" == typeof t5.converter ? { fromAttribute: t5.converter } : void 0 !== t5.converter?.fromAttribute ? t5.converter : u;
-      this._$Em = e8;
+    const i6 = this.constructor, e7 = i6._$Eh.get(t4);
+    if (void 0 !== e7 && this._$Em !== e7) {
+      const t5 = i6.getPropertyOptions(e7), h3 = "function" == typeof t5.converter ? { fromAttribute: t5.converter } : void 0 !== t5.converter?.fromAttribute ? t5.converter : u;
+      this._$Em = e7;
       const r6 = h3.fromAttribute(s4, t5.type);
-      this[e8] = r6 ?? this._$Ej?.get(e8) ?? r6, this._$Em = null;
+      this[e7] = r6 ?? this._$Ej?.get(e7) ?? r6, this._$Em = null;
     }
   }
-  requestUpdate(t4, s4, i6, e8 = false, h3) {
+  requestUpdate(t4, s4, i6, e7 = false, h3) {
     if (void 0 !== t4) {
       const r6 = this.constructor;
-      if (false === e8 && (h3 = this[t4]), i6 ?? (i6 = r6.getPropertyOptions(t4)), !((i6.hasChanged ?? f)(h3, s4) || i6.useDefault && i6.reflect && h3 === this._$Ej?.get(t4) && !this.hasAttribute(r6._$Eu(t4, i6)))) return;
+      if (false === e7 && (h3 = this[t4]), i6 ?? (i6 = r6.getPropertyOptions(t4)), !((i6.hasChanged ?? f)(h3, s4) || i6.useDefault && i6.reflect && h3 === this._$Ej?.get(t4) && !this.hasAttribute(r6._$Eu(t4, i6)))) return;
       this.C(t4, s4, i6);
     }
     false === this.isUpdatePending && (this._$ES = this._$EP());
   }
-  C(t4, s4, { useDefault: i6, reflect: e8, wrapped: h3 }, r6) {
-    i6 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t4) && (this._$Ej.set(t4, r6 ?? s4 ?? this[t4]), true !== h3 || void 0 !== r6) || (this._$AL.has(t4) || (this.hasUpdated || i6 || (s4 = void 0), this._$AL.set(t4, s4)), true === e8 && this._$Em !== t4 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t4));
+  C(t4, s4, { useDefault: i6, reflect: e7, wrapped: h3 }, r6) {
+    i6 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t4) && (this._$Ej.set(t4, r6 ?? s4 ?? this[t4]), true !== h3 || void 0 !== r6) || (this._$AL.has(t4) || (this.hasUpdated || i6 || (s4 = void 0), this._$AL.set(t4, s4)), true === e7 && this._$Em !== t4 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t4));
   }
   async _$EP() {
     this.isUpdatePending = true;
@@ -240,8 +240,8 @@ var y = class extends HTMLElement {
       }
       const t5 = this.constructor.elementProperties;
       if (t5.size > 0) for (const [s5, i6] of t5) {
-        const { wrapped: t6 } = i6, e8 = this[s5];
-        true !== t6 || this._$AL.has(s5) || void 0 === e8 || this.C(s5, void 0, i6, e8);
+        const { wrapped: t6 } = i6, e7 = this[s5];
+        true !== t6 || this._$AL.has(s5) || void 0 === e7 || this.C(s5, void 0, i6, e7);
       }
     }
     let t4 = false;
@@ -316,32 +316,32 @@ function V(t4, i6) {
   return void 0 !== e3 ? e3.createHTML(i6) : i6;
 }
 var N = (t4, i6) => {
-  const s4 = t4.length - 1, e8 = [];
+  const s4 = t4.length - 1, e7 = [];
   let n5, l3 = 2 === i6 ? "<svg>" : 3 === i6 ? "<math>" : "", c4 = v;
   for (let i7 = 0; i7 < s4; i7++) {
     const s5 = t4[i7];
     let a3, u3, d3 = -1, f3 = 0;
     for (; f3 < s5.length && (c4.lastIndex = f3, u3 = c4.exec(s5), null !== u3); ) f3 = c4.lastIndex, c4 === v ? "!--" === u3[1] ? c4 = _ : void 0 !== u3[1] ? c4 = m : void 0 !== u3[2] ? (y2.test(u3[2]) && (n5 = RegExp("</" + u3[2], "g")), c4 = p2) : void 0 !== u3[3] && (c4 = p2) : c4 === p2 ? ">" === u3[0] ? (c4 = n5 ?? v, d3 = -1) : void 0 === u3[1] ? d3 = -2 : (d3 = c4.lastIndex - u3[2].length, a3 = u3[1], c4 = void 0 === u3[3] ? p2 : '"' === u3[3] ? $ : g) : c4 === $ || c4 === g ? c4 = p2 : c4 === _ || c4 === m ? c4 = v : (c4 = p2, n5 = void 0);
     const x2 = c4 === p2 && t4[i7 + 1].startsWith("/>") ? " " : "";
-    l3 += c4 === v ? s5 + r3 : d3 >= 0 ? (e8.push(a3), s5.slice(0, d3) + h2 + s5.slice(d3) + o3 + x2) : s5 + o3 + (-2 === d3 ? i7 : x2);
+    l3 += c4 === v ? s5 + r3 : d3 >= 0 ? (e7.push(a3), s5.slice(0, d3) + h2 + s5.slice(d3) + o3 + x2) : s5 + o3 + (-2 === d3 ? i7 : x2);
   }
-  return [V(t4, l3 + (t4[s4] || "<?>") + (2 === i6 ? "</svg>" : 3 === i6 ? "</math>" : "")), e8];
+  return [V(t4, l3 + (t4[s4] || "<?>") + (2 === i6 ? "</svg>" : 3 === i6 ? "</math>" : "")), e7];
 };
 var S2 = class _S {
-  constructor({ strings: t4, _$litType$: i6 }, e8) {
+  constructor({ strings: t4, _$litType$: i6 }, e7) {
     let r6;
     this.parts = [];
     let l3 = 0, a3 = 0;
     const u3 = t4.length - 1, d3 = this.parts, [f3, v2] = N(t4, i6);
-    if (this.el = _S.createElement(f3, e8), P.currentNode = this.el.content, 2 === i6 || 3 === i6) {
+    if (this.el = _S.createElement(f3, e7), P.currentNode = this.el.content, 2 === i6 || 3 === i6) {
       const t5 = this.el.content.firstChild;
       t5.replaceWith(...t5.childNodes);
     }
     for (; null !== (r6 = P.nextNode()) && d3.length < u3; ) {
       if (1 === r6.nodeType) {
         if (r6.hasAttributes()) for (const t5 of r6.getAttributeNames()) if (t5.endsWith(h2)) {
-          const i7 = v2[a3++], s4 = r6.getAttribute(t5).split(o3), e9 = /([.?@])?(.*)/.exec(i7);
-          d3.push({ type: 1, index: l3, name: e9[2], strings: s4, ctor: "." === e9[1] ? I : "?" === e9[1] ? L : "@" === e9[1] ? z : H }), r6.removeAttribute(t5);
+          const i7 = v2[a3++], s4 = r6.getAttribute(t5).split(o3), e8 = /([.?@])?(.*)/.exec(i7);
+          d3.push({ type: 1, index: l3, name: e8[2], strings: s4, ctor: "." === e8[1] ? I : "?" === e8[1] ? L : "@" === e8[1] ? z : H }), r6.removeAttribute(t5);
         } else t5.startsWith(o3) && (d3.push({ type: 6, index: l3 }), r6.removeAttribute(t5));
         if (y2.test(r6.tagName)) {
           const t5 = r6.textContent.split(o3), i7 = t5.length - 1;
@@ -364,11 +364,11 @@ var S2 = class _S {
     return s4.innerHTML = t4, s4;
   }
 };
-function M(t4, i6, s4 = t4, e8) {
+function M(t4, i6, s4 = t4, e7) {
   if (i6 === E) return i6;
-  let h3 = void 0 !== e8 ? s4._$Co?.[e8] : s4._$Cl;
+  let h3 = void 0 !== e7 ? s4._$Co?.[e7] : s4._$Cl;
   const o6 = a2(i6) ? void 0 : i6._$litDirective$;
-  return h3?.constructor !== o6 && (h3?._$AO?.(false), void 0 === o6 ? h3 = void 0 : (h3 = new o6(t4), h3._$AT(t4, s4, e8)), void 0 !== e8 ? (s4._$Co ?? (s4._$Co = []))[e8] = h3 : s4._$Cl = h3), void 0 !== h3 && (i6 = M(t4, h3._$AS(t4, i6.values), h3, e8)), i6;
+  return h3?.constructor !== o6 && (h3?._$AO?.(false), void 0 === o6 ? h3 = void 0 : (h3 = new o6(t4), h3._$AT(t4, s4, e7)), void 0 !== e7 ? (s4._$Co ?? (s4._$Co = []))[e7] = h3 : s4._$Cl = h3), void 0 !== h3 && (i6 = M(t4, h3._$AS(t4, i6.values), h3, e7)), i6;
 }
 var R = class {
   constructor(t4, i6) {
@@ -381,8 +381,8 @@ var R = class {
     return this._$AM._$AU;
   }
   u(t4) {
-    const { el: { content: i6 }, parts: s4 } = this._$AD, e8 = (t4?.creationScope ?? l2).importNode(i6, true);
-    P.currentNode = e8;
+    const { el: { content: i6 }, parts: s4 } = this._$AD, e7 = (t4?.creationScope ?? l2).importNode(i6, true);
+    P.currentNode = e7;
     let h3 = P.nextNode(), o6 = 0, n5 = 0, r6 = s4[0];
     for (; void 0 !== r6; ) {
       if (o6 === r6.index) {
@@ -391,7 +391,7 @@ var R = class {
       }
       o6 !== r6?.index && (h3 = P.nextNode(), o6++);
     }
-    return P.currentNode = l2, e8;
+    return P.currentNode = l2, e7;
   }
   p(t4) {
     let i6 = 0;
@@ -402,8 +402,8 @@ var k = class _k {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
-  constructor(t4, i6, s4, e8) {
-    this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t4, this._$AB = i6, this._$AM = s4, this.options = e8, this._$Cv = e8?.isConnected ?? true;
+  constructor(t4, i6, s4, e7) {
+    this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t4, this._$AB = i6, this._$AM = s4, this.options = e7, this._$Cv = e7?.isConnected ?? true;
   }
   get parentNode() {
     let t4 = this._$AA.parentNode;
@@ -429,10 +429,10 @@ var k = class _k {
     this._$AH !== A && a2(this._$AH) ? this._$AA.nextSibling.data = t4 : this.T(l2.createTextNode(t4)), this._$AH = t4;
   }
   $(t4) {
-    const { values: i6, _$litType$: s4 } = t4, e8 = "number" == typeof s4 ? this._$AC(t4) : (void 0 === s4.el && (s4.el = S2.createElement(V(s4.h, s4.h[0]), this.options)), s4);
-    if (this._$AH?._$AD === e8) this._$AH.p(i6);
+    const { values: i6, _$litType$: s4 } = t4, e7 = "number" == typeof s4 ? this._$AC(t4) : (void 0 === s4.el && (s4.el = S2.createElement(V(s4.h, s4.h[0]), this.options)), s4);
+    if (this._$AH?._$AD === e7) this._$AH.p(i6);
     else {
-      const t5 = new R(e8, this), s5 = t5.u(this.options);
+      const t5 = new R(e7, this), s5 = t5.u(this.options);
       t5.p(i6), this.T(s5), this._$AH = t5;
     }
   }
@@ -443,9 +443,9 @@ var k = class _k {
   k(t4) {
     u2(this._$AH) || (this._$AH = [], this._$AR());
     const i6 = this._$AH;
-    let s4, e8 = 0;
-    for (const h3 of t4) e8 === i6.length ? i6.push(s4 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s4 = i6[e8], s4._$AI(h3), e8++;
-    e8 < i6.length && (this._$AR(s4 && s4._$AB.nextSibling, e8), i6.length = e8);
+    let s4, e7 = 0;
+    for (const h3 of t4) e7 === i6.length ? i6.push(s4 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s4 = i6[e7], s4._$AI(h3), e7++;
+    e7 < i6.length && (this._$AR(s4 && s4._$AB.nextSibling, e7), i6.length = e7);
   }
   _$AR(t4 = this._$AA.nextSibling, s4) {
     for (this._$AP?.(false, true, s4); t4 !== this._$AB; ) {
@@ -464,19 +464,19 @@ var H = class {
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(t4, i6, s4, e8, h3) {
-    this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t4, this.name = i6, this._$AM = e8, this.options = h3, s4.length > 2 || "" !== s4[0] || "" !== s4[1] ? (this._$AH = Array(s4.length - 1).fill(new String()), this.strings = s4) : this._$AH = A;
+  constructor(t4, i6, s4, e7, h3) {
+    this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t4, this.name = i6, this._$AM = e7, this.options = h3, s4.length > 2 || "" !== s4[0] || "" !== s4[1] ? (this._$AH = Array(s4.length - 1).fill(new String()), this.strings = s4) : this._$AH = A;
   }
-  _$AI(t4, i6 = this, s4, e8) {
+  _$AI(t4, i6 = this, s4, e7) {
     const h3 = this.strings;
     let o6 = false;
     if (void 0 === h3) t4 = M(this, t4, i6, 0), o6 = !a2(t4) || t4 !== this._$AH && t4 !== E, o6 && (this._$AH = t4);
     else {
-      const e9 = t4;
+      const e8 = t4;
       let n5, r6;
-      for (t4 = h3[0], n5 = 0; n5 < h3.length - 1; n5++) r6 = M(this, e9[s4 + n5], i6, n5), r6 === E && (r6 = this._$AH[n5]), o6 || (o6 = !a2(r6) || r6 !== this._$AH[n5]), r6 === A ? t4 = A : t4 !== A && (t4 += (r6 ?? "") + h3[n5 + 1]), this._$AH[n5] = r6;
+      for (t4 = h3[0], n5 = 0; n5 < h3.length - 1; n5++) r6 = M(this, e8[s4 + n5], i6, n5), r6 === E && (r6 = this._$AH[n5]), o6 || (o6 = !a2(r6) || r6 !== this._$AH[n5]), r6 === A ? t4 = A : t4 !== A && (t4 += (r6 ?? "") + h3[n5 + 1]), this._$AH[n5] = r6;
     }
-    o6 && !e8 && this.j(t4);
+    o6 && !e7 && this.j(t4);
   }
   j(t4) {
     t4 === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t4 ?? "");
@@ -499,13 +499,13 @@ var L = class extends H {
   }
 };
 var z = class extends H {
-  constructor(t4, i6, s4, e8, h3) {
-    super(t4, i6, s4, e8, h3), this.type = 5;
+  constructor(t4, i6, s4, e7, h3) {
+    super(t4, i6, s4, e7, h3), this.type = 5;
   }
   _$AI(t4, i6 = this) {
     if ((t4 = M(this, t4, i6, 0) ?? A) === E) return;
-    const s4 = this._$AH, e8 = t4 === A && s4 !== A || t4.capture !== s4.capture || t4.once !== s4.once || t4.passive !== s4.passive, h3 = t4 !== A && (s4 === A || e8);
-    e8 && this.element.removeEventListener(this.name, this, s4), h3 && this.element.addEventListener(this.name, this, t4), this._$AH = t4;
+    const s4 = this._$AH, e7 = t4 === A && s4 !== A || t4.capture !== s4.capture || t4.once !== s4.once || t4.passive !== s4.passive, h3 = t4 !== A && (s4 === A || e7);
+    e7 && this.element.removeEventListener(this.name, this, s4), h3 && this.element.addEventListener(this.name, this, t4), this._$AH = t4;
   }
   handleEvent(t4) {
     "function" == typeof this._$AH ? this._$AH.call(this.options?.host ?? this.element, t4) : this._$AH.handleEvent(t4);
@@ -525,11 +525,11 @@ var Z = class {
 var B = t2.litHtmlPolyfillSupport;
 B?.(S2, k), (t2.litHtmlVersions ?? (t2.litHtmlVersions = [])).push("3.3.2");
 var D = (t4, i6, s4) => {
-  const e8 = s4?.renderBefore ?? i6;
-  let h3 = e8._$litPart$;
+  const e7 = s4?.renderBefore ?? i6;
+  let h3 = e7._$litPart$;
   if (void 0 === h3) {
     const t5 = s4?.renderBefore ?? null;
-    e8._$litPart$ = h3 = new k(i6.insertBefore(c3(), t5), t5, void 0, s4 ?? {});
+    e7._$litPart$ = h3 = new k(i6.insertBefore(c3(), t5), t5, void 0, s4 ?? {});
   }
   return h3._$AI(t4), h3;
 };
@@ -566,32 +566,32 @@ o4?.({ LitElement: i4 });
 
 // node_modules/@lit/reactive-element/decorators/property.js
 var o5 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
-var r4 = (t4 = o5, e8, r6) => {
+var r4 = (t4 = o5, e7, r6) => {
   const { kind: n5, metadata: i6 } = r6;
   let s4 = globalThis.litPropertyMetadata.get(i6);
   if (void 0 === s4 && globalThis.litPropertyMetadata.set(i6, s4 = /* @__PURE__ */ new Map()), "setter" === n5 && ((t4 = Object.create(t4)).wrapped = true), s4.set(r6.name, t4), "accessor" === n5) {
     const { name: o6 } = r6;
     return { set(r7) {
-      const n6 = e8.get.call(this);
-      e8.set.call(this, r7), this.requestUpdate(o6, n6, t4, true, r7);
-    }, init(e9) {
-      return void 0 !== e9 && this.C(o6, void 0, t4, e9), e9;
+      const n6 = e7.get.call(this);
+      e7.set.call(this, r7), this.requestUpdate(o6, n6, t4, true, r7);
+    }, init(e8) {
+      return void 0 !== e8 && this.C(o6, void 0, t4, e8), e8;
     } };
   }
   if ("setter" === n5) {
     const { name: o6 } = r6;
     return function(r7) {
       const n6 = this[o6];
-      e8.call(this, r7), this.requestUpdate(o6, n6, t4, true, r7);
+      e7.call(this, r7), this.requestUpdate(o6, n6, t4, true, r7);
     };
   }
   throw Error("Unsupported decorator location: " + n5);
 };
 function n4(t4) {
-  return (e8, o6) => "object" == typeof o6 ? r4(t4, e8, o6) : ((t5, e9, o7) => {
-    const r6 = e9.hasOwnProperty(o7);
-    return e9.constructor.createProperty(o7, t5), r6 ? Object.getOwnPropertyDescriptor(e9, o7) : void 0;
-  })(t4, e8, o6);
+  return (e7, o6) => "object" == typeof o6 ? r4(t4, e7, o6) : ((t5, e8, o7) => {
+    const r6 = e8.hasOwnProperty(o7);
+    return e8.constructor.createProperty(o7, t5), r6 ? Object.getOwnPropertyDescriptor(e8, o7) : void 0;
+  })(t4, e7, o6);
 }
 
 // node_modules/@lit/reactive-element/decorators/state.js
@@ -599,55 +599,28 @@ function r5(r6) {
   return n4({ ...r6, state: true, attribute: false });
 }
 
-// node_modules/@lit/reactive-element/decorators/base.js
-var e4 = (e8, t4, c4) => (c4.configurable = true, c4.enumerable = true, Reflect.decorate && "object" != typeof t4 && Object.defineProperty(e8, t4, c4), c4);
-
-// node_modules/@lit/reactive-element/decorators/query.js
-function e5(e8, r6) {
-  return (n5, s4, i6) => {
-    const o6 = (t4) => t4.renderRoot?.querySelector(e8) ?? null;
-    if (r6) {
-      const { get: e9, set: r7 } = "object" == typeof s4 ? n5 : i6 ?? /* @__PURE__ */ (() => {
-        const t4 = /* @__PURE__ */ Symbol();
-        return { get() {
-          return this[t4];
-        }, set(e10) {
-          this[t4] = e10;
-        } };
-      })();
-      return e4(n5, s4, { get() {
-        let t4 = e9.call(this);
-        return void 0 === t4 && (t4 = o6(this), (null !== t4 || this.hasUpdated) && r7.call(this, t4)), t4;
-      } });
-    }
-    return e4(n5, s4, { get() {
-      return o6(this);
-    } });
-  };
-}
-
 // node_modules/lit-html/directive.js
 var t3 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
-var e6 = (t4) => (...e8) => ({ _$litDirective$: t4, values: e8 });
+var e5 = (t4) => (...e7) => ({ _$litDirective$: t4, values: e7 });
 var i5 = class {
   constructor(t4) {
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  _$AT(t4, e8, i6) {
-    this._$Ct = t4, this._$AM = e8, this._$Ci = i6;
+  _$AT(t4, e7, i6) {
+    this._$Ct = t4, this._$AM = e7, this._$Ci = i6;
   }
-  _$AS(t4, e8) {
-    return this.update(t4, e8);
+  _$AS(t4, e7) {
+    return this.update(t4, e7);
   }
-  update(t4, e8) {
-    return this.render(...e8);
+  update(t4, e7) {
+    return this.render(...e7);
   }
 };
 
 // node_modules/lit-html/directives/class-map.js
-var e7 = e6(class extends i5 {
+var e6 = e5(class extends i5 {
   constructor(t4) {
     if (super(t4), t4.type !== t3.ATTRIBUTE || "class" !== t4.name || t4.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -669,18 +642,6 @@ var e7 = e6(class extends i5 {
     return E;
   }
 });
-
-// src/utils/dom.utils.ts
-function emit(host, name, detail, opts = {}) {
-  const event = new CustomEvent(name, {
-    detail,
-    bubbles: true,
-    composed: true,
-    ...opts
-  });
-  host.dispatchEvent(event);
-  return event;
-}
 
 // src/styles/tokens.ts
 var primary = r("#6366f1");
@@ -767,354 +728,271 @@ var placementOriginsExtended = i`
   [data-placement="right-start"] { transform-origin: left top;     }
   [data-placement="right-end"]   { transform-origin: left bottom;  }
 `;
+function focusRing(selector, colorVar = "--uwc-color-primary", colorDefault = "#6366f1") {
+  return i`
+    ${r(selector)}:focus-visible {
+      outline: 2px solid var(${r(colorVar)}, ${r(colorDefault)});
+      outline-offset: 2px;
+    }
+  `;
+}
 
-// src/panel/styles.ts
+// src/rating/styles.ts
 var styles_default = [
   hostReset,
+  focusRing(".uwc-rating__star", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-rating__cancel", "--uwc-color-primary", "#6366f1"),
   i`
-    /* ── Host ───────────────────────────────────────────────────────── */
     :host {
-      display: block;
-      border:        var(--uwc-panel-border,  1px solid ${border});
-      border-radius: var(--uwc-panel-radius,  ${radiusLg});
-      background:    var(--uwc-panel-bg,      ${surface});
-      box-shadow:    var(--uwc-panel-shadow,  ${shadowSm});
-      overflow:      hidden;
+      display: inline-block;
     }
 
-    /* ── Header ─────────────────────────────────────────────────────── */
-    .uwc-panel__header {
-      display:         flex;
-      align-items:     center;
-      gap:             ${space2};
-      padding:         var(--uwc-panel-header-padding, ${space3} ${space5});
-      background:      var(--uwc-panel-header-bg,      transparent);
-      border-bottom:   var(--uwc-panel-header-border,  1px solid ${border});
-      color:           var(--uwc-panel-header-color,   ${text});
-      font-size:       var(--uwc-panel-header-font-size, ${fontSizeLg});
-      font-weight:     var(--uwc-panel-header-font-weight, ${fontWeightSemibold});
-      line-height:     1.4;
-      min-height:      3rem;
-    }
-
-    /* When collapsed, header has no bottom border (content is hidden) */
-    :host([collapsed]) .uwc-panel__header {
-      border-bottom-color: transparent;
-    }
-
-    /* ── Header icon ─────────────────────────────────────────────────── */
-    .uwc-panel__header-icon {
-      display:         inline-flex;
-      align-items:     center;
-      flex-shrink:     0;
-      color:           var(--uwc-panel-icon-color, ${primary});
-    }
-
-    /* ── Header title ────────────────────────────────────────────────── */
-    .uwc-panel__title {
-      flex:          1;
-      min-width:     0;
-      overflow:      hidden;
-      text-overflow: ellipsis;
-      white-space:   nowrap;
-    }
-
-    /* ── Header icons slot (custom actions) ──────────────────────────── */
-    .uwc-panel__header-actions {
+    /* ── Container ───────────────────────────────────────────────────── */
+    .uwc-rating {
       display:     inline-flex;
       align-items: center;
-      gap:         ${space1};
-      margin-left: auto;
+      gap:         var(--uwc-rating-gap, 0.125rem);
+    }
+
+    /* ── Star / cancel buttons ───────────────────────────────────────── */
+    .uwc-rating__star,
+    .uwc-rating__cancel {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      background:      transparent;
+      border:          none;
+      padding:         var(--uwc-rating-padding, 0.25rem);
+      cursor:          pointer;
+      border-radius:   ${radiusSm};
+      color:           var(--uwc-rating-off-color, ${textMuted});
+      transition:      color ${durationBase}, transform ${durationFast};
+      line-height:     1;
+    }
+
+    /* ── SVG sizes ───────────────────────────────────────────────────── */
+    .uwc-rating__star svg,
+    .uwc-rating__cancel svg {
+      width:  1.35rem;
+      height: 1.35rem;
+      display: block;
+    }
+    :host([size="small"]) .uwc-rating__star svg,
+    :host([size="small"]) .uwc-rating__cancel svg { width: 1rem;   height: 1rem;   }
+    :host([size="large"]) .uwc-rating__star svg,
+    :host([size="large"]) .uwc-rating__cancel svg { width: 1.75rem; height: 1.75rem; }
+
+    /* ── Filled / active state ───────────────────────────────────────── */
+    .uwc-rating__star[aria-checked="true"] {
+      color: var(--uwc-rating-on-color, ${warning});
+    }
+
+    /* Hover preview on stars (not readonly / disabled) */
+    :host(:not([readonly]):not([disabled])) .uwc-rating__star.is-preview {
+      color: var(--uwc-rating-hover-color, ${warning});
+    }
+
+    :host(:not([readonly]):not([disabled])) .uwc-rating__star:hover,
+    :host(:not([readonly]):not([disabled])) .uwc-rating__star.is-preview {
+      transform: scale(1.2);
+    }
+
+    /* Cancel button */
+    .uwc-rating__cancel {
+      color: var(--uwc-rating-cancel-color, ${textMuted});
+    }
+    :host(:not([readonly]):not([disabled])) .uwc-rating__cancel:hover {
+      color:     var(--uwc-rating-cancel-hover-color, ${danger});
+      transform: scale(1.2);
+    }
+
+    /* ── Separator between cancel and stars ──────────────────────────── */
+    .uwc-rating__sep {
+      width:      1px;
+      height:     1.1rem;
+      background: var(--uwc-rating-sep-color, ${borderControl});
+      margin:     0 0.25rem;
       flex-shrink: 0;
     }
 
-    /* ── Toggle button ───────────────────────────────────────────────── */
-    .uwc-panel__toggler {
-      display:          inline-flex;
-      align-items:      center;
-      justify-content:  center;
-      width:            1.75rem;
-      height:           1.75rem;
-      border-radius:    ${radiusFull};
-      border:           1px solid ${border};
-      background:       transparent;
-      color:            var(--uwc-panel-toggler-color, ${textSecondary});
-      cursor:           pointer;
-      padding:          0;
-      flex-shrink:      0;
-      transition:
-        background    ${durationBase},
-        border-color  ${durationBase},
-        color         ${durationBase};
+    /* ── Readonly ────────────────────────────────────────────────────── */
+    :host([readonly]) .uwc-rating__star,
+    :host([readonly]) .uwc-rating__cancel {
+      cursor:         default;
+      pointer-events: none;
     }
 
-    .uwc-panel__toggler:hover {
-      background:    ${hoverBg};
-      border-color:  var(--uwc-color-primary, ${primary});
-      color:         var(--uwc-color-primary, ${primary});
-    }
-
-    .uwc-panel__toggler:focus-visible {
-      outline:        2px solid var(--uwc-color-primary, ${primary});
-      outline-offset: 2px;
-    }
-
-    /* Chevron rotation — open state */
-    .uwc-panel__toggler-icon {
-      display:    inline-flex;
-      transform:  rotate(0deg);
-      transition: transform 250ms ease;
-    }
-
-    :host(:not([collapsed])) .uwc-panel__toggler-icon {
-      transform: rotate(180deg);
+    /* ── Disabled ────────────────────────────────────────────────────── */
+    :host([disabled]) .uwc-rating {
+      opacity:        0.5;
+      pointer-events: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .uwc-panel__toggler-icon { transition: none; }
-      .uwc-panel__toggler      { transition: none; }
-    }
-
-    /* ── Content wrapper (WAAPI animated) ───────────────────────────── */
-    .uwc-panel__content-wrap {
-      /* Height animated by JS; overflow applied inline during animation */
-    }
-
-    /* ── Content body ────────────────────────────────────────────────── */
-    .uwc-panel__content {
-      padding:    var(--uwc-panel-content-padding, ${space4} ${space5});
-      color:      var(--uwc-panel-content-color,   ${text});
-      font-size:  var(--uwc-panel-content-font-size, ${fontSizeMd});
-      line-height: 1.6;
-    }
-
-    /* ── Footer ─────────────────────────────────────────────────────── */
-    .uwc-panel__footer {
-      padding:      var(--uwc-panel-footer-padding, ${space3} ${space5});
-      background:   var(--uwc-panel-footer-bg,      transparent);
-      border-top:   var(--uwc-panel-footer-border,  1px solid ${border});
-      font-size:    ${fontSizeMd};
-      color:        ${textSecondary};
-    }
-
-    /* Footer hidden when slot is empty */
-    .uwc-panel__footer--hidden {
-      display: none;
-    }
-
-    /* ── No-header mode ──────────────────────────────────────────────── */
-    :host([no-header]) .uwc-panel__header {
-      display: none;
+      .uwc-rating__star,
+      .uwc-rating__cancel { transition: none; }
     }
   `
 ];
 
-// src/panel/index.ts
-var UwcPanel = class extends i4 {
+// src/rating/index.ts
+var _starFilled = w`<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+var _starOutline = w`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+var _cancelIcon = w`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+var UwcRating = class extends i4 {
   constructor() {
     super(...arguments);
-    this.header = "";
-    this.toggleable = false;
-    this.collapsed = false;
-    this.noHeader = false;
-    this._hasFooter = false;
+    this.value = 0;
+    this.stars = 5;
+    this.cancel = false;
+    this.readonly = false;
+    this.disabled = false;
+    this.size = "medium";
+    this._hovered = 0;
   }
-  // ── Lifecycle ──────────────────────────────────────────────────────────────
-  firstUpdated() {
-    if (this._wrap && this.collapsed) {
-      this._wrap.style.height = "0px";
-      this._wrap.style.overflow = "hidden";
+  // ── Actions ───────────────────────────────────────────────────────
+  _select(v2) {
+    if (this.readonly || this.disabled) return;
+    this.value = v2;
+    this._emit(v2);
+  }
+  _clear() {
+    if (this.readonly || this.disabled) return;
+    this.value = 0;
+    this._emit(0);
+  }
+  _emit(value) {
+    this.dispatchEvent(new CustomEvent("uwc-change", {
+      bubbles: true,
+      composed: true,
+      detail: { value }
+    }));
+  }
+  // ── Keyboard navigation ────────────────────────────────────────────
+  _onStarKeydown(e7, n5) {
+    if (this.readonly || this.disabled) return;
+    if (e7.key === "ArrowRight" || e7.key === "ArrowUp") {
+      e7.preventDefault();
+      const next = Math.min(n5 + 1, this.stars);
+      this._select(next);
+      this._focusStar(next);
+    } else if (e7.key === "ArrowLeft" || e7.key === "ArrowDown") {
+      e7.preventDefault();
+      const prev = n5 - 1;
+      if (prev <= 0 && this.cancel) {
+        this._focusCancel();
+      } else {
+        this._select(Math.max(prev, 1));
+        this._focusStar(Math.max(prev, 1));
+      }
     }
   }
-  updated(changed) {
-    super.updated(changed);
-    if (!changed.has("collapsed") || !this._wrap) return;
-    if (this.collapsed) {
-      this._animateClose();
-    } else {
-      this._animateOpen();
+  _onCancelKeydown(e7) {
+    if (e7.key === "ArrowRight" || e7.key === "ArrowUp") {
+      e7.preventDefault();
+      this._select(1);
+      this._focusStar(1);
     }
   }
-  // ── WAAPI animations ───────────────────────────────────────────────────────
-  _animateOpen() {
-    const wrap = this._wrap;
-    if (!wrap) return;
-    const fromHeight = this._currentAnimation ? wrap.getBoundingClientRect().height : 0;
-    this._currentAnimation?.cancel();
-    this._currentAnimation = void 0;
-    wrap.style.removeProperty("height");
-    wrap.style.removeProperty("overflow");
-    const toHeight = wrap.scrollHeight;
-    const anim = wrap.animate(
-      [
-        { height: `${fromHeight}px`, overflow: "hidden" },
-        { height: `${toHeight}px`, overflow: "hidden" }
-      ],
-      { duration: this._duration(), easing: "ease", fill: "both" }
-    );
-    this._currentAnimation = anim;
-    anim.addEventListener("finish", () => {
-      if (this._currentAnimation !== anim) return;
-      anim.cancel();
-      wrap.style.removeProperty("height");
-      wrap.style.removeProperty("overflow");
-      this._currentAnimation = void 0;
-      emit(this, "uwc-expand");
-    }, { once: true });
+  _focusStar(n5) {
+    const el = this.shadowRoot?.querySelector(`[data-star="${n5}"]`);
+    el?.focus();
   }
-  _animateClose() {
-    const wrap = this._wrap;
-    if (!wrap) return;
-    const fromHeight = wrap.getBoundingClientRect().height;
-    this._currentAnimation?.cancel();
-    this._currentAnimation = void 0;
-    const anim = wrap.animate(
-      [
-        { height: `${fromHeight}px`, overflow: "hidden" },
-        { height: "0px", overflow: "hidden" }
-      ],
-      { duration: this._duration(), easing: "ease", fill: "both" }
-    );
-    this._currentAnimation = anim;
-    anim.addEventListener("finish", () => {
-      if (this._currentAnimation !== anim) return;
-      anim.cancel();
-      wrap.style.height = "0px";
-      wrap.style.overflow = "hidden";
-      this._currentAnimation = void 0;
-      emit(this, "uwc-collapse");
-    }, { once: true });
+  _focusCancel() {
+    const el = this.shadowRoot?.querySelector(".uwc-rating__cancel");
+    el?.focus();
   }
-  _duration() {
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
-  }
-  // ── Handlers ───────────────────────────────────────────────────────────────
-  _onToggle() {
-    this.collapsed = !this.collapsed;
-    emit(this, "uwc-toggle", { collapsed: this.collapsed });
-  }
-  _onFooterSlotChange(e8) {
-    const slot = e8.target;
-    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
-  }
-  // ── Public API ─────────────────────────────────────────────────────────────
-  /** Expand the panel. No-op if already expanded. */
-  expand() {
-    if (!this.collapsed) return;
-    this.collapsed = false;
-    emit(this, "uwc-toggle", { collapsed: false });
-  }
-  /** Collapse the panel. No-op if already collapsed. */
-  collapse() {
-    if (this.collapsed) return;
-    this.collapsed = true;
-    emit(this, "uwc-toggle", { collapsed: true });
-  }
-  /** Toggle the panel open/closed. */
-  toggle() {
-    this._onToggle();
-  }
-  // ── Render helpers ─────────────────────────────────────────────────────────
-  _renderHeader() {
-    return b2`
-      <div part="header" class="uwc-panel__header">
-        ${this.icon ? b2`
-          <span part="header-icon" class="uwc-panel__header-icon" aria-hidden="true">
-            <uwc-icon name=${this.icon} size="18px"></uwc-icon>
-          </span>
-        ` : A}
-
-        <slot name="header">
-          <span part="title" class="uwc-panel__title">${this.header}</span>
-        </slot>
-
-        <span part="actions" class="uwc-panel__header-actions">
-          <slot name="icons"></slot>
-        </span>
-
-        ${this.toggleable ? b2`
-          <button
-            type="button"
-            part="toggler"
-            class="uwc-panel__toggler"
-            aria-label=${this.collapsed ? "Expand panel" : "Collapse panel"}
-            aria-expanded=${!this.collapsed ? "true" : "false"}
-            aria-controls="uwc-panel-content"
-            @click=${this._onToggle}
-          >
-            <span class="uwc-panel__toggler-icon" aria-hidden="true">
-              <uwc-icon name="chevron-down" size="14px"></uwc-icon>
-            </span>
-          </button>
-        ` : A}
-      </div>
-    `;
-  }
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────
   render() {
+    const items = Array.from({ length: this.stars }, (_2, i6) => i6 + 1);
+    const preview = this._hovered > 0 ? this._hovered : this.value;
     return b2`
-      <div part="panel" class="uwc-panel">
-        ${!this.noHeader ? this._renderHeader() : A}
+      <div
+        class="uwc-rating"
+        role="radiogroup"
+        aria-label="Rating"
+        aria-disabled=${this.disabled}
+      >
+        ${this.cancel ? b2`
+          <button
+            part="cancel"
+            class="uwc-rating__cancel"
+            type="button"
+            aria-label="Clear rating"
+            title="Clear rating"
+            ?disabled=${this.disabled}
+            @click=${this._clear}
+            @keydown=${this._onCancelKeydown}
+          >${_cancelIcon}</button>
+          <span class="uwc-rating__sep" aria-hidden="true"></span>
+        ` : A}
 
-        <div
-          part="content-wrap"
-          class="uwc-panel__content-wrap"
-          id="uwc-panel-content"
-          role="region"
-          aria-labelledby="uwc-panel-header-title"
-        >
-          <div part="content" class="uwc-panel__content">
-            <slot></slot>
-          </div>
-        </div>
-
-        <div
-          part="footer"
-          class=${e7({ "uwc-panel__footer": true, "uwc-panel__footer--hidden": !this._hasFooter })}
-        >
-          <slot name="footer" @slotchange=${this._onFooterSlotChange}></slot>
-        </div>
+        ${items.map((n5) => {
+      const filled = n5 <= preview;
+      const checked = n5 <= this.value;
+      return b2`
+            <button
+              part="star"
+              class=${e6({
+        "uwc-rating__star": true,
+        "is-preview": filled && !checked
+      })}
+              type="button"
+              role="radio"
+              data-star=${n5}
+              aria-label="${n5} star${n5 !== 1 ? "s" : ""}"
+              aria-checked=${checked}
+              ?disabled=${this.disabled}
+              tabindex=${n5 === (this.value || 1) && !this.cancel ? "0" : n5 === this.value ? "0" : "-1"}
+              @click=${() => this._select(n5)}
+              @mouseenter=${() => {
+        if (!this.readonly && !this.disabled) this._hovered = n5;
+      }}
+              @mouseleave=${() => {
+        this._hovered = 0;
+      }}
+              @keydown=${(e7) => this._onStarKeydown(e7, n5)}
+            >${filled ? _starFilled : _starOutline}</button>
+          `;
+    })}
       </div>
     `;
   }
 };
-UwcPanel.styles = styles_default;
+UwcRating.styles = [styles_default];
 __decorateClass([
-  n4()
-], UwcPanel.prototype, "header", 2);
+  n4({ type: Number, reflect: true })
+], UwcRating.prototype, "value", 2);
 __decorateClass([
-  n4()
-], UwcPanel.prototype, "icon", 2);
-__decorateClass([
-  n4({ type: Boolean, reflect: true })
-], UwcPanel.prototype, "toggleable", 2);
+  n4({ type: Number })
+], UwcRating.prototype, "stars", 2);
 __decorateClass([
   n4({ type: Boolean, reflect: true })
-], UwcPanel.prototype, "collapsed", 2);
+], UwcRating.prototype, "cancel", 2);
 __decorateClass([
-  n4({ type: Boolean, reflect: true, attribute: "no-header" })
-], UwcPanel.prototype, "noHeader", 2);
+  n4({ type: Boolean, reflect: true })
+], UwcRating.prototype, "readonly", 2);
 __decorateClass([
-  e5(".uwc-panel__content-wrap")
-], UwcPanel.prototype, "_wrap", 2);
+  n4({ type: Boolean, reflect: true })
+], UwcRating.prototype, "disabled", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcRating.prototype, "size", 2);
 __decorateClass([
   r5()
-], UwcPanel.prototype, "_hasFooter", 2);
+], UwcRating.prototype, "_hovered", 2);
 
-// src/panel/react.ts
-var UwcPanelReact = createComponent({
+// src/rating/react.ts
+var UwcRating2 = createComponent({
+  tagName: "uwc-rating",
+  elementClass: UwcRating,
   react: React,
-  tagName: "uwc-panel",
-  elementClass: UwcPanel,
   events: {
-    onUwcToggle: "uwc-toggle",
-    onUwcCollapse: "uwc-collapse",
-    onUwcExpand: "uwc-expand"
+    onUwcChange: "uwc-change"
   }
 });
 export {
-  UwcPanelReact as UwcPanel,
-  UwcPanelReact
+  UwcRating2 as UwcRating
 };
 /*! Bundled license information:
 

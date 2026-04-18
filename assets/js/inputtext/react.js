@@ -659,12 +659,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -743,7 +745,7 @@ var styles_default = [
     /* ── Wrapper ────────────────────────────────────────────────────────────── */
     .uwc-input {
       --_bg:        var(--uwc-input-bg,                ${surface});
-      --_border:    var(--uwc-input-border,            1px solid #d1d5db);
+      --_border:    var(--uwc-input-border,            1px solid ${borderControl});
       --_radius:    var(--uwc-input-radius,            ${radiusMd});
       --_color:     var(--uwc-input-color,             ${text});
       --_ph-color:  var(--uwc-input-placeholder-color, ${textMuted});
@@ -822,6 +824,117 @@ var styles_default = [
     /* Shrink native input padding when slot is present */
     :host([has-prefix]) input { padding-inline-start: var(--_icon-gap); }
     :host([has-suffix]) input { padding-inline-end:   var(--_icon-gap); }
+
+    /* ── Float label ─────────────────────────────────────────────────────────── */
+
+    /* Shared wrapper positioning context */
+    .uwc-input--float { position: relative; }
+
+    /* Shared label base — each variant overrides top / transform / background */
+    .uwc-input__label {
+      position:       absolute;
+      left:           calc(var(--_px) + 0.125rem);
+      line-height:    1;
+      white-space:    nowrap;
+      pointer-events: none;
+      padding-inline: 0.25rem;
+      transition:
+        top       ${durationBase} ${easingStandard},
+        font-size ${durationBase} ${easingStandard},
+        color     ${durationBase} ${easingStandard},
+        transform ${durationBase} ${easingStandard};
+    }
+
+    /* ── "over" (default): label floats fully ABOVE the input with gap ─── */
+    /* translateY(calc(-100% - 0.375rem)) lifts the label so its bottom edge
+       sits 0.375 rem above the top border, giving clear breathing room.      */
+    .uwc-input--float-over {
+      overflow:   visible;
+      margin-top: 1.5rem;   /* layout space for the label above the border */
+    }
+    .uwc-input--float-over .uwc-input__label {
+      top:        50%;
+      transform:  translateY(-50%);
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: transparent;
+    }
+    .uwc-input--float-over:focus-within .uwc-input__label,
+    .uwc-input--float-over input:not(:placeholder-shown) ~ .uwc-input__label {
+      top:       0;
+      transform: translateY(calc(-100% - 0.375rem));   /* gap above the border */
+      font-size: calc(var(--_font-size) * 0.85);
+      color:     var(--uwc-input-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+
+    /* ── "on": label sits ON (straddles) the upper border ───────────── */
+    /* top:0 + translateY(-50%) centres the label on the top border line.
+       overflow:visible + margin-top expose the half that protrudes above. */
+    .uwc-input--float-on {
+      overflow:   visible;
+      margin-top: 0.75rem;
+    }
+    .uwc-input--float-on .uwc-input__label {
+      top:        50%;
+      transform:  translateY(-50%);
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: var(--_bg);   /* masks the border line beneath the label */
+    }
+    .uwc-input--float-on:focus-within .uwc-input__label,
+    .uwc-input--float-on input:not(:placeholder-shown) ~ .uwc-input__label {
+      top:       0;
+      transform: translateY(-50%);   /* stays centred on top border */
+      font-size: calc(var(--_font-size) * 0.8);
+      color:     var(--uwc-input-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+    .uwc-input--float-on.uwc-input--filled .uwc-input__label {
+      background: var(--uwc-input-filled-bg, ${surfaceRaised});
+    }
+
+    /* ── "in": label floats to the interior top, never leaves the border ─ */
+    /* Extra input padding creates room so the small label and input text
+       never overlap. The label at rest centres in the lower text area.      */
+    .uwc-input--float-in input {
+      padding-top:    1.375rem;
+      padding-bottom: 0.3125rem;
+    }
+    .uwc-input--float-in .uwc-input__label {
+      top:            50%;
+      transform:      translateY(-50%);
+      font-size:      var(--_font-size);
+      color:          var(--_ph-color);
+      background:     transparent;
+      left:           var(--_px);   /* align with input text start */
+      padding-inline: 0;            /* no border-masking needed inside */
+    }
+    .uwc-input--float-in:focus-within .uwc-input__label,
+    .uwc-input--float-in input:not(:placeholder-shown) ~ .uwc-input__label {
+      top:            0.3125rem;   /* clearly inside, below the border */
+      transform:      none;
+      font-size:      calc(var(--_font-size) * 0.75);
+      color:          var(--uwc-input-label-active-color, var(--uwc-color-primary, ${primary}));
+      left:           var(--_px);
+      padding-inline: 0;
+    }
+
+    /* ── Invalid label color (all variants) ─────────────────────────────── */
+    .uwc-input--invalid .uwc-input__label,
+    .uwc-input--invalid:focus-within .uwc-input__label,
+    .uwc-input--invalid input:not(:placeholder-shown) ~ .uwc-input__label {
+      color: var(--uwc-color-danger, ${danger});
+    }
+
+    /* ── Prefix offset ───────────────────────────────────────────────────── */
+    :host([has-prefix]) .uwc-input__label {
+      left: calc(var(--_px) + var(--_icon-gap) + 1.25rem);
+    }
+    /* "in" variant: label aligns with input text, adjust for prefix */
+    :host([has-prefix]) .uwc-input--float-in .uwc-input__label,
+    :host([has-prefix]) .uwc-input--float-in:focus-within .uwc-input__label,
+    :host([has-prefix]) .uwc-input--float-in input:not(:placeholder-shown) ~ .uwc-input__label {
+      left: calc(var(--_icon-gap) + 1.25rem);
+    }
   `
 ];
 
@@ -833,6 +946,7 @@ var UwcInputText = class extends i4 {
     this.type = "text";
     this.variant = "outlined";
     this.size = "medium";
+    this.floatLabel = "over";
     this.disabled = false;
     this.readonly = false;
     this.invalid = false;
@@ -873,13 +987,17 @@ var UwcInputText = class extends i4 {
   }
   // ── Render ────────────────────────────────────────────────────────
   render() {
+    const floatMode = !!this.label;
     const classes = e6({
       "uwc-input": true,
       [`uwc-input--${this.variant}`]: true,
       [`uwc-input--${this.size}`]: this.size !== "medium",
       "uwc-input--invalid": this.invalid,
-      "uwc-input--disabled": this.disabled
+      "uwc-input--disabled": this.disabled,
+      "uwc-input--float": floatMode,
+      [`uwc-input--float-${this.floatLabel}`]: floatMode
     });
+    const placeholder = floatMode ? this.placeholder ?? " " : this.placeholder;
     return b2`
       <div part="wrapper" class=${classes}>
         ${this._hasPrefix ? b2`<span class="uwc-input__prefix"><slot name="prefix"></slot></span>` : A}
@@ -887,7 +1005,7 @@ var UwcInputText = class extends i4 {
           part="input"
           type=${this.type}
           .value=${this.value}
-          placeholder=${o6(this.placeholder)}
+          placeholder=${o6(placeholder)}
           name=${o6(this.name)}
           autocomplete=${o6(this.autocomplete)}
           maxlength=${o6(this.maxlength)}
@@ -898,6 +1016,7 @@ var UwcInputText = class extends i4 {
           @focus=${() => this.dispatchEvent(new CustomEvent("uwc-focus", { bubbles: true, composed: true }))}
           @blur=${() => this.dispatchEvent(new CustomEvent("uwc-blur", { bubbles: true, composed: true }))}
         />
+        ${floatMode ? b2`<label class="uwc-input__label" part="label">${this.label}</label>` : A}
         ${this._hasSuffix ? b2`<span class="uwc-input__suffix"><slot name="suffix"></slot></span>` : A}
       </div>
     `;
@@ -928,6 +1047,12 @@ __decorateClass([
 __decorateClass([
   n4({ reflect: true })
 ], UwcInputText.prototype, "size", 2);
+__decorateClass([
+  n4()
+], UwcInputText.prototype, "label", 2);
+__decorateClass([
+  n4({ attribute: "float-label", reflect: true })
+], UwcInputText.prototype, "floatLabel", 2);
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcInputText.prototype, "disabled", 2);
