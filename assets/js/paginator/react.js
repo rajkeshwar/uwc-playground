@@ -743,12 +743,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -896,7 +898,7 @@ var styles_default = [
     }
     .uwc-pg__page--active {
       --_bg:    var(--uwc-paginator-active-bg,    var(--uwc-color-primary, ${primary}));
-      --_color: var(--uwc-paginator-active-color, #fff);
+      --_color: var(--uwc-paginator-active-color, ${colorWhite});
       border-color: var(--uwc-paginator-active-bg, var(--uwc-color-primary, ${primary}));
     }
     .uwc-pg__page--active:hover:not(:disabled) {
@@ -932,7 +934,7 @@ var styles_default = [
       height:        2.25rem;
       padding-inline: 0.5rem 1.5rem;
       padding-block: 0;
-      border:        1px solid rgba(0,0,0,0.15);
+      border:        1px solid ${borderControl};
       border-radius: var(--uwc-paginator-btn-radius, ${radiusMd});
       background:    ${surface} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 0.375rem center;
       color:         ${text};
@@ -971,7 +973,7 @@ var styles_default = [
       width:         3.5rem;
       height:        2.25rem;
       padding-inline: 0.5rem;
-      border:        1px solid rgba(0,0,0,0.15);
+      border:        1px solid ${borderControl};
       border-radius: var(--uwc-paginator-btn-radius, ${radiusMd});
       background:    ${surface};
       color:         ${text};
@@ -992,7 +994,7 @@ var styles_default = [
       height:        2.25rem;
       padding-inline: 0.5rem 1.5rem;
       padding-block: 0;
-      border:        1px solid rgba(0,0,0,0.15);
+      border:        1px solid ${borderControl};
       border-radius: var(--uwc-paginator-btn-radius, ${radiusMd});
       background:    ${surface} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 0.375rem center;
       color:         ${text};

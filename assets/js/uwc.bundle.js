@@ -667,9 +667,1251 @@ var e7 = e6(class extends i5 {
   }
 });
 
+// src/styles/tokens.ts
+var primary = r("#6366f1");
+var secondary = r("#64748b");
+var success = r("#22c55e");
+var warning = r("#f59e0b");
+var danger = r("#ef4444");
+var info = r("#38bdf8");
+var help = r("#a855f7");
+var contrast = r("#1e293b");
+var surface = r("#ffffff");
+var surfaceRaised = r("#f9f8f5");
+var border = r("rgba(0,0,0,0.09)");
+var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
+var text = r("#111111");
+var textSecondary = r("#64748b");
+var textMuted = r("#9ca3af");
+var textDisabled = r("#bbbbbb");
+var hoverBg = r("rgba(0,0,0,0.04)");
+var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
+var radiusXs = r("2px");
+var radiusSm = r("4px");
+var radiusMd = r("6px");
+var radiusLg = r("10px");
+var radiusXl = r("14px");
+var radiusFull = r("9999px");
+var space1 = r("0.25rem");
+var space2 = r("0.5rem");
+var space3 = r("0.75rem");
+var space4 = r("1rem");
+var space5 = r("1.25rem");
+var space6 = r("1.5rem");
+var fontSizeXs = r("0.6875rem");
+var fontSizeSm = r("0.75rem");
+var fontSizeMd = r("0.875rem");
+var fontSizeLg = r("1rem");
+var fontSizeXl = r("1.125rem");
+var fontWeightNormal = r("400");
+var fontWeightMedium = r("500");
+var fontWeightSemibold = r("600");
+var fontWeightBold = r("700");
+var shadowSm = r("0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10)");
+var shadowMd = r("0 4px 8px -2px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)");
+var shadowLg = r("0 1px 2px rgba(0,0,0,0.05), 0 4px 8px -2px rgba(0,0,0,0.08), 0 16px 32px -4px rgba(0,0,0,0.12)");
+var durationFast = r("80ms");
+var durationBase = r("120ms");
+var durationslow = r("200ms");
+var easingStandard = r("cubic-bezier(0.16, 1, 0.3, 1)");
+var easingOut = r("cubic-bezier(0, 0, 0.2, 1)");
+var zFloat = r("9999");
+var zTooltip = r("10000");
+var zDialog = r("10001");
+
+// src/styles/mixins.ts
+var hostReset = i`
+  :host {
+    box-sizing: border-box;
+  }
+  :host *,
+  :host *::before,
+  :host *::after {
+    box-sizing: inherit;
+  }
+  :host [hidden] {
+    display: none !important;
+  }
+`;
+function floatingPanel(selector, opts = {}) {
+  const {
+    scaleFrom = "scale(0.96) translateY(-4px)",
+    scaleTo = "scale(1) translateY(0)",
+    durationVar = "--uwc-panel-duration",
+    durationDefault = "200ms",
+    easing = "cubic-bezier(0.16, 1, 0.3, 1)"
+  } = opts;
+  const sel = r(selector);
+  const sf = r(scaleFrom);
+  const st = r(scaleTo);
+  const dv = r(durationVar);
+  const dd = r(durationDefault);
+  const ez = r(easing);
+  return i`
+    ${sel} {
+      position: fixed;
+      inset: 0 auto auto 0;
+      margin: 0;
+      opacity: 0;
+      transform: ${sf};
+      transition:
+        opacity   var(${dv}, ${dd}) ${ez},
+        transform var(${dv}, ${dd}) ${ez},
+        display   var(${dv}, ${dd}) allow-discrete,
+        overlay   var(${dv}, ${dd}) allow-discrete;
+    }
+    ${sel}.is-open,
+    ${sel}:popover-open {
+      opacity: 1;
+      transform: ${st};
+    }
+  `;
+}
+var placementOrigins = i`
+  [data-placement^="bottom"]      { transform-origin: top center;    }
+  [data-placement="bottom-start"] { transform-origin: top left;      }
+  [data-placement="bottom-end"]   { transform-origin: top right;     }
+  [data-placement^="top"]         { transform-origin: bottom center; }
+  [data-placement="top-start"]    { transform-origin: bottom left;   }
+  [data-placement="top-end"]      { transform-origin: bottom right;  }
+  [data-placement^="left"]        { transform-origin: right center;  }
+  [data-placement^="right"]       { transform-origin: left center;   }
+`;
+var placementOriginsExtended = i`
+  ${placementOrigins}
+  [data-placement="left-start"]  { transform-origin: right top;    }
+  [data-placement="left-end"]    { transform-origin: right bottom; }
+  [data-placement="right-start"] { transform-origin: left top;     }
+  [data-placement="right-end"]   { transform-origin: left bottom;  }
+`;
+function focusRing(selector, colorVar = "--uwc-color-primary", colorDefault = "#6366f1") {
+  return i`
+    ${r(selector)}:focus-visible {
+      outline: 2px solid var(${r(colorVar)}, ${r(colorDefault)});
+      outline-offset: 2px;
+    }
+  `;
+}
+
+// src/rating/styles.ts
+var styles_default = [
+  hostReset,
+  focusRing(".uwc-rating__star", "--uwc-color-primary", "#6366f1"),
+  focusRing(".uwc-rating__cancel", "--uwc-color-primary", "#6366f1"),
+  i`
+    :host {
+      display: inline-block;
+    }
+
+    /* ── Container ───────────────────────────────────────────────────── */
+    .uwc-rating {
+      display:     inline-flex;
+      align-items: center;
+      gap:         var(--uwc-rating-gap, 0.125rem);
+    }
+
+    /* ── Star / cancel buttons ───────────────────────────────────────── */
+    .uwc-rating__star,
+    .uwc-rating__cancel {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      background:      transparent;
+      border:          none;
+      padding:         var(--uwc-rating-padding, 0.25rem);
+      cursor:          pointer;
+      border-radius:   ${radiusSm};
+      color:           var(--uwc-rating-off-color, ${textMuted});
+      transition:      color ${durationBase}, transform ${durationFast};
+      line-height:     1;
+    }
+
+    /* ── SVG sizes ───────────────────────────────────────────────────── */
+    .uwc-rating__star svg,
+    .uwc-rating__cancel svg {
+      width:  1.35rem;
+      height: 1.35rem;
+      display: block;
+    }
+    :host([size="small"]) .uwc-rating__star svg,
+    :host([size="small"]) .uwc-rating__cancel svg { width: 1rem;   height: 1rem;   }
+    :host([size="large"]) .uwc-rating__star svg,
+    :host([size="large"]) .uwc-rating__cancel svg { width: 1.75rem; height: 1.75rem; }
+
+    /* ── Filled / active state ───────────────────────────────────────── */
+    .uwc-rating__star[aria-checked="true"] {
+      color: var(--uwc-rating-on-color, ${warning});
+    }
+
+    /* Hover preview on stars (not readonly / disabled) */
+    :host(:not([readonly]):not([disabled])) .uwc-rating__star.is-preview {
+      color: var(--uwc-rating-hover-color, ${warning});
+    }
+
+    :host(:not([readonly]):not([disabled])) .uwc-rating__star:hover,
+    :host(:not([readonly]):not([disabled])) .uwc-rating__star.is-preview {
+      transform: scale(1.2);
+    }
+
+    /* Cancel button */
+    .uwc-rating__cancel {
+      color: var(--uwc-rating-cancel-color, ${textMuted});
+    }
+    :host(:not([readonly]):not([disabled])) .uwc-rating__cancel:hover {
+      color:     var(--uwc-rating-cancel-hover-color, ${danger});
+      transform: scale(1.2);
+    }
+
+    /* ── Separator between cancel and stars ──────────────────────────── */
+    .uwc-rating__sep {
+      width:      1px;
+      height:     1.1rem;
+      background: var(--uwc-rating-sep-color, ${borderControl});
+      margin:     0 0.25rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Readonly ────────────────────────────────────────────────────── */
+    :host([readonly]) .uwc-rating__star,
+    :host([readonly]) .uwc-rating__cancel {
+      cursor:         default;
+      pointer-events: none;
+    }
+
+    /* ── Disabled ────────────────────────────────────────────────────── */
+    :host([disabled]) .uwc-rating {
+      opacity:        0.5;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-rating__star,
+      .uwc-rating__cancel { transition: none; }
+    }
+  `
+];
+
+// src/rating/index.ts
+var _starFilled = w`<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+var _starOutline = w`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+var _cancelIcon = w`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+var UwcRating = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.value = 0;
+    this.stars = 5;
+    this.cancel = false;
+    this.readonly = false;
+    this.disabled = false;
+    this.size = "medium";
+    this._hovered = 0;
+  }
+  // ── Actions ───────────────────────────────────────────────────────
+  _select(v3) {
+    if (this.readonly || this.disabled) return;
+    this.value = v3;
+    this._emit(v3);
+  }
+  _clear() {
+    if (this.readonly || this.disabled) return;
+    this.value = 0;
+    this._emit(0);
+  }
+  _emit(value) {
+    this.dispatchEvent(new CustomEvent("uwc-change", {
+      bubbles: true,
+      composed: true,
+      detail: { value }
+    }));
+  }
+  // ── Keyboard navigation ────────────────────────────────────────────
+  _onStarKeydown(e9, n6) {
+    if (this.readonly || this.disabled) return;
+    if (e9.key === "ArrowRight" || e9.key === "ArrowUp") {
+      e9.preventDefault();
+      const next = Math.min(n6 + 1, this.stars);
+      this._select(next);
+      this._focusStar(next);
+    } else if (e9.key === "ArrowLeft" || e9.key === "ArrowDown") {
+      e9.preventDefault();
+      const prev = n6 - 1;
+      if (prev <= 0 && this.cancel) {
+        this._focusCancel();
+      } else {
+        this._select(Math.max(prev, 1));
+        this._focusStar(Math.max(prev, 1));
+      }
+    }
+  }
+  _onCancelKeydown(e9) {
+    if (e9.key === "ArrowRight" || e9.key === "ArrowUp") {
+      e9.preventDefault();
+      this._select(1);
+      this._focusStar(1);
+    }
+  }
+  _focusStar(n6) {
+    const el = this.shadowRoot?.querySelector(`[data-star="${n6}"]`);
+    el?.focus();
+  }
+  _focusCancel() {
+    const el = this.shadowRoot?.querySelector(".uwc-rating__cancel");
+    el?.focus();
+  }
+  // ── Render ────────────────────────────────────────────────────────
+  render() {
+    const items = Array.from({ length: this.stars }, (_2, i8) => i8 + 1);
+    const preview = this._hovered > 0 ? this._hovered : this.value;
+    return b2`
+      <div
+        class="uwc-rating"
+        role="radiogroup"
+        aria-label="Rating"
+        aria-disabled=${this.disabled}
+      >
+        ${this.cancel ? b2`
+          <button
+            part="cancel"
+            class="uwc-rating__cancel"
+            type="button"
+            aria-label="Clear rating"
+            title="Clear rating"
+            ?disabled=${this.disabled}
+            @click=${this._clear}
+            @keydown=${this._onCancelKeydown}
+          >${_cancelIcon}</button>
+          <span class="uwc-rating__sep" aria-hidden="true"></span>
+        ` : A}
+
+        ${items.map((n6) => {
+      const filled = n6 <= preview;
+      const checked = n6 <= this.value;
+      return b2`
+            <button
+              part="star"
+              class=${e7({
+        "uwc-rating__star": true,
+        "is-preview": filled && !checked
+      })}
+              type="button"
+              role="radio"
+              data-star=${n6}
+              aria-label="${n6} star${n6 !== 1 ? "s" : ""}"
+              aria-checked=${checked}
+              ?disabled=${this.disabled}
+              tabindex=${n6 === (this.value || 1) && !this.cancel ? "0" : n6 === this.value ? "0" : "-1"}
+              @click=${() => this._select(n6)}
+              @mouseenter=${() => {
+        if (!this.readonly && !this.disabled) this._hovered = n6;
+      }}
+              @mouseleave=${() => {
+        this._hovered = 0;
+      }}
+              @keydown=${(e9) => this._onStarKeydown(e9, n6)}
+            >${filled ? _starFilled : _starOutline}</button>
+          `;
+    })}
+      </div>
+    `;
+  }
+};
+UwcRating.styles = [styles_default];
+__decorateClass([
+  n4({ type: Number, reflect: true })
+], UwcRating.prototype, "value", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcRating.prototype, "stars", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcRating.prototype, "cancel", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcRating.prototype, "readonly", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcRating.prototype, "disabled", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcRating.prototype, "size", 2);
+__decorateClass([
+  r5()
+], UwcRating.prototype, "_hovered", 2);
+
+// node_modules/lit-html/directives/if-defined.js
+var o6 = (o10) => o10 ?? A;
+
+// src/textarea/styles.ts
+var styles_default2 = [
+  hostReset,
+  i`
+    :host {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    :host([fluid]) { display: block; width: 100%; }
+
+    /* ── Wrapper ─────────────────────────────────────────────────────── */
+    .uwc-textarea {
+      --_bg:        var(--uwc-textarea-bg,                ${surface});
+      --_border:    var(--uwc-textarea-border,            1px solid ${borderControl});
+      --_radius:    var(--uwc-textarea-radius,            ${radiusMd});
+      --_color:     var(--uwc-textarea-color,             ${text});
+      --_ph-color:  var(--uwc-textarea-placeholder-color, ${textMuted});
+      --_font-size: var(--uwc-textarea-font-size,         ${fontSizeMd});
+      --_px:        var(--uwc-textarea-padding-x,         0.75rem);
+      --_py:        var(--uwc-textarea-padding-y,         0.5rem);
+
+      display:       block;
+      width:         100%;
+      background:    var(--_bg);
+      border:        var(--_border);
+      border-radius: var(--_radius);
+      transition:    border-color ${durationBase}, box-shadow ${durationBase};
+    }
+
+    .uwc-textarea:focus-within {
+      border-color: var(--uwc-color-primary, ${primary});
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-primary, ${primary}) 20%, transparent);
+    }
+
+    /* ── Variants ────────────────────────────────────────────────────── */
+    .uwc-textarea--filled {
+      --_bg: var(--uwc-textarea-filled-bg, ${surfaceRaised});
+      border-color: transparent;
+    }
+    .uwc-textarea--filled:focus-within {
+      --_bg: var(--uwc-textarea-bg, ${surface});
+      border-color: var(--uwc-color-primary, ${primary});
+    }
+
+    /* ── Invalid ─────────────────────────────────────────────────────── */
+    .uwc-textarea--invalid {
+      border-color: var(--uwc-color-danger, ${danger}) !important;
+    }
+    .uwc-textarea--invalid:focus-within {
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--uwc-color-danger, ${danger}) 20%, transparent);
+    }
+
+    /* ── Sizes ───────────────────────────────────────────────────────── */
+    .uwc-textarea--small { --_font-size: ${fontSizeXs}; --_px: 0.5rem;  --_py: 0.3125rem; }
+    .uwc-textarea--large { --_font-size: ${fontSizeLg}; --_px: 1rem;    --_py: 0.6875rem; }
+
+    /* ── Disabled ────────────────────────────────────────────────────── */
+    .uwc-textarea--disabled { pointer-events: none; opacity: 0.6; }
+
+    /* ── Native textarea ─────────────────────────────────────────────── */
+    textarea {
+      display:     block;
+      width:       100%;
+      min-width:   0;
+      padding:     var(--_py) var(--_px);
+      font-family: var(--uwc-font-family, inherit);
+      font-size:   var(--_font-size);
+      line-height: 1.5;
+      color:       var(--_color);
+      background:  transparent;
+      border:      none;
+      outline:     none;
+      box-sizing:  border-box;
+      resize:      var(--uwc-textarea-resize, vertical);
+    }
+
+    /* Resize variants */
+    :host([resize="none"])       textarea { resize: none; }
+    :host([resize="both"])       textarea { resize: both; }
+    :host([resize="horizontal"]) textarea { resize: horizontal; }
+    :host([resize="vertical"])   textarea { resize: vertical; }
+    :host([auto-resize])         textarea { resize: none; overflow: hidden; }
+
+    textarea::placeholder { color: var(--_ph-color); }
+    textarea:disabled      { cursor: not-allowed; }
+
+    /* ── Character count bar ─────────────────────────────────────────── */
+    .uwc-textarea__footer {
+      display:         flex;
+      justify-content: flex-end;
+      padding:         0.25rem var(--_px) 0.3125rem;
+      border-top:      1px solid var(--uwc-textarea-footer-border, ${borderSubtle});
+    }
+
+    .uwc-textarea__count {
+      font-size:  ${fontSizeXs};
+      color:      var(--uwc-textarea-count-color, ${textMuted});
+      font-variant-numeric: tabular-nums;
+    }
+
+    .uwc-textarea__count--warn {
+      color: var(--uwc-color-danger, ${danger});
+    }
+
+    /* ── Float label ─────────────────────────────────────────────────── */
+    .uwc-textarea--float { position: relative; }
+
+    .uwc-textarea__label {
+      position:       absolute;
+      left:           calc(var(--_px) + 0.125rem);
+      line-height:    1;
+      white-space:    nowrap;
+      pointer-events: none;
+      padding-inline: 0.25rem;
+      transition:
+        top       ${durationBase} ${easingStandard},
+        font-size ${durationBase} ${easingStandard},
+        color     ${durationBase} ${easingStandard},
+        transform ${durationBase} ${easingStandard};
+    }
+
+    /* Over (default) */
+    .uwc-textarea--float-over {
+      overflow:   visible;
+      margin-top: 1.5rem;
+    }
+    .uwc-textarea--float-over .uwc-textarea__label {
+      top:        0.6rem;
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: transparent;
+      transform:  none;
+    }
+    .uwc-textarea--float-over:focus-within .uwc-textarea__label,
+    .uwc-textarea--float-over textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      top:       0;
+      transform: translateY(calc(-100% - 0.375rem));
+      font-size: calc(var(--_font-size) * 0.85);
+      color:     var(--uwc-textarea-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+
+    /* On */
+    .uwc-textarea--float-on {
+      overflow:   visible;
+      margin-top: 0.75rem;
+    }
+    .uwc-textarea--float-on .uwc-textarea__label {
+      top:        0.6rem;
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: var(--_bg);
+      transform:  none;
+    }
+    .uwc-textarea--float-on:focus-within .uwc-textarea__label,
+    .uwc-textarea--float-on textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      top:       0;
+      transform: translateY(-50%);
+      font-size: calc(var(--_font-size) * 0.8);
+      color:     var(--uwc-textarea-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+    .uwc-textarea--float-on.uwc-textarea--filled .uwc-textarea__label {
+      background: var(--uwc-textarea-filled-bg, ${surfaceRaised});
+    }
+
+    /* In */
+    .uwc-textarea--float-in textarea {
+      padding-top: 1.5rem;
+    }
+    .uwc-textarea--float-in .uwc-textarea__label {
+      top:            0.6rem;
+      font-size:      var(--_font-size);
+      color:          var(--_ph-color);
+      background:     transparent;
+      left:           var(--_px);
+      padding-inline: 0;
+      transform:      none;
+    }
+    .uwc-textarea--float-in:focus-within .uwc-textarea__label,
+    .uwc-textarea--float-in textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      top:            0.3125rem;
+      transform:      none;
+      font-size:      calc(var(--_font-size) * 0.75);
+      color:          var(--uwc-textarea-label-active-color, var(--uwc-color-primary, ${primary}));
+      left:           var(--_px);
+      padding-inline: 0;
+    }
+
+    /* Invalid label */
+    .uwc-textarea--invalid .uwc-textarea__label,
+    .uwc-textarea--invalid:focus-within .uwc-textarea__label,
+    .uwc-textarea--invalid textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      color: var(--uwc-color-danger, ${danger});
+    }
+  `
+];
+
+// src/textarea/index.ts
+var UwcTextarea = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.value = "";
+    this.rows = 4;
+    this.variant = "outlined";
+    this.size = "medium";
+    this.resize = "vertical";
+    this.floatLabel = "over";
+    this.disabled = false;
+    this.readonly = false;
+    this.invalid = false;
+    this.fluid = false;
+    this.autoResize = false;
+    this.showCount = false;
+    this._charCount = 0;
+  }
+  firstUpdated() {
+    this._charCount = this.value?.length ?? 0;
+    if (this.autoResize) this._doAutoResize();
+  }
+  // ── Handlers ─────────────────────────────────────────────────────
+  _onInput(e9) {
+    const ta = e9.target;
+    this.value = ta.value;
+    this._charCount = ta.value.length;
+    if (this.autoResize) this._doAutoResize();
+    this.dispatchEvent(new CustomEvent("uwc-input", {
+      bubbles: true,
+      composed: true,
+      detail: { value: this.value, originalEvent: e9 }
+    }));
+  }
+  _onChange(e9) {
+    const ta = e9.target;
+    this.value = ta.value;
+    this.dispatchEvent(new CustomEvent("uwc-change", {
+      bubbles: true,
+      composed: true,
+      detail: { value: this.value, originalEvent: e9 }
+    }));
+  }
+  _doAutoResize() {
+    const ta = this.shadowRoot?.querySelector("textarea");
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${ta.scrollHeight}px`;
+  }
+  // ── Render ────────────────────────────────────────────────────────
+  render() {
+    const floatMode = !!this.label;
+    const classes = e7({
+      "uwc-textarea": true,
+      [`uwc-textarea--${this.variant}`]: true,
+      [`uwc-textarea--${this.size}`]: this.size !== "medium",
+      "uwc-textarea--invalid": this.invalid,
+      "uwc-textarea--disabled": this.disabled,
+      "uwc-textarea--float": floatMode,
+      [`uwc-textarea--float-${this.floatLabel}`]: floatMode
+    });
+    const placeholder = floatMode ? this.placeholder ?? " " : this.placeholder;
+    const showFooter = this.showCount && this.maxlength !== void 0;
+    const nearLimit = this.maxlength !== void 0 && this._charCount >= this.maxlength * 0.9;
+    return b2`
+      <div part="wrapper" class=${classes}>
+        <textarea
+          part="textarea"
+          .value=${this.value}
+          rows=${this.rows}
+          cols=${o6(this.cols)}
+          placeholder=${o6(placeholder)}
+          name=${o6(this.name)}
+          autocomplete=${o6(this.autocomplete)}
+          maxlength=${o6(this.maxlength)}
+          ?disabled=${this.disabled}
+          ?readonly=${this.readonly}
+          aria-invalid=${this.invalid}
+          aria-multiline="true"
+          @input=${this._onInput}
+          @change=${this._onChange}
+          @focus=${() => this.dispatchEvent(new CustomEvent("uwc-focus", { bubbles: true, composed: true }))}
+          @blur=${() => this.dispatchEvent(new CustomEvent("uwc-blur", { bubbles: true, composed: true }))}
+        ></textarea>
+        ${floatMode ? b2`<label class="uwc-textarea__label" part="label">${this.label}</label>` : A}
+        ${showFooter ? b2`
+          <div part="footer" class="uwc-textarea__footer">
+            <span part="count" class="uwc-textarea__count${nearLimit ? " uwc-textarea__count--warn" : ""}">
+              ${this._charCount} / ${this.maxlength}
+            </span>
+          </div>
+        ` : A}
+      </div>
+    `;
+  }
+};
+UwcTextarea.styles = [styles_default2];
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "value", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "placeholder", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcTextarea.prototype, "rows", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcTextarea.prototype, "cols", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcTextarea.prototype, "maxlength", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "name", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "autocomplete", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcTextarea.prototype, "variant", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcTextarea.prototype, "size", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcTextarea.prototype, "resize", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "label", 2);
+__decorateClass([
+  n4({ attribute: "float-label", reflect: true })
+], UwcTextarea.prototype, "floatLabel", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTextarea.prototype, "disabled", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTextarea.prototype, "readonly", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTextarea.prototype, "invalid", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcTextarea.prototype, "fluid", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true, attribute: "auto-resize" })
+], UwcTextarea.prototype, "autoResize", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-count" })
+], UwcTextarea.prototype, "showCount", 2);
+__decorateClass([
+  r5()
+], UwcTextarea.prototype, "_charCount", 2);
+
+// node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i6 = " !" + n5;
+var o7 = e6(class extends i5 {
+  constructor(t6) {
+    if (super(t6), t6.type !== t3.ATTRIBUTE || "style" !== t6.name || t6.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t6) {
+    return Object.keys(t6).reduce((e9, r7) => {
+      const s5 = t6[r7];
+      return null == s5 ? e9 : e9 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
+    }, "");
+  }
+  update(e9, [r7]) {
+    const { style: s5 } = e9.element;
+    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
+    for (const t6 of this.ft) null == r7[t6] && (this.ft.delete(t6), t6.includes("-") ? s5.removeProperty(t6) : s5[t6] = null);
+    for (const t6 in r7) {
+      const e10 = r7[t6];
+      if (null != e10) {
+        this.ft.add(t6);
+        const r8 = "string" == typeof e10 && e10.endsWith(i6);
+        t6.includes("-") || r8 ? s5.setProperty(t6, r8 ? e10.slice(0, -11) : e10, r8 ? n5 : "") : s5[t6] = e10;
+      }
+    }
+    return E;
+  }
+});
+
+// src/utils/virtual-scroll.controller.ts
+var VirtualScrollController = class {
+  // ── Construction ─────────────────────────────────────────────────
+  constructor(host, opts = {}) {
+    // ── State ─────────────────────────────────────────────────────────
+    this._items = [];
+    this._scrollTop = 0;
+    this._containerHeight = 0;
+    this._scrollEl = null;
+    this._resizeObs = null;
+    this._lastRange = { first: 0, last: 0 };
+    // ── Private ───────────────────────────────────────────────────────
+    /** Arrow function preserves `this` for removeEventListener identity. */
+    this._onScroll = () => {
+      if (!this._scrollEl) return;
+      this._scrollTop = this._scrollEl.scrollTop;
+      const r7 = this.range;
+      const changed = r7.first !== this._lastRange.first || r7.last !== this._lastRange.last;
+      if (changed) {
+        this._lastRange = r7;
+        this._onRangeChange?.(r7);
+        this.host.requestUpdate();
+      }
+    };
+    this.host = host;
+    this._itemSize = opts.itemSize ?? 48;
+    this._buffer = opts.buffer ?? 4;
+    this._onRangeChange = opts.onRangeChange ?? null;
+    host.addController(this);
+  }
+  // ── Reactive controller lifecycle ─────────────────────────────────
+  /** Intentionally empty — wiring is deferred to `attach()`. */
+  hostConnected() {
+  }
+  hostDisconnected() {
+    this.detach();
+  }
+  // ── Public API ────────────────────────────────────────────────────
+  /** Replace the items array and request a host re-render. */
+  setItems(items) {
+    this._items = items;
+    if (this._scrollEl) {
+      this._scrollTop = Math.min(this._scrollTop, this.totalHeight);
+    }
+    this.host.requestUpdate();
+  }
+  /** Update estimated item height and request a re-render. */
+  setItemSize(px) {
+    this._itemSize = px;
+    this.host.requestUpdate();
+  }
+  /** Update render buffer size. */
+  setBuffer(n6) {
+    this._buffer = n6;
+    this.host.requestUpdate();
+  }
+  // ── Derived state (read-only) ─────────────────────────────────────
+  get items() {
+    return this._items;
+  }
+  get totalCount() {
+    return this._items.length;
+  }
+  get itemSize() {
+    return this._itemSize;
+  }
+  /** Total pixel height the full (un-windowed) list would occupy. */
+  get totalHeight() {
+    return this._items.length * this._itemSize;
+  }
+  /** The index range currently rendered (first inclusive, last exclusive). */
+  get range() {
+    const safeHeight = this._containerHeight > 0 ? this._containerHeight : 400;
+    const first = Math.max(
+      0,
+      Math.floor(this._scrollTop / this._itemSize) - this._buffer
+    );
+    const visibleCount = Math.ceil(safeHeight / this._itemSize);
+    const last = Math.min(
+      this._items.length,
+      first + visibleCount + this._buffer * 2
+    );
+    return { first, last };
+  }
+  /** Items currently in the render window with their absolute indices. */
+  get visibleItems() {
+    const { first, last } = this.range;
+    return this._items.slice(first, last).map((item, i8) => ({
+      item,
+      index: first + i8
+    }));
+  }
+  /** Pixel height of the empty spacer placed BEFORE the rendered items. */
+  get paddingBefore() {
+    return this.range.first * this._itemSize;
+  }
+  /** Pixel height of the empty spacer placed AFTER the rendered items. */
+  get paddingAfter() {
+    return (this._items.length - this.range.last) * this._itemSize;
+  }
+  /** Current scroll offset of the attached container (px). */
+  get scrollTop() {
+    return this._scrollTop;
+  }
+  // ── Scroll control ────────────────────────────────────────────────
+  /**
+   * Scroll so that the item at `index` is visible.
+   * Defaults to 'auto' (instant) so UI interactions feel immediate;
+   * pass 'smooth' for animated transitions.
+   */
+  scrollToIndex(index, behavior = "auto") {
+    if (!this._scrollEl) return;
+    const top = Math.max(0, Math.min(index * this._itemSize, this.totalHeight));
+    this._scrollEl.scrollTo({ top, behavior });
+  }
+  /** Scroll to the very beginning of the list. */
+  scrollToTop(behavior = "auto") {
+    this._scrollEl?.scrollTo({ top: 0, behavior });
+  }
+  /** Scroll to the very end of the list. */
+  scrollToBottom(behavior = "auto") {
+    this._scrollEl?.scrollTo({ top: this.totalHeight, behavior });
+  }
+  // ── Container wiring ──────────────────────────────────────────────
+  /**
+   * Attach the controller to a DOM scroll container.
+   *
+   * Call from the host's `firstUpdated()` once the shadow DOM is ready.
+   * If called multiple times, the previous container is automatically
+   * detached first.
+   */
+  attach(scrollEl) {
+    this.detach();
+    this._scrollEl = scrollEl;
+    this._containerHeight = scrollEl.clientHeight;
+    this._scrollTop = scrollEl.scrollTop;
+    scrollEl.addEventListener("scroll", this._onScroll, { passive: true });
+    this._resizeObs = new ResizeObserver((entries) => {
+      const h4 = entries[0]?.contentRect.height ?? 0;
+      if (h4 !== this._containerHeight) {
+        this._containerHeight = h4;
+        this.host.requestUpdate();
+      }
+    });
+    this._resizeObs.observe(scrollEl);
+  }
+  /**
+   * Remove scroll listeners and observer.
+   * Called automatically when the host disconnects.
+   */
+  detach() {
+    if (this._scrollEl) {
+      this._scrollEl.removeEventListener("scroll", this._onScroll);
+      this._scrollEl = null;
+    }
+    this._resizeObs?.disconnect();
+    this._resizeObs = null;
+    this._scrollTop = 0;
+    this._containerHeight = 0;
+  }
+};
+
+// src/virtualscroller/styles.ts
+var styles_default3 = [
+  hostReset,
+  i`
+    :host {
+      display: block;
+      /* height is applied via inline style from scrollHeight property */
+    }
+
+    /* ── Outer shell ─────────────────────────────────────────────────── */
+    .uwc-vs {
+      display:        flex;
+      flex-direction: column;
+      box-sizing:     border-box;
+      /* height is set via inline style from the scrollHeight property */
+      border:         var(--uwc-vs-border,        1px solid ${border});
+      border-radius:  var(--uwc-vs-radius,        ${radiusMd});
+      background:     var(--uwc-vs-bg,            ${surface});
+      overflow:       hidden;
+    }
+
+    /* ── Header slot ─────────────────────────────────────────────────── */
+    .uwc-vs__header {
+      padding:      var(--uwc-vs-header-padding, ${space2} ${space3});
+      border-bottom:1px solid var(--uwc-vs-divider, ${borderSubtle});
+      flex-shrink:  0;
+    }
+
+    /* ── Scroll viewport ─────────────────────────────────────────────── */
+    .uwc-vs__viewport {
+      overflow-y:      auto;
+      overflow-x:      hidden;
+      flex:            1;
+      min-height:      0;        /* allow flex child to shrink below content size */
+      position:        relative;
+      /*
+       * Disable browser scroll-anchoring. Without this, when Lit replaces
+       * rendered items with a taller paddingBefore spacer the browser adjusts
+       * scrollTop to compensate, which fires another scroll event and creates
+       * a runaway scroll loop to the end of the list.
+       */
+      overflow-anchor: none;
+      scrollbar-width: thin;
+      scrollbar-color: var(--uwc-vs-scrollbar, ${borderControl}) transparent;
+    }
+    .uwc-vs__viewport::-webkit-scrollbar         { width: 6px; }
+    .uwc-vs__viewport::-webkit-scrollbar-track   { background: transparent; }
+    .uwc-vs__viewport::-webkit-scrollbar-thumb   {
+      background:    var(--uwc-vs-scrollbar, ${borderControl});
+      border-radius: ${radiusFull};
+    }
+
+    /* ── Spacers that maintain the full-list scroll height ───────────── */
+    .uwc-vs__spacer {
+      flex-shrink:     0;
+      width:           100%;
+      overflow-anchor: none;   /* never let the browser anchor to a spacer */
+    }
+
+    /* ── Default item rendering (used when renderItem is not supplied) ── */
+    .uwc-vs__item {
+      display:     flex;
+      align-items: center;
+      padding:     0 var(--uwc-vs-item-padding-x, ${space3});
+      height:      var(--uwc-vs-item-height, 3rem);
+      border-bottom: 1px solid var(--uwc-vs-item-divider, ${borderSubtle});
+      font-size:   var(--uwc-vs-item-font-size, ${fontSizeMd});
+      color:       var(--uwc-vs-item-color, ${text});
+      cursor:      pointer;
+      user-select: none;
+      transition:  background ${durationFast};
+    }
+    .uwc-vs__item:last-child { border-bottom: none; }
+    .uwc-vs__item:hover      { background: var(--uwc-vs-item-hover-bg, ${hoverBg}); }
+    .uwc-vs__item[aria-selected="true"] {
+      background: var(--uwc-vs-item-selected-bg, ${selectedBg});
+      color:      var(--uwc-color-primary, ${primary});
+      font-weight:${fontWeightSemibold};
+    }
+    .uwc-vs__item[data-focused="true"] {
+      outline:        2px solid var(--uwc-color-primary, ${primary});
+      outline-offset: -2px;
+    }
+
+    /* ── Empty state ─────────────────────────────────────────────────── */
+    .uwc-vs__empty {
+      display:        flex;
+      align-items:    center;
+      justify-content:center;
+      height:         100%;
+      min-height:     6rem;
+      color:          var(--uwc-vs-empty-color, ${textMuted});
+      font-size:      ${fontSizeMd};
+    }
+
+    /* ── Loading skeleton ────────────────────────────────────────────── */
+    .uwc-vs__skeleton-item {
+      display:     flex;
+      align-items: center;
+      gap:         ${space3};
+      padding:     0 var(--uwc-vs-item-padding-x, ${space3});
+      height:      var(--uwc-vs-item-height, 3rem);
+      border-bottom: 1px solid ${borderSubtle};
+    }
+    .uwc-vs__skeleton-bar {
+      height:       0.875rem;
+      border-radius:${radiusSm};
+      background:   linear-gradient(
+        90deg,
+        ${borderSubtle} 25%,
+        ${border}       50%,
+        ${borderSubtle} 75%
+      );
+      background-size: 200% 100%;
+      animation:   uwc-vs-shimmer 1.4s ease infinite;
+    }
+    @keyframes uwc-vs-shimmer {
+      0%   { background-position:  200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Footer slot ─────────────────────────────────────────────────── */
+    .uwc-vs__footer {
+      padding:     var(--uwc-vs-footer-padding, ${space2} ${space3});
+      border-top:  1px solid var(--uwc-vs-divider, ${borderSubtle});
+      flex-shrink: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uwc-vs__skeleton-bar { animation: none; }
+    }
+  `
+];
+
+// src/virtualscroller/index.ts
+var UwcVirtualScroller = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.items = [];
+    this.itemSize = 48;
+    this.scrollHeight = 400;
+    this.buffer = 4;
+    this.loading = false;
+    this.emptyMessage = "No items";
+    this._focusedIndex = -1;
+    this._vs = new VirtualScrollController(this, {
+      onRangeChange: (range) => {
+        this.dispatchEvent(new CustomEvent("uwc-range-change", {
+          bubbles: true,
+          composed: true,
+          detail: range
+        }));
+      }
+    });
+  }
+  // ── Lifecycle ─────────────────────────────────────────────────────
+  willUpdate(changed) {
+    if (changed.has("items")) this._vs.setItems(this.items);
+    if (changed.has("itemSize")) this._vs.setItemSize(this.itemSize);
+    if (changed.has("buffer")) this._vs.setBuffer(this.buffer);
+  }
+  firstUpdated() {
+    const vp = this.shadowRoot.querySelector(".uwc-vs__viewport");
+    this._vs.attach(vp);
+  }
+  // ── Public methods ────────────────────────────────────────────────
+  /** Scroll so that item at `index` is visible. */
+  scrollToIndex(index, behavior = "auto") {
+    this._vs.scrollToIndex(index, behavior);
+  }
+  scrollToTop(behavior = "auto") {
+    this._vs.scrollToTop(behavior);
+  }
+  scrollToBottom(behavior = "auto") {
+    this._vs.scrollToBottom(behavior);
+  }
+  // ── Keyboard navigation ───────────────────────────────────────────
+  _onKeydown(e9) {
+    const total = this._vs.totalCount;
+    if (!total) return;
+    if (e9.key === "ArrowDown") {
+      e9.preventDefault();
+      this._focusedIndex = Math.min(this._focusedIndex + 1, total - 1);
+      this._vs.scrollToIndex(this._focusedIndex, "smooth");
+    } else if (e9.key === "ArrowUp") {
+      e9.preventDefault();
+      this._focusedIndex = Math.max(this._focusedIndex - 1, 0);
+      this._vs.scrollToIndex(this._focusedIndex, "smooth");
+    } else if (e9.key === "Home") {
+      e9.preventDefault();
+      this._focusedIndex = 0;
+      this._vs.scrollToTop();
+    } else if (e9.key === "End") {
+      e9.preventDefault();
+      this._focusedIndex = total - 1;
+      this._vs.scrollToBottom();
+    } else if ((e9.key === "Enter" || e9.key === " ") && this._focusedIndex >= 0) {
+      e9.preventDefault();
+      this._selectItem(this.items[this._focusedIndex], this._focusedIndex);
+    }
+  }
+  _selectItem(item, index) {
+    this.selectedId = item.id;
+    this._focusedIndex = index;
+    this.dispatchEvent(new CustomEvent("uwc-item-click", {
+      bubbles: true,
+      composed: true,
+      detail: { item, index }
+    }));
+  }
+  // ── Renderers ─────────────────────────────────────────────────────
+  _renderDefaultItem(item, index) {
+    const selected = item.id !== void 0 && item.id === this.selectedId;
+    const focused = index === this._focusedIndex;
+    return b2`
+      <div
+        part="item"
+        class="uwc-vs__item"
+        role="option"
+        aria-selected=${selected}
+        data-focused=${focused}
+        style=${o7({ height: `${this.itemSize}px` })}
+        @click=${() => this._selectItem(item, index)}
+      >
+        <div>
+          <div>${item.label}</div>
+          ${item.subtitle ? b2`<div style="font-size:.75rem;color:#9ca3af;margin-top:1px;">${item.subtitle}</div>` : A}
+        </div>
+      </div>
+    `;
+  }
+  _renderSkeleton() {
+    const count = Math.ceil(this.scrollHeight / this.itemSize);
+    return b2`
+      ${Array.from({ length: count }, () => b2`
+        <div class="uwc-vs__skeleton-item">
+          <div class="uwc-vs__skeleton-bar" style="width:40%;flex-shrink:0;"></div>
+          <div class="uwc-vs__skeleton-bar" style="flex:1;"></div>
+        </div>
+      `)}
+    `;
+  }
+  _renderEmpty() {
+    return b2`
+      <div class="uwc-vs__empty" role="status" aria-live="polite">
+        <slot name="empty">${this.emptyMessage}</slot>
+      </div>
+    `;
+  }
+  // ── Render ────────────────────────────────────────────────────────
+  render() {
+    const hasHeader = !!this.querySelector('[slot="header"]');
+    const hasFooter = !!this.querySelector('[slot="footer"]');
+    const wrapperStyles = o7({
+      height: `${this.scrollHeight}px`
+    });
+    let listContent = A;
+    if (this.loading) {
+      listContent = this._renderSkeleton();
+    } else if (this._vs.totalCount === 0) {
+      listContent = this._renderEmpty();
+    } else {
+      const renderer = this.renderItem ? this.renderItem.bind(this) : this._renderDefaultItem.bind(this);
+      listContent = b2`
+        <div
+          class="uwc-vs__spacer"
+          style=${o7({ height: `${this._vs.paddingBefore}px` })}
+          aria-hidden="true"
+        ></div>
+        ${this._vs.visibleItems.map(({ item, index }) => renderer(item, index))}
+        <div
+          class="uwc-vs__spacer"
+          style=${o7({ height: `${this._vs.paddingAfter}px` })}
+          aria-hidden="true"
+        ></div>
+      `;
+    }
+    return b2`
+      <div class="uwc-vs" style=${wrapperStyles}>
+        ${hasHeader ? b2`<div class="uwc-vs__header"><slot name="header"></slot></div>` : A}
+
+        <div
+          part="viewport"
+          class="uwc-vs__viewport"
+          role="listbox"
+          tabindex="0"
+          aria-label="Virtual list"
+          aria-rowcount=${this._vs.totalCount}
+          @keydown=${this._onKeydown}
+        >
+          ${listContent}
+        </div>
+
+        ${hasFooter ? b2`<div class="uwc-vs__footer"><slot name="footer"></slot></div>` : A}
+      </div>
+    `;
+  }
+};
+UwcVirtualScroller.styles = [styles_default3];
+__decorateClass([
+  n4({ type: Array })
+], UwcVirtualScroller.prototype, "items", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "item-size" })
+], UwcVirtualScroller.prototype, "itemSize", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "scroll-height" })
+], UwcVirtualScroller.prototype, "scrollHeight", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcVirtualScroller.prototype, "buffer", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], UwcVirtualScroller.prototype, "loading", 2);
+__decorateClass([
+  n4({ attribute: "empty-message" })
+], UwcVirtualScroller.prototype, "emptyMessage", 2);
+__decorateClass([
+  n4({ attribute: "selected-id" })
+], UwcVirtualScroller.prototype, "selectedId", 2);
+__decorateClass([
+  r5()
+], UwcVirtualScroller.prototype, "_focusedIndex", 2);
+
 // node_modules/lit-html/directive-helpers.js
 var { I: t4 } = j;
-var i6 = (o10) => o10;
+var i7 = (o10) => o10;
 var r6 = (o10) => void 0 === o10.strings;
 var s4 = () => document.createComment("");
 var v2 = (o10, n6, e9) => {
@@ -686,8 +1928,8 @@ var v2 = (o10, n6, e9) => {
     if (t6 !== d3 || c5) {
       let o11 = e9._$AA;
       for (; o11 !== t6; ) {
-        const t7 = i6(o11).nextSibling;
-        i6(l4).insertBefore(o11, d3), o11 = t7;
+        const t7 = i7(o11).nextSibling;
+        i7(l4).insertBefore(o11, d3), o11 = t7;
       }
     }
   }
@@ -817,132 +2059,6 @@ function emit(host, name, detail, opts = {}) {
   return event;
 }
 
-// src/styles/tokens.ts
-var primary = r("#6366f1");
-var secondary = r("#64748b");
-var success = r("#22c55e");
-var warning = r("#f59e0b");
-var danger = r("#ef4444");
-var info = r("#38bdf8");
-var help = r("#a855f7");
-var contrast = r("#1e293b");
-var surface = r("#ffffff");
-var surfaceRaised = r("#f9f8f5");
-var border = r("rgba(0,0,0,0.09)");
-var borderSubtle = r("rgba(0,0,0,0.06)");
-var text = r("#111111");
-var textSecondary = r("#64748b");
-var textMuted = r("#9ca3af");
-var textDisabled = r("#bbbbbb");
-var hoverBg = r("rgba(0,0,0,0.04)");
-var selectedBg = r("rgba(99,102,241,0.08)");
-var radiusXs = r("2px");
-var radiusSm = r("4px");
-var radiusMd = r("6px");
-var radiusLg = r("10px");
-var radiusXl = r("14px");
-var radiusFull = r("9999px");
-var space1 = r("0.25rem");
-var space2 = r("0.5rem");
-var space3 = r("0.75rem");
-var space4 = r("1rem");
-var space5 = r("1.25rem");
-var space6 = r("1.5rem");
-var fontSizeXs = r("0.6875rem");
-var fontSizeSm = r("0.75rem");
-var fontSizeMd = r("0.875rem");
-var fontSizeLg = r("1rem");
-var fontSizeXl = r("1.125rem");
-var fontWeightNormal = r("400");
-var fontWeightMedium = r("500");
-var fontWeightSemibold = r("600");
-var fontWeightBold = r("700");
-var shadowSm = r("0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10)");
-var shadowMd = r("0 4px 8px -2px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)");
-var shadowLg = r("0 1px 2px rgba(0,0,0,0.05), 0 4px 8px -2px rgba(0,0,0,0.08), 0 16px 32px -4px rgba(0,0,0,0.12)");
-var durationFast = r("80ms");
-var durationBase = r("120ms");
-var durationslow = r("200ms");
-var easingStandard = r("cubic-bezier(0.16, 1, 0.3, 1)");
-var easingOut = r("cubic-bezier(0, 0, 0.2, 1)");
-var zFloat = r("9999");
-var zTooltip = r("10000");
-var zDialog = r("10001");
-
-// src/styles/mixins.ts
-var hostReset = i`
-  :host {
-    box-sizing: border-box;
-  }
-  :host *,
-  :host *::before,
-  :host *::after {
-    box-sizing: inherit;
-  }
-  :host [hidden] {
-    display: none !important;
-  }
-`;
-function floatingPanel(selector, opts = {}) {
-  const {
-    scaleFrom = "scale(0.96) translateY(-4px)",
-    scaleTo = "scale(1) translateY(0)",
-    durationVar = "--uwc-panel-duration",
-    durationDefault = "200ms",
-    easing = "cubic-bezier(0.16, 1, 0.3, 1)"
-  } = opts;
-  const sel = r(selector);
-  const sf = r(scaleFrom);
-  const st = r(scaleTo);
-  const dv = r(durationVar);
-  const dd = r(durationDefault);
-  const ez = r(easing);
-  return i`
-    ${sel} {
-      position: fixed;
-      inset: 0 auto auto 0;
-      margin: 0;
-      opacity: 0;
-      transform: ${sf};
-      transition:
-        opacity   var(${dv}, ${dd}) ${ez},
-        transform var(${dv}, ${dd}) ${ez},
-        display   var(${dv}, ${dd}) allow-discrete,
-        overlay   var(${dv}, ${dd}) allow-discrete;
-    }
-    ${sel}.is-open,
-    ${sel}:popover-open {
-      opacity: 1;
-      transform: ${st};
-    }
-  `;
-}
-var placementOrigins = i`
-  [data-placement^="bottom"]      { transform-origin: top center;    }
-  [data-placement="bottom-start"] { transform-origin: top left;      }
-  [data-placement="bottom-end"]   { transform-origin: top right;     }
-  [data-placement^="top"]         { transform-origin: bottom center; }
-  [data-placement="top-start"]    { transform-origin: bottom left;   }
-  [data-placement="top-end"]      { transform-origin: bottom right;  }
-  [data-placement^="left"]        { transform-origin: right center;  }
-  [data-placement^="right"]       { transform-origin: left center;   }
-`;
-var placementOriginsExtended = i`
-  ${placementOrigins}
-  [data-placement="left-start"]  { transform-origin: right top;    }
-  [data-placement="left-end"]    { transform-origin: right bottom; }
-  [data-placement="right-start"] { transform-origin: left top;     }
-  [data-placement="right-end"]   { transform-origin: left bottom;  }
-`;
-function focusRing(selector, colorVar = "--uwc-color-primary", colorDefault = "#6366f1") {
-  return i`
-    ${r(selector)}:focus-visible {
-      outline: 2px solid var(${r(colorVar)}, ${r(colorDefault)});
-      outline-offset: 2px;
-    }
-  `;
-}
-
 // src/stepper/styles.ts
 var INDICATOR_SIZE = r("2rem");
 var CONNECTOR_THICKNESS = r("2px");
@@ -1009,14 +2125,14 @@ var panelStyles = [
     :host([active]) .uwc-sp__v-indicator {
       background:   var(--uwc-step-active-bg,    ${primary});
       border-color: var(--uwc-step-active-border, ${primary});
-      color:        var(--uwc-step-active-color,  #fff);
+      color:        var(--uwc-step-active-color,  ${colorWhite});
       box-shadow:   0 0 0 4px color-mix(in oklab, ${primary} 18%, transparent);
     }
 
     :host([completed]) .uwc-sp__v-indicator {
       background:   var(--uwc-step-done-bg,    ${primary});
       border-color: var(--uwc-step-done-border, ${primary});
-      color:        var(--uwc-step-done-color,  #fff);
+      color:        var(--uwc-step-done-color,  ${colorWhite});
       box-shadow:   none;
     }
 
@@ -1213,14 +2329,14 @@ var stepperStyles = [
     .uwc-step__indicator--active {
       background:  var(--uwc-step-active-bg,    ${primary});
       border-color:var(--uwc-step-active-border, ${primary});
-      color:       var(--uwc-step-active-color,  #fff);
+      color:       var(--uwc-step-active-color,  ${colorWhite});
       box-shadow:  0 0 0 4px color-mix(in oklab, ${primary} 18%, transparent);
     }
 
     .uwc-step__indicator--completed {
       background:   var(--uwc-step-done-bg,    ${primary});
       border-color: var(--uwc-step-done-border, ${primary});
-      color:        var(--uwc-step-done-color,  #fff);
+      color:        var(--uwc-step-done-color,  ${colorWhite});
       box-shadow:   none;
     }
 
@@ -1829,7 +2945,7 @@ __decorateClass([
 ], UwcStepper.prototype, "_activeIndex", 2);
 
 // src/panel/styles.ts
-var styles_default = [
+var styles_default4 = [
   hostReset,
   i`
     /* ── Host ───────────────────────────────────────────────────────── */
@@ -2138,7 +3254,7 @@ var UwcPanel = class extends i4 {
     `;
   }
 };
-UwcPanel.styles = styles_default;
+UwcPanel.styles = styles_default4;
 __decorateClass([
   n4()
 ], UwcPanel.prototype, "header", 2);
@@ -2162,7 +3278,7 @@ __decorateClass([
 ], UwcPanel.prototype, "_hasFooter", 2);
 
 // src/message/styles.ts
-var styles_default2 = [
+var styles_default5 = [
   hostReset,
   i`
     :host {
@@ -2415,7 +3531,7 @@ var _UwcMessage = class _UwcMessage extends i4 {
     `;
   }
 };
-_UwcMessage.styles = styles_default2;
+_UwcMessage.styles = styles_default5;
 _UwcMessage._ICONS = {
   info: "info-circle-fill",
   success: "check-circle-fill",
@@ -2450,37 +3566,8 @@ __decorateClass([
 ], _UwcMessage.prototype, "_closed", 2);
 var UwcMessage = _UwcMessage;
 
-// node_modules/lit-html/directives/style-map.js
-var n5 = "important";
-var i7 = " !" + n5;
-var o6 = e6(class extends i5 {
-  constructor(t6) {
-    if (super(t6), t6.type !== t3.ATTRIBUTE || "style" !== t6.name || t6.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
-  }
-  render(t6) {
-    return Object.keys(t6).reduce((e9, r7) => {
-      const s5 = t6[r7];
-      return null == s5 ? e9 : e9 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
-    }, "");
-  }
-  update(e9, [r7]) {
-    const { style: s5 } = e9.element;
-    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
-    for (const t6 of this.ft) null == r7[t6] && (this.ft.delete(t6), t6.includes("-") ? s5.removeProperty(t6) : s5[t6] = null);
-    for (const t6 in r7) {
-      const e10 = r7[t6];
-      if (null != e10) {
-        this.ft.add(t6);
-        const r8 = "string" == typeof e10 && e10.endsWith(i7);
-        t6.includes("-") || r8 ? s5.setProperty(t6, r8 ? e10.slice(0, -11) : e10, r8 ? n5 : "") : s5[t6] = e10;
-      }
-    }
-    return E;
-  }
-});
-
 // src/toast/styles.ts
-var styles_default3 = [
+var styles_default6 = [
   hostReset,
   i`
     :host {
@@ -2865,7 +3952,7 @@ var _UwcToast = class _UwcToast extends i4 {
         ${!m3.sticky && m3.life > 0 ? b2`
           <div
             class="uwc-toast-item__progress uwc-toast-item__progress--${m3.severity}"
-            style=${o6(progressStyle)}
+            style=${o7(progressStyle)}
           ></div>
         ` : A}
       </div>
@@ -2883,7 +3970,7 @@ var _UwcToast = class _UwcToast extends i4 {
     `;
   }
 };
-_UwcToast.styles = styles_default3;
+_UwcToast.styles = styles_default6;
 _UwcToast._ICONS = {
   info: "info-circle-fill",
   success: "check-circle-fill",
@@ -2904,11 +3991,8 @@ __decorateClass([
 ], _UwcToast.prototype, "_messages", 2);
 var UwcToast = _UwcToast;
 
-// node_modules/lit-html/directives/if-defined.js
-var o7 = (o10) => o10 ?? A;
-
 // src/button/styles.ts
-var styles_default4 = [
+var styles_default7 = [
   hostReset,
   i`
     :host {
@@ -2922,7 +4006,7 @@ var styles_default4 = [
     /* ── Base button ────────────────────────────────────────────────────────── */
     .uwc-btn {
       --_bg:         var(--uwc-btn-bg,        var(--uwc-color-primary,  ${primary}));
-      --_color:      var(--uwc-btn-color,     #fff);
+      --_color:      var(--uwc-btn-color,     ${colorWhite});
       --_border:     var(--uwc-btn-border,    transparent);
       --_radius:     var(--uwc-btn-radius,    var(--uwc-radius-md,     ${radiusMd}));
       --_shadow:     var(--uwc-btn-shadow,    none);
@@ -2978,7 +4062,7 @@ var styles_default4 = [
     .uwc-btn--warning   { --_bg: var(--uwc-color-warning,   ${warning}); --_color: var(--uwc-btn-warning-color, ${contrast}); }
     .uwc-btn--help      { --_bg: var(--uwc-color-help,      ${help});    }
     .uwc-btn--danger    { --_bg: var(--uwc-color-danger,    ${danger});  }
-    .uwc-btn--contrast  { --_bg: var(--uwc-color-contrast,  ${contrast}); --_color: #fff; }
+    .uwc-btn--contrast  { --_bg: var(--uwc-color-contrast,  ${contrast}); --_color: ${colorWhite}; }
 
     /* ── Sizes ──────────────────────────────────────────────────────────────── */
     .uwc-btn--small { --_font-size: var(--uwc-font-size-xs, ${fontSizeXs}); --_px: 0.625rem;  --_py: 0.3125rem; }
@@ -3023,7 +4107,7 @@ var styles_default4 = [
     /* ── Badge ──────────────────────────────────────────────────────────────── */
     .uwc-btn__badge {
       --_badge-bg:    var(--uwc-btn-badge-bg,    var(--uwc-color-danger, ${danger}));
-      --_badge-color: var(--uwc-btn-badge-color, #fff);
+      --_badge-color: var(--uwc-btn-badge-color, ${colorWhite});
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -3177,9 +4261,9 @@ var UwcButton = class extends i4 {
         class=${classes}
         type=${this.type}
         ?disabled=${this.disabled || this.loading}
-        aria-label=${o7(this.ariaLabel ?? this.label)}
+        aria-label=${o6(this.ariaLabel ?? this.label)}
         aria-busy=${this.loading ? "true" : "false"}
-        tabindex=${o7(this.tabindex)}
+        tabindex=${o6(this.tabindex)}
         ?autofocus=${this.autofocus}
         @click=${this._handleClick}
         @focus=${() => this.dispatchEvent(new CustomEvent("uwc-focus", { bubbles: true, composed: true }))}
@@ -3189,7 +4273,7 @@ var UwcButton = class extends i4 {
       </button>`;
   }
 };
-UwcButton.styles = [styles_default4];
+UwcButton.styles = [styles_default7];
 __decorateClass([
   n4()
 ], UwcButton.prototype, "label", 2);
@@ -3255,7 +4339,7 @@ __decorateClass([
 ], UwcButton.prototype, "autofocus", 2);
 
 // src/card/styles.ts
-var styles_default5 = [
+var styles_default8 = [
   hostReset,
   i`
     /* ── Host ────────────────────────────────────────────────────────── */
@@ -3355,7 +4439,7 @@ var styles_default5 = [
     /* ── Footer slot ─────────────────────────────────────────────────── */
     .uwc-card__footer {
       padding: var(--uwc-card-footer-padding, .875rem 1.5rem 1.25rem);
-      border-top: 1px solid ${border};
+      border-top: var(--uwc-card-footer-border, 1px solid ${border});
       display: block;
     }
     .uwc-card__footer:empty { display: none; }
@@ -3441,7 +4525,7 @@ var UwcCard = class extends i4 {
     `;
   }
 };
-UwcCard.styles = styles_default5;
+UwcCard.styles = styles_default8;
 __decorateClass([
   n4({ reflect: true })
 ], UwcCard.prototype, "title", 2);
@@ -3459,7 +4543,7 @@ __decorateClass([
 ], UwcCard.prototype, "horizontal", 2);
 
 // src/carousel/styles.ts
-var styles_default6 = [
+var styles_default9 = [
   hostReset,
   focusRing(".uwc-car__prev", "--uwc-color-primary", "#6366f1"),
   focusRing(".uwc-car__next", "--uwc-color-primary", "#6366f1"),
@@ -3926,7 +5010,7 @@ var UwcCarousel = class extends i4 {
         >
           <div
             class=${e7({ "uwc-car__track": true, "is-animating": this._animating })}
-            style=${o6(this._trackStyle)}
+            style=${o7(this._trackStyle)}
             aria-live="off"
           >
             ${c4(
@@ -3935,7 +5019,7 @@ var UwcCarousel = class extends i4 {
       (item, index) => b2`
                 <div
                   class="uwc-car__item"
-                  style=${o6(itemStyle)}
+                  style=${o7(itemStyle)}
                   role="group"
                   aria-roledescription="slide"
                   aria-label="Slide ${index + 1} of ${this.items.length}"
@@ -3993,7 +5077,7 @@ var UwcCarousel = class extends i4 {
     `;
   }
 };
-UwcCarousel.styles = styles_default6;
+UwcCarousel.styles = styles_default9;
 __decorateClass([
   n4({ type: Array })
 ], UwcCarousel.prototype, "items", 2);
@@ -4050,7 +5134,7 @@ __decorateClass([
 ], UwcCarousel.prototype, "_viewport", 2);
 
 // src/galleria/styles.ts
-var styles_default7 = [
+var styles_default10 = [
   hostReset,
   focusRing(".uwc-gal__item-wrapper", "--uwc-color-primary", "#6366f1"),
   focusRing(".uwc-gal__thumb-item", "--uwc-color-primary", "#6366f1"),
@@ -4970,7 +6054,7 @@ var UwcGalleria = class extends i4 {
     `;
   }
 };
-UwcGalleria.styles = styles_default7;
+UwcGalleria.styles = styles_default10;
 __decorateClass([
   n4({ type: Array })
 ], UwcGalleria.prototype, "items", 2);
@@ -6599,7 +7683,7 @@ __decorateClass([
 ], UwcSplitter.prototype, "step", 2);
 
 // src/checkbox/styles.ts
-var styles_default8 = [
+var styles_default11 = [
   hostReset,
   i`
     :host {
@@ -6620,7 +7704,7 @@ var styles_default8 = [
     .uwc-cb {
       --_size:   var(--uwc-checkbox-size,   1.125rem);
       --_radius: var(--uwc-checkbox-radius, ${radiusSm});
-      --_border: var(--uwc-checkbox-border, 1px solid #d1d5db);
+      --_border: var(--uwc-checkbox-border, 1px solid ${borderControl});
       --_bg:     var(--uwc-checkbox-bg,     ${surface});
       --_color:  var(--uwc-checkbox-color,  var(--uwc-color-primary, ${primary}));
 
@@ -6662,7 +7746,7 @@ var styles_default8 = [
     .uwc-cb__icon {
       display: none;
       pointer-events: none;
-      color: #fff;
+      color: var(--uwc-checkbox-icon-color, ${colorWhite});
       width:  0.6875rem;
       height: 0.6875rem;
     }
@@ -6746,7 +7830,7 @@ var UwcCheckbox = class extends i4 {
             .checked=${this.checked}
             .indeterminate=${this.indeterminate}
             value=${this.value}
-            name=${o7(this.name)}
+            name=${o6(this.name)}
             ?disabled=${this.disabled}
             @change=${this._onChange}
           />
@@ -6758,7 +7842,7 @@ var UwcCheckbox = class extends i4 {
     `;
   }
 };
-UwcCheckbox.styles = [styles_default8];
+UwcCheckbox.styles = [styles_default11];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcCheckbox.prototype, "checked", 2);
@@ -6785,7 +7869,7 @@ __decorateClass([
 ], UwcCheckbox.prototype, "variant", 2);
 
 // src/dialog/styles.ts
-var styles_default9 = [
+var styles_default12 = [
   hostReset,
   i`
     :host { display: contents; }
@@ -7320,7 +8404,7 @@ var UwcDialog = class extends i4 {
     `;
   }
 };
-UwcDialog.styles = [styles_default9];
+UwcDialog.styles = [styles_default12];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcDialog.prototype, "open", 2);
@@ -7371,7 +8455,7 @@ __decorateClass([
 ], UwcDialog.prototype, "_dialog", 2);
 
 // src/colorpicker/styles.ts
-var styles_default10 = [
+var styles_default13 = [
   hostReset,
   // Panel enters/exits via the floatingPanel mixin — same as dropdown/popover/tooltip
   floatingPanel(".uwc-cp__panel", { durationVar: "--uwc-cp-duration", durationDefault: "140ms" }),
@@ -8138,7 +9222,7 @@ var UwcColorPicker = class extends i4 {
         >
           <div class="uwc-cp__area-hue"></div>
           <div class="uwc-cp__area-dark"></div>
-          <div class="uwc-cp__cursor" style=${o6({
+          <div class="uwc-cp__cursor" style=${o7({
       left: `${this._hsv.s}%`,
       top: `${100 - this._hsv.v}%`
     })}></div>
@@ -8150,16 +9234,16 @@ var UwcColorPicker = class extends i4 {
           <div class="uwc-cp__sliders">
             <!-- Hue -->
             <div class="uwc-cp__hue-track" @pointerdown=${this._huePointerDown}>
-              <div class="uwc-cp__thumb" style=${o6({
+              <div class="uwc-cp__thumb" style=${o7({
       left: `${this._hsv.h / 360 * 100}%`
     })}></div>
             </div>
             <!-- Alpha (optional) -->
             ${this.showAlpha ? b2`
               <div class="uwc-cp__alpha-track"
-                style=${o6({ "--_alpha-color": `rgb(${rgb.r},${rgb.g},${rgb.b})` })}
+                style=${o7({ "--_alpha-color": `rgb(${rgb.r},${rgb.g},${rgb.b})` })}
                 @pointerdown=${this._alphaPointerDown}>
-                <div class="uwc-cp__thumb" style=${o6({
+                <div class="uwc-cp__thumb" style=${o7({
       left: `${this._alpha * 100}%`
     })}></div>
               </div>` : A}
@@ -8183,7 +9267,7 @@ var UwcColorPicker = class extends i4 {
     `;
   }
 };
-UwcColorPicker.styles = [styles_default10];
+UwcColorPicker.styles = [styles_default13];
 __decorateClass([
   n4({ reflect: true })
 ], UwcColorPicker.prototype, "placement", 2);
@@ -8225,7 +9309,7 @@ __decorateClass([
 ], UwcColorPicker.prototype, "_alphaEl", 2);
 
 // src/datatable/styles.ts
-var styles_default11 = [
+var styles_default14 = [
   hostReset,
   i`
     :host { display: block; }
@@ -8294,7 +9378,7 @@ var styles_default11 = [
       color: ${text};
     }
     .dt-toolbar-btn.active {
-      background:   var(--uwc-dt-primary-lt, rgba(99,102,241,0.08));
+      background:   var(--uwc-dt-primary-lt, ${selectedBg});
       border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
       color:        var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
     }
@@ -8306,7 +9390,7 @@ var styles_default11 = [
     .dt-sel-badge {
       padding: ${space1} 10px;
       background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
-      color: #fff;
+      color: ${colorWhite};
       border-radius: ${radiusFull};
       font-size:   ${fontSizeXs};
       font-weight: ${fontWeightSemibold};
@@ -8389,7 +9473,7 @@ var styles_default11 = [
       font-size:   9px;
       font-weight: ${fontWeightBold};
       background:  var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
-      color:       #fff;
+      color:       ${colorWhite};
       border-radius: ${radiusXs};
       padding: 0 3px;
       line-height: 1.4;
@@ -8460,7 +9544,7 @@ var styles_default11 = [
       transition: all ${durationFast};
     }
     .dt-expand-btn:hover { border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); }
-    .dt-expand-btn.open { background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); color: #fff; }
+    .dt-expand-btn.open { background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); border-color: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary})); color: ${colorWhite}; }
 
     /* ── Cell types ─────────────────────────────────────────────────────────── */
     .dt-badge {
@@ -8497,7 +9581,7 @@ var styles_default11 = [
       width: 52px; height: 52px;
       border-radius: ${radiusFull};
       background: var(--uwc-dt-primary, var(--uwc-color-primary, ${primary}));
-      color: #fff;
+      color: ${colorWhite};
       display: flex;
       align-items: center;
       justify-content: center;
@@ -9293,7 +10377,7 @@ var UwcDatatable = class extends i4 {
   }
 };
 // ── Styles ────────────────────────────────────────────────────────────────
-UwcDatatable.styles = [styles_default11];
+UwcDatatable.styles = [styles_default14];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatatable.prototype, "data", 2);
@@ -9380,7 +10464,7 @@ __decorateClass([
 ], UwcDatatable.prototype, "_resizeStartW", 2);
 
 // src/datepicker/styles.ts
-var styles_default12 = [
+var styles_default15 = [
   hostReset,
   floatingPanel(".dp-panel", { durationVar: "--uwc-dp-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -9393,7 +10477,7 @@ var styles_default12 = [
       display: inline-flex;
       align-items: center;
       background:    var(--uwc-dp-trigger-bg,     ${surface});
-      border:        var(--uwc-dp-trigger-border, 1px solid #d0cfc9);
+      border:        var(--uwc-dp-trigger-border, 1px solid ${borderControl});
       border-radius: var(--uwc-dp-trigger-radius, ${radiusLg});
       min-width: 180px;
       overflow:  hidden;
@@ -9549,14 +10633,14 @@ var styles_default12 = [
       position: relative;
     }
     .dp-day:hover:not(:disabled):not(.dp-day--selected) {
-      background: var(--uwc-dp-day-hover-bg, rgba(99,102,241,0.08));
+      background: var(--uwc-dp-day-hover-bg, ${selectedBg});
     }
     .dp-day--other-month { color: ${textDisabled}; }
     .dp-day--today       { border: 1.5px solid var(--uwc-dp-day-today-border, var(--uwc-color-primary, ${primary})); font-weight: ${fontWeightSemibold}; }
-    .dp-day--selected    { background: var(--uwc-dp-day-selected-bg, var(--uwc-color-primary, ${primary})); color: var(--uwc-dp-day-selected-color, #fff); font-weight: ${fontWeightSemibold}; }
+    .dp-day--selected    { background: var(--uwc-dp-day-selected-bg, var(--uwc-color-primary, ${primary})); color: var(--uwc-dp-day-selected-color, ${colorWhite}); font-weight: ${fontWeightSemibold}; }
     .dp-day--range-start,
-    .dp-day--range-end   { background: var(--uwc-dp-day-selected-bg, var(--uwc-color-primary, ${primary})); color: var(--uwc-dp-day-selected-color, #fff); border-radius: ${radiusFull}; z-index: 1; }
-    .dp-day--in-range    { background: var(--uwc-dp-range-bg, rgba(99,102,241,0.1)); border-radius: 0; }
+    .dp-day--range-end   { background: var(--uwc-dp-day-selected-bg, var(--uwc-color-primary, ${primary})); color: var(--uwc-dp-day-selected-color, ${colorWhite}); border-radius: ${radiusFull}; z-index: 1; }
+    .dp-day--in-range    { background: var(--uwc-dp-range-bg, ${selectedBg}); border-radius: 0; }
     .dp-day--disabled    { color: ${textDisabled}; cursor: not-allowed; opacity: 0.5; }
 
     /* ── Month / Year grid ──────────────────────────────────────────────────── */
@@ -9582,7 +10666,7 @@ var styles_default12 = [
     .dp-month-cell--selected,
     .dp-year-cell--selected {
       background: var(--uwc-dp-day-selected-bg, var(--uwc-color-primary, ${primary}));
-      color: var(--uwc-dp-day-selected-color, #fff);
+      color: var(--uwc-dp-day-selected-color, ${colorWhite});
       font-weight: ${fontWeightMedium};
     }
     .dp-month-cell--current,
@@ -10539,7 +11623,7 @@ var UwcDatepicker = class extends i4 {
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
 // ═══════════════════════════════════════════════════════════════════════════
-UwcDatepicker.styles = [styles_default12];
+UwcDatepicker.styles = [styles_default15];
 __decorateClass([
   n4({ attribute: false })
 ], UwcDatepicker.prototype, "value", 2);
@@ -10650,24 +11734,32 @@ __decorateClass([
 ], UwcDatepicker.prototype, "_panel", 2);
 
 // src/dropdown/styles.ts
-var styles_default13 = [
+var styles_default16 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-dd-duration", durationDefault: "140ms" }),
   placementOrigins,
   i`
     :host { display: inline-block; }
+    :host([fluid]) { width: 100%; }
 
-    /* ── Trigger ────────────────────────────────────────────────────────────── */
+    /* ── Root wrapper (trigger + float label) ───────────────────────────────── */
+    .dd-root {
+      position: relative;
+      display:  inline-flex;
+      width:    100%;
+    }
+
+    /* ── Trigger (shared base) ──────────────────────────────────────────────── */
     .trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      width: 100%;
-      padding: ${space2} ${space3};
+      display:       inline-flex;
+      align-items:   center;
+      gap:           6px;
+      width:         100%;
+      padding:       ${space2} ${space3};
       font-family:   var(--uwc-font-family, inherit);
       font-size:     var(--uwc-dd-trigger-font-size, ${fontSizeSm});
       background:    var(--uwc-dd-trigger-bg,     ${surface});
-      border:        var(--uwc-dd-trigger-border, 1px solid #d0cfc9);
+      border:        var(--uwc-dd-trigger-border, 1px solid ${borderControl});
       border-radius: var(--uwc-dd-trigger-radius, ${radiusLg});
       color:         var(--uwc-dd-trigger-color,  ${text});
       cursor:        pointer;
@@ -10675,89 +11767,188 @@ var styles_default13 = [
       user-select:   none;
       min-width:     140px;
       transition:    border-color ${durationBase}, box-shadow ${durationBase};
+      box-sizing:    border-box;
     }
-    .trigger:hover:not(:disabled) {
-      border-color: color-mix(in oklab, var(--uwc-dd-trigger-border, #d0cfc9) 80%, #000);
+    .trigger:hover:not([disabled]):not(:disabled) {
+      border-color: color-mix(in oklab, var(--uwc-color-primary, ${primary}) 40%, ${borderControl});
     }
     .trigger:focus-visible {
-      outline: none;
+      outline:      none;
       border-color: var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary}));
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary})) 20%, transparent);
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-primary, ${primary}) 20%, transparent);
     }
-    .trigger:disabled {
-      background: var(--uwc-dd-trigger-disabled-bg, #f5f5f0);
-      color:      var(--uwc-text-disabled, ${textDisabled});
+    .trigger:disabled,
+    .trigger[aria-disabled="true"] {
+      background: var(--uwc-dd-trigger-disabled-bg, ${surfaceRaised});
+      color:      ${textDisabled};
       cursor:     not-allowed;
+      pointer-events: none;
     }
     .trigger--open {
       border-color: var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary}));
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary})) 20%, transparent);
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-primary, ${primary}) 20%, transparent);
     }
 
+    /* Editable trigger — div wrapper holding an <input> */
+    .trigger--editable { padding: 0; cursor: text; }
+    .editable-input {
+      flex:        1;
+      min-width:   0;
+      padding:     ${space2} ${space3};
+      border:      none;
+      outline:     none;
+      background:  transparent;
+      font-family: var(--uwc-font-family, inherit);
+      font-size:   inherit;
+      color:       inherit;
+      cursor:      text;
+    }
+    .trigger--editable .trigger-actions { padding-right: ${space2}; }
+
+    /* ── Sizes ──────────────────────────────────────────────────────────────── */
+    :host([size="sm"]) .trigger {
+      padding:   0.25rem 0.625rem;
+      font-size: ${fontSizeXs};
+      min-height: 1.875rem;
+    }
+    :host([size="sm"]) .editable-input { padding: 0.25rem 0.625rem; }
+
+    :host([size="lg"]) .trigger {
+      padding:   0.5rem 1rem;
+      font-size: ${fontSizeMd};
+      min-height: 2.75rem;
+    }
+    :host([size="lg"]) .editable-input { padding: 0.5rem 1rem; }
+
+    /* ── Filled variant ─────────────────────────────────────────────────────── */
+    :host([variant="filled"]) .trigger {
+      background:   var(--uwc-dd-filled-bg, ${surfaceRaised});
+      border-color: transparent;
+    }
+    :host([variant="filled"]) .trigger:hover:not([disabled]):not(:disabled) {
+      background: color-mix(in oklab, ${surfaceRaised} 80%, #000);
+    }
+    :host([variant="filled"]) .trigger--open {
+      border-color: var(--uwc-color-primary, ${primary});
+      background:   var(--uwc-dd-filled-bg, ${surfaceRaised});
+    }
+
+    /* ── Invalid state ──────────────────────────────────────────────────────── */
+    :host([invalid]) .trigger {
+      border-color: var(--uwc-color-danger, ${danger});
+    }
+    :host([invalid]) .trigger--open,
+    :host([invalid]) .trigger:focus-visible {
+      border-color: var(--uwc-color-danger, ${danger});
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-danger, ${danger}) 20%, transparent);
+    }
+
+    /* ── Float label ────────────────────────────────────────────────────────── */
+    .float-label {
+      position:       absolute;
+      left:           calc(${space3} + 1px);
+      top:            50%;
+      transform:      translateY(-50%);
+      font-size:      ${fontSizeSm};
+      color:          ${textMuted};
+      pointer-events: none;
+      transition:     top 0.18s ease, font-size 0.18s ease, color 0.18s ease, padding 0.18s ease;
+      white-space:    nowrap;
+    }
+
+    /* "over" — label always rendered above the trigger */
+    :host([float-label="over"]) .float-label {
+      top:       0;
+      transform: translateY(-100%);
+      font-size: ${fontSizeXs};
+      padding:   0 2px;
+      color:     var(--uwc-color-primary, ${primary});
+    }
+    :host([float-label="over"]) .dd-root { margin-top: 1.25rem; }
+
+    /* "in" — label starts inside, floats up when active */
+    :host([float-label="in"]) .float-label.float-label--active,
+    /* "on" — same motion but label sits on the border */
+    :host([float-label="on"]) .float-label.float-label--active {
+      top:       0;
+      transform: translateY(-50%);
+      font-size: ${fontSizeXs};
+      color:     var(--uwc-color-primary, ${primary});
+    }
+    :host([float-label="on"]) .float-label {
+      background: var(--uwc-dd-trigger-bg, ${surface});
+      padding:    0 4px;
+    }
+    /* hide the native placeholder text while the in-label is inside */
+    :host([float-label="in"]) .trigger--empty .is-placeholder,
+    :host([float-label="in"]) .trigger--empty .editable-input::placeholder {
+      color: transparent;
+    }
+
+    /* ── Trigger label / placeholder ────────────────────────────────────────── */
     .trigger-label {
-      flex: 1;
-      overflow: hidden;
+      flex:          1;
+      overflow:      hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space:   nowrap;
     }
     .trigger-label.is-placeholder { color: var(--uwc-dd-trigger-placeholder, ${textMuted}); }
 
     .trigger-actions { display: flex; align-items: center; gap: ${space1}; flex-shrink: 0; }
 
     /* ── Caret ──────────────────────────────────────────────────────────────── */
-    .caret { color: ${textMuted}; transition: transform 160ms ease; }
+    .caret { color: ${textMuted}; transition: transform 160ms ease; flex-shrink: 0; }
     .caret--open { transform: rotate(180deg); }
 
     /* ── Clear button ───────────────────────────────────────────────────────── */
     .clear-btn {
-      font-size: ${fontSizeXs};
-      color: ${textMuted};
-      cursor: pointer;
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
+      display:         flex;
+      align-items:     center;
       justify-content: center;
-      border-radius: ${radiusFull};
-      transition: background ${durationFast}, color ${durationFast};
+      width:           18px;
+      height:          18px;
+      color:           ${textMuted};
+      cursor:          pointer;
+      border-radius:   ${radiusFull};
+      transition:      background ${durationFast}, color ${durationFast};
     }
     .clear-btn:hover { background: ${hoverBg}; color: ${text}; }
 
     /* ── Loading spinner ────────────────────────────────────────────────────── */
     .loading-icon {
-      display: block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid #ddd;
+      display:       block;
+      width:         14px;
+      height:        14px;
+      border:        2px solid ${borderControl};
       border-top-color: var(--uwc-color-primary, ${primary});
       border-radius: ${radiusFull};
-      animation: dd-spin 600ms linear infinite;
+      animation:     dd-spin 600ms linear infinite;
+      flex-shrink:   0;
     }
     @keyframes dd-spin { to { transform: rotate(360deg); } }
 
     /* ── Chips (multi-select) ───────────────────────────────────────────────── */
     .chips-wrapper { display: flex; flex-wrap: wrap; gap: ${space1}; flex: 1; min-width: 0; }
     .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: ${space1};
-      padding: 2px 6px 2px 8px;
-      background:    var(--uwc-dd-chip-bg,    #ebe8e1);
-      color:         var(--uwc-dd-chip-color, #444);
-      border-radius: var(--uwc-radius-sm, ${radiusSm});
+      display:       inline-flex;
+      align-items:   center;
+      gap:           ${space1};
+      padding:       2px 6px 2px 8px;
+      background:    var(--uwc-dd-chip-bg,    ${borderSubtle});
+      color:         var(--uwc-dd-chip-color, ${textSecondary});
+      border-radius: ${radiusSm};
       font-size:     ${fontSizeXs};
     }
     .chip--overflow { background: ${borderSubtle}; color: ${textSecondary}; padding: 2px 8px; }
-
     .chip-remove {
-      font-size: ${fontSizeSm};
+      font-size:   ${fontSizeSm};
       line-height: 1;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: ${textMuted};
-      padding: 0 2px;
-      transition: color ${durationFast};
+      background:  none;
+      border:      none;
+      cursor:      pointer;
+      color:       ${textMuted};
+      padding:     0 2px;
+      transition:  color ${durationFast};
     }
     .chip-remove:hover { color: ${text}; }
 
@@ -10772,36 +11963,68 @@ var styles_default13 = [
       overflow:      hidden;
     }
 
+    /* ── Panel header / footer slots ────────────────────────────────────────── */
+    .panel-header {
+      padding:       ${space2} ${space3};
+      border-bottom: 1px solid ${borderSubtle};
+      flex-shrink:   0;
+    }
+    .panel-footer {
+      padding:    ${space2} ${space3};
+      border-top: 1px solid ${borderSubtle};
+      flex-shrink:0;
+      font-size:  ${fontSizeXs};
+      color:      ${textMuted};
+    }
+
     /* ── Filter input ───────────────────────────────────────────────────────── */
     .filter-wrapper {
-      display: flex;
-      align-items: center;
-      gap: ${space2};
-      padding: ${space2} ${space3};
+      display:       flex;
+      align-items:   center;
+      gap:           ${space2};
+      padding:       ${space2} ${space3};
       border-bottom: 1px solid ${borderSubtle};
     }
     .filter-icon  { color: ${textDisabled}; flex-shrink: 0; }
     .filter-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-family: var(--uwc-font-family, inherit);
-      font-size:   ${fontSizeXs};
-      color:       ${text};
-      background:  transparent;
+      flex:       1;
+      border:     none;
+      outline:    none;
+      font-family:var(--uwc-font-family, inherit);
+      font-size:  ${fontSizeXs};
+      color:      ${text};
+      background: transparent;
     }
     .filter-input::placeholder { color: ${textDisabled}; }
 
-    /* ── Options list ───────────────────────────────────────────────────────── */
-    .options-wrapper { overflow-y: auto; max-height: var(--uwc-dd-max-height, 220px); }
-    .options-list    { list-style: none; margin: 0; padding: ${space1} 0; }
+    /* ── Options wrapper ────────────────────────────────────────────────────── */
+    .options-wrapper {
+      overflow-y: auto;
+      /* max-height set via inline style (scrollHeight prop) for non-virtual */
+    }
+
+    /* ── Standard options list ──────────────────────────────────────────────── */
+    .options-list { list-style: none; margin: 0; padding: ${space1} 0; }
+
+    /* ── Virtual options scroll container ───────────────────────────────────── */
+    .options-scroll {
+      overflow-anchor: none;
+      scrollbar-width: thin;
+      scrollbar-color: ${borderControl} transparent;
+    }
+    .options-scroll::-webkit-scrollbar        { width: 6px; }
+    .options-scroll::-webkit-scrollbar-track  { background: transparent; }
+    .options-scroll::-webkit-scrollbar-thumb  {
+      background:    ${borderControl};
+      border-radius: ${radiusFull};
+    }
 
     /* ── Group header ───────────────────────────────────────────────────────── */
     .group-header {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: ${space2} 13px 4px;
+      display:        flex;
+      align-items:    center;
+      gap:            7px;
+      padding:        ${space2} 13px 4px;
       font-size:      ${fontSizeXs};
       font-weight:    ${fontWeightBold};
       letter-spacing: 0.08em;
@@ -10812,42 +12035,55 @@ var styles_default13 = [
 
     /* ── Option ─────────────────────────────────────────────────────────────── */
     .option {
-      display: flex;
+      display:     flex;
       align-items: center;
-      gap: 9px;
-      padding: ${space2} 13px;
-      font-size:  ${fontSizeSm};
-      color:      ${text};
-      cursor:     pointer;
-      list-style: none;
-      transition: background ${durationFast};
+      gap:         9px;
+      padding:     0 13px;
+      font-size:   ${fontSizeSm};
+      color:       ${text};
+      cursor:      pointer;
+      list-style:  none;
+      transition:  background ${durationFast};
+      min-height:  2.375rem;  /* fallback for non-virtual */
     }
     .option:hover,
-    .option--highlighted { background: var(--uwc-dd-option-hover-bg, ${hoverBg}); }
+    .option--highlighted        { background: var(--uwc-dd-option-hover-bg, ${hoverBg}); }
     .option--selected {
-      background:  var(--uwc-dd-option-selected-bg,    rgba(99,102,241,0.08));
+      background:  var(--uwc-dd-option-selected-bg,    ${selectedBg});
       color:       var(--uwc-dd-option-selected-color, var(--uwc-color-primary, ${primary}));
       font-weight: ${fontWeightMedium};
     }
     .option--selected.option--highlighted {
       background: color-mix(in oklab, var(--uwc-color-primary, ${primary}) 15%, transparent);
     }
-    .option--disabled { color: var(--uwc-dd-option-disabled-color, ${textDisabled}); cursor: not-allowed; }
-    .option--disabled:hover { background: transparent; }
+    .option--disabled           { color: ${textDisabled}; cursor: not-allowed; }
+    .option--disabled:hover     { background: transparent; }
 
     .opt-icon  { width: 18px; text-align: center; flex-shrink: 0; }
     .opt-label { flex: 1; }
     .opt-badge {
-      font-size: ${fontSizeXs};
-      padding: 1px 6px;
+      font-size:     ${fontSizeXs};
+      padding:       1px 6px;
       border-radius: ${radiusFull};
-      background: ${borderSubtle};
-      color: ${textSecondary};
+      background:    ${borderSubtle};
+      color:         ${textSecondary};
     }
-    .opt-check { color: var(--uwc-color-primary, ${primary}); margin-left: auto; }
+    .opt-check {
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      color:           var(--uwc-color-primary, ${primary});
+      margin-left:     auto;
+      flex-shrink:     0;
+    }
 
     /* ── Empty state ────────────────────────────────────────────────────────── */
-    .empty { padding: 20px ${space4}; text-align: center; font-size: ${fontSizeXs}; color: ${textDisabled}; }
+    .empty {
+      padding:    20px ${space4};
+      text-align: center;
+      font-size:  ${fontSizeXs};
+      color:      ${textDisabled};
+    }
   `
 ];
 
@@ -10870,17 +12106,32 @@ var UwcDropdown = class extends i4 {
     this.autoDisplayFirst = false;
     this.emptyMessage = "No results found.";
     this.maxSelectedLabels = 3;
+    this.virtual = false;
+    this.itemSize = 38;
+    this.editable = false;
+    this.label = "";
+    this.floatLabel = null;
+    this.variant = "outlined";
+    this.size = "md";
+    this.invalid = false;
+    this.fluid = false;
     this._filterQuery = "";
     this._highlightIdx = -1;
     this._focusWithin = false;
     this._onDropdownKeydown = this._handleDropdownKeydown.bind(this);
-    // ── Controller ───────────────────────────────────────────────────
+    // ── Virtual scroll controller ───────────────────────────────────────────────
+    // Always instantiated; only attached to a DOM element when virtual=true.
+    this._vs = new VirtualScrollController(this, {
+      onRangeChange: () => {
+      }
+    });
+    // ── Placement controller ────────────────────────────────────────────────────
     this._pc = new PlacementController(this, {
       getPanelEl: () => this._panel,
-      // Dropdown renders its own trigger; setTriggerElement() called from firstUpdated
       onTriggerFound: (el) => {
         const onClick = (e9) => {
           e9.stopPropagation();
+          if (this.editable && e9.target.closest("#editable-input")) return;
           this._pc.toggle();
         };
         const onKeydown = (e9) => {
@@ -10906,19 +12157,29 @@ var UwcDropdown = class extends i4 {
         document.addEventListener("keydown", this._onDropdownKeydown);
         emit(this, "uwc-show");
         requestAnimationFrame(() => {
-          if (this.filter) this._filterInput?.focus();
+          if (this.editable) {
+            this._editableInput?.focus();
+            this._editableInput?.select();
+          } else if (this.filter) {
+            this._filterInput?.focus();
+          }
           this._scrollToHighlighted();
+          if (this.virtual && this._optionsScroll) {
+            this._vs.attach(this._optionsScroll);
+            this._vs.setItems(this._filteredOptions());
+          }
         });
       },
       afterHide: () => {
         document.removeEventListener("keydown", this._onDropdownKeydown);
         this._highlightIdx = -1;
         emit(this, "uwc-hide");
-        this._triggerBtn?.focus();
+        if (this.editable) this.requestUpdate();
+        if (!this.editable) this._triggerBtn?.focus();
       }
     });
   }
-  // ── Lifecycle ────────────────────────────────────────────────────
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
   firstUpdated() {
     this._pc.setTriggerElement(this._triggerBtn);
     if (this.autoDisplayFirst && !this._hasValue() && this.options.length) {
@@ -10929,37 +12190,26 @@ var UwcDropdown = class extends i4 {
   updated(changed) {
     super.updated(changed);
     this._pc.updated(changed, null, null);
-    if (changed.has("_highlightIdx")) {
-      this._scrollToHighlighted();
+    if (changed.has("_highlightIdx")) this._scrollToHighlighted();
+    if (this.virtual && this._pc.open && this._optionsScroll) {
+      if (changed.has("options") || changed.has("_filterQuery")) {
+        this._vs.setItems(this._filteredOptions());
+      }
     }
   }
-  // ── Value helpers ────────────────────────────────────────────────
+  // ── Value helpers ──────────────────────────────────────────────────────────
   _hasValue() {
     if (this.multiple) return Array.isArray(this.value) && this.value.length > 0;
     return this.value !== null && this.value !== void 0;
   }
   _isSelected(opt) {
-    if (this.multiple) {
-      return Array.isArray(this.value) && this.value.includes(opt.value);
-    }
+    if (this.multiple) return Array.isArray(this.value) && this.value.includes(opt.value);
     return this.value === opt.value;
   }
   _indexOfSelectedValue() {
     if (!this._hasValue()) return -1;
-    const visible = this._filteredOptions();
     if (this.multiple) return 0;
-    return visible.findIndex((o10) => !o10.group && o10.value === this.value);
-  }
-  // ── Options helpers ──────────────────────────────────────────────
-  _filteredOptions() {
-    if (!this._filterQuery) return this.options;
-    const q = this._filterQuery.toLowerCase();
-    return this.options.filter(
-      (o10) => o10.group !== void 0 || o10.label.toLowerCase().includes(q)
-    );
-  }
-  _selectableOptions() {
-    return this._filteredOptions().filter((o10) => !o10.group && !o10.disabled);
+    return this._selectableOptions().findIndex((o10) => o10.value === this.value);
   }
   _labelForValue(val) {
     return this.options.find((o10) => o10.value === val)?.label ?? String(val);
@@ -10973,7 +12223,18 @@ var UwcDropdown = class extends i4 {
     }
     return this._labelForValue(this.value);
   }
-  // ── Selection ────────────────────────────────────────────────────
+  // ── Options helpers ────────────────────────────────────────────────────────
+  _filteredOptions() {
+    if (!this._filterQuery) return this.options;
+    const q = this._filterQuery.toLowerCase();
+    return this.options.filter(
+      (o10) => o10.group !== void 0 || o10.label.toLowerCase().includes(q)
+    );
+  }
+  _selectableOptions() {
+    return this._filteredOptions().filter((o10) => !o10.group && !o10.disabled);
+  }
+  // ── Selection ──────────────────────────────────────────────────────────────
   _selectOption(opt, e9, { silent = false } = {}) {
     if (opt.disabled || opt.group) return;
     let newValue;
@@ -11000,8 +12261,7 @@ var UwcDropdown = class extends i4 {
   _removeChip(val, e9) {
     e9.stopPropagation();
     if (!this.multiple || !Array.isArray(this.value)) return;
-    const prev = this.value;
-    this.value = prev.filter((v3) => v3 !== val);
+    this.value = this.value.filter((v3) => v3 !== val);
     emit(this, "uwc-change", {
       value: this.value,
       label: this._labelForValue(val)
@@ -11012,18 +12272,22 @@ var UwcDropdown = class extends i4 {
     const prev = this.value;
     this.value = this.multiple ? [] : null;
     emit(this, "uwc-clear", { previousValue: prev });
-    emit(this, "uwc-change", {
-      value: this.value,
-      label: ""
-    });
+    emit(this, "uwc-change", { value: this.value, label: "" });
   }
-  // ── Filter ───────────────────────────────────────────────────────
+  // ── Filter ─────────────────────────────────────────────────────────────────
   _handleFilterInput(e9) {
     this._filterQuery = e9.target.value;
     this._highlightIdx = 0;
     emit(this, "uwc-filter", { query: this._filterQuery, originalEvent: e9 });
   }
-  // ── Keyboard navigation ──────────────────────────────────────────
+  _handleEditableInput(e9) {
+    const val = e9.target.value;
+    this._filterQuery = val;
+    this._highlightIdx = 0;
+    if (!this._pc.open) this._pc.show();
+    emit(this, "uwc-filter", { query: val, originalEvent: e9 });
+  }
+  // ── Keyboard navigation ────────────────────────────────────────────────────
   _handleDropdownKeydown(e9) {
     const opts = this._selectableOptions();
     if (!opts.length) return;
@@ -11046,7 +12310,7 @@ var UwcDropdown = class extends i4 {
         break;
       case "Enter":
       case " ":
-        if (e9.key === " " && this.filter) break;
+        if (e9.key === " " && (this.filter || this.editable)) break;
         e9.preventDefault();
         if (this._highlightIdx >= 0 && opts[this._highlightIdx]) {
           this._selectOption(opts[this._highlightIdx], e9);
@@ -11059,17 +12323,22 @@ var UwcDropdown = class extends i4 {
   }
   _scrollToHighlighted() {
     requestAnimationFrame(() => {
-      const list = this._optionsList;
-      const item = list?.querySelector('[data-highlighted="true"]');
+      if (this.virtual) {
+        if (this._highlightIdx < 0) return;
+        const targetOpt = this._selectableOptions()[this._highlightIdx];
+        const filtIdx = targetOpt ? this._filteredOptions().indexOf(targetOpt) : -1;
+        if (filtIdx >= 0) this._vs.scrollToIndex(filtIdx, "auto");
+        return;
+      }
+      const item = this.shadowRoot?.querySelector('[data-highlighted="true"]');
       item?.scrollIntoView({ block: "nearest" });
     });
   }
-  // ── Render helpers ────────────────────────────────────────────────
+  // ── Render helpers ─────────────────────────────────────────────────────────
   _renderChips() {
     if (!this.multiple || !Array.isArray(this.value)) return b2``;
-    const selected = this.value;
-    const visible = selected.slice(0, this.maxSelectedLabels);
-    const overflow = selected.length - visible.length;
+    const visible = this.value.slice(0, this.maxSelectedLabels);
+    const overflow = this.value.length - visible.length;
     return b2`
       <div class="chips-wrapper">
         ${visible.map((val) => b2`
@@ -11086,7 +12355,22 @@ var UwcDropdown = class extends i4 {
         ${overflow > 0 ? b2`<span class="chip chip--overflow">+${overflow}</span>` : A}
       </div>`;
   }
-  _renderOptions() {
+  /** Renders the option row content (icon / label / badge / check). */
+  _renderOptionContent(opt, isSelected) {
+    return b2`
+      ${opt.icon ? b2`<span class="opt-icon">${opt.icon}</span>` : A}
+      <span class="opt-label">${opt.label}</span>
+      ${opt.badge ? b2`<span class="opt-badge">${opt.badge}</span>` : A}
+      ${isSelected ? b2`<span class="opt-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>` : A}
+    `;
+  }
+  /** Standard (non-virtual) options list. */
+  _renderOptionsStandard() {
     const filtered = this._filteredOptions();
     const selectable = this._selectableOptions();
     if (!filtered.length) {
@@ -11102,7 +12386,7 @@ var UwcDropdown = class extends i4 {
         ${c4(
       filtered,
       (opt) => String(opt.value ?? opt.group ?? opt.label),
-      (opt) => {
+      (opt, absIdx) => {
         if (opt.group !== void 0) {
           return b2`
                 <li part="group-header" class="group-header" role="presentation">
@@ -11112,18 +12396,18 @@ var UwcDropdown = class extends i4 {
         }
         const selIdx = selectable.indexOf(opt);
         const isHighlit = selIdx === this._highlightIdx;
-        const isSelected = this._isSelected(opt);
+        const isSel = this._isSelected(opt);
         return b2`
               <li
                 part="option"
                 role="option"
                 id="opt-${String(opt.value)}"
-                aria-selected=${isSelected}
+                aria-selected=${isSel}
                 aria-disabled=${opt.disabled ?? false}
                 data-highlighted=${isHighlit}
                 class=${e7({
           "option": true,
-          "option--selected": isSelected,
+          "option--selected": isSel,
           "option--highlighted": isHighlit,
           "option--disabled": !!opt.disabled
         })}
@@ -11135,71 +12419,226 @@ var UwcDropdown = class extends i4 {
           if (!opt.disabled) this._highlightIdx = selIdx;
         }}
               >
-                ${opt.icon ? b2`<span class="opt-icon">${opt.icon}</span>` : A}
-                <span class="opt-label">${opt.label}</span>
-                ${opt.badge ? b2`<span class="opt-badge">${opt.badge}</span>` : A}
-                ${isSelected ? b2`<span class="opt-check" aria-hidden="true">✓</span>` : A}
+                ${this.renderOption ? this.renderOption(opt, absIdx) : this._renderOptionContent(opt, isSel)}
               </li>`;
       }
     )}
       </ul>`;
   }
-  // ── Render ───────────────────────────────────────────────────────
+  /** Virtually-scrolled options list using VirtualScrollController. */
+  _renderOptionsVirtual() {
+    const filtered = this._filteredOptions();
+    const selectable = this._selectableOptions();
+    if (!filtered.length) {
+      return b2`<div part="empty" class="empty">${this.emptyMessage}</div>`;
+    }
+    const h4 = `${this.scrollHeight}px`;
+    return b2`
+      <div
+        class="options-scroll"
+        style=${o7({
+      height: h4,
+      overflowY: "auto",
+      overflowAnchor: "none",
+      position: "relative"
+    })}
+        role="listbox"
+        aria-multiselectable=${this.multiple}
+      >
+        <div
+          style=${o7({ height: `${this._vs.paddingBefore}px` })}
+          aria-hidden="true"
+        ></div>
+
+        ${this._vs.visibleItems.map(({ item: opt, index: absIdx }) => {
+      if (opt.group !== void 0) {
+        return b2`
+              <div
+                part="group-header"
+                class="group-header"
+                role="presentation"
+                style=${o7({ height: `${this.itemSize}px`, boxSizing: "border-box" })}
+              >
+                ${opt.icon ? b2`<span class="opt-icon">${opt.icon}</span>` : A}
+                <span>${opt.group || opt.label}</span>
+              </div>`;
+      }
+      const selIdx = selectable.indexOf(opt);
+      const isHighlit = selIdx === this._highlightIdx;
+      const isSel = this._isSelected(opt);
+      return b2`
+            <div
+              part="option"
+              role="option"
+              id="opt-${String(opt.value)}"
+              aria-selected=${isSel}
+              aria-disabled=${opt.disabled ?? false}
+              data-highlighted=${isHighlit}
+              class=${e7({
+        "option": true,
+        "option--selected": isSel,
+        "option--highlighted": isHighlit,
+        "option--disabled": !!opt.disabled
+      })}
+              style=${o7({ height: `${this.itemSize}px`, boxSizing: "border-box" })}
+              title=${opt.title ?? ""}
+              @click=${(e9) => {
+        if (!opt.disabled) this._selectOption(opt, e9);
+      }}
+              @mouseenter=${() => {
+        if (!opt.disabled) this._highlightIdx = selIdx;
+      }}
+            >
+              ${this.renderOption ? this.renderOption(opt, absIdx) : this._renderOptionContent(opt, isSel)}
+            </div>`;
+    })}
+
+        <div
+          style=${o7({ height: `${this._vs.paddingAfter}px` })}
+          aria-hidden="true"
+        ></div>
+      </div>`;
+  }
+  _renderFilterInput() {
+    return b2`
+      <div class="filter-wrapper">
+        <svg class="filter-icon" width="14" height="14" viewBox="0 0 14 14"
+             fill="none" aria-hidden="true">
+          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round"/>
+        </svg>
+        <input
+          id="filter-input"
+          part="filter-input"
+          type="text"
+          class="filter-input"
+          placeholder=${this.filterPlaceholder}
+          .value=${l3(this._filterQuery)}
+          autocomplete="off"
+          @input=${this._handleFilterInput}
+          @keydown=${(e9) => {
+      if (["ArrowUp", "ArrowDown"].includes(e9.key)) e9.preventDefault();
+    }}
+        />
+      </div>`;
+  }
+  _renderTriggerActions(open) {
+    const showClearBtn = this.showClear && this._hasValue() && !this.disabled && !this.loading;
+    return b2`
+      <span class="trigger-actions">
+        ${showClearBtn ? b2`
+          <span
+            part="clear-btn"
+            class="clear-btn"
+            role="button"
+            tabindex="-1"
+            aria-label="Clear"
+            @click=${this._clear}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round"/>
+            </svg>
+          </span>` : A}
+
+        ${this.loading ? b2`<span part="loading-icon" class="loading-icon" aria-hidden="true"></span>` : b2`
+            <svg part="caret" class="caret ${open ? "caret--open" : ""}"
+                 width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>`}
+      </span>`;
+  }
+  // ── Render ─────────────────────────────────────────────────────────────────
   render() {
     const open = this._pc.open;
     const hasValue = this._hasValue();
     const label = this._triggerLabel();
-    const showClearBtn = this.showClear && hasValue && !this.disabled && !this.loading;
-    return b2`
-      <button
-        id="trigger-btn"
-        part="trigger"
-        type="button"
-        class=${e7({
+    const floatActive = hasValue || open;
+    const triggerClasses = e7({
       "trigger": true,
       "trigger--open": open,
       "trigger--loading": this.loading,
-      "trigger--empty": !hasValue
-    })}
-        ?disabled=${this.disabled || this.loading}
-        aria-expanded=${open}
-        aria-controls="panel"
-        aria-label=${label || this.placeholder}
-        @focus=${() => {
+      "trigger--empty": !hasValue,
+      "trigger--has-value": hasValue,
+      "trigger--editable": this.editable
+    });
+    const triggerEl = this.editable ? b2`
+          <div
+            id="trigger-btn"
+            part="trigger"
+            role="combobox"
+            class=${triggerClasses}
+            aria-expanded=${open}
+            aria-controls="panel"
+            aria-haspopup="listbox"
+          >
+            <input
+              id="editable-input"
+              class="editable-input"
+              type="text"
+              autocomplete="off"
+              .value=${l3(open ? this._filterQuery : label)}
+              placeholder=${this.placeholder}
+              ?disabled=${this.disabled || this.loading}
+              aria-label=${label || this.placeholder}
+              @input=${this._handleEditableInput}
+              @focus=${() => {
       this._focusWithin = true;
+      if (!this._pc.open) this._pc.show();
       emit(this, "uwc-focus");
     }}
-        @blur=${() => {
+              @blur=${() => {
       this._focusWithin = false;
       emit(this, "uwc-blur");
     }}
-      >
-        ${this.multiple && hasValue ? this._renderChips() : b2`<span part="label" class="trigger-label ${!hasValue ? "is-placeholder" : ""}">
-                   ${hasValue ? label : this.placeholder}
-                 </span>`}
-
-        <span class="trigger-actions">
-          ${showClearBtn ? b2`
-            <span
-              part="clear-btn"
-              class="clear-btn"
-              role="button"
-              tabindex="-1"
-              aria-label="Clear"
-              @click=${this._clear}
-            >✕</span>` : A}
-
-          ${this.loading ? b2`<span part="loading-icon" class="loading-icon" aria-hidden="true"></span>` : b2`<svg
-                part="caret"
-                class="caret ${open ? "caret--open" : ""}"
-                width="12" height="12" viewBox="0 0 12 12" fill="none"
-                aria-hidden="true">
-                <path d="M2 4l4 4 4-4"
-                  stroke="currentColor" stroke-width="1.5"
-                  stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>`}
-        </span>
-      </button>
+              @keydown=${(e9) => {
+      if ((e9.key === "ArrowDown" || e9.key === "Enter") && !this._pc.open) {
+        e9.preventDefault();
+        this._pc.show();
+      }
+    }}
+            />
+            ${this._renderTriggerActions(open)}
+          </div>` : b2`
+          <button
+            id="trigger-btn"
+            part="trigger"
+            type="button"
+            class=${triggerClasses}
+            ?disabled=${this.disabled || this.loading}
+            aria-expanded=${open}
+            aria-controls="panel"
+            aria-label=${label || this.placeholder}
+            @focus=${() => {
+      this._focusWithin = true;
+      emit(this, "uwc-focus");
+    }}
+            @blur=${() => {
+      this._focusWithin = false;
+      emit(this, "uwc-blur");
+    }}
+          >
+            ${this.multiple && hasValue ? this._renderChips() : b2`<span part="label" class="trigger-label ${!hasValue ? "is-placeholder" : ""}">
+                       ${hasValue ? label : this.placeholder}
+                     </span>`}
+            ${this._renderTriggerActions(open)}
+          </button>`;
+    const floatLabelEl = this.floatLabel && this.label ? b2`<label
+               class=${e7({
+      "float-label": true,
+      "float-label--active": floatActive
+    })}
+               aria-hidden="true"
+             >${this.label}</label>` : A;
+    const hasSlotHeader = !!this.querySelector('[slot="header"]');
+    const hasSlotFooter = !!this.querySelector('[slot="footer"]');
+    return b2`
+      <div class="dd-root">
+        ${triggerEl}
+        ${floatLabelEl}
+      </div>
 
       <div
         id="panel"
@@ -11207,34 +12646,21 @@ var UwcDropdown = class extends i4 {
         popover="manual"
         class="panel ${open ? "is-open" : ""}"
         data-placement=${this.placement}
-        style="--scroll-height: ${this.scrollHeight}"
         aria-label="Options"
       >
-        ${this.filter ? b2`
-          <div class="filter-wrapper">
-            <span class="filter-icon" aria-hidden="true">🔍</span>
-            <input
-              id="filter-input"
-              part="filter-input"
-              type="text"
-              class="filter-input"
-              placeholder=${this.filterPlaceholder}
-              .value=${l3(this._filterQuery)}
-              autocomplete="off"
-              @input=${this._handleFilterInput}
-              @keydown=${(e9) => {
-      if (["ArrowUp", "ArrowDown"].includes(e9.key)) e9.preventDefault();
-    }}
-            />
-          </div>` : A}
+        ${hasSlotHeader ? b2`<div class="panel-header"><slot name="header"></slot></div>` : A}
 
-        <div class="options-wrapper">
-          ${this._renderOptions()}
+        ${this.filter && !this.editable ? this._renderFilterInput() : A}
+
+        <div class="options-wrapper" style=${!this.virtual ? o7({ maxHeight: `${this.scrollHeight}px` }) : ""}>
+          ${this.virtual ? this._renderOptionsVirtual() : this._renderOptionsStandard()}
         </div>
+
+        ${hasSlotFooter ? b2`<div class="panel-footer"><slot name="footer"></slot></div>` : A}
       </div>`;
   }
 };
-UwcDropdown.styles = [styles_default13];
+UwcDropdown.styles = [styles_default16];
 __decorateClass([
   n4({ type: Array })
 ], UwcDropdown.prototype, "options", 2);
@@ -11281,6 +12707,33 @@ __decorateClass([
   n4({ type: Number, attribute: "max-selected-labels" })
 ], UwcDropdown.prototype, "maxSelectedLabels", 2);
 __decorateClass([
+  n4({ type: Boolean })
+], UwcDropdown.prototype, "virtual", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "item-size" })
+], UwcDropdown.prototype, "itemSize", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], UwcDropdown.prototype, "editable", 2);
+__decorateClass([
+  n4({ type: String })
+], UwcDropdown.prototype, "label", 2);
+__decorateClass([
+  n4({ type: String, attribute: "float-label", reflect: true })
+], UwcDropdown.prototype, "floatLabel", 2);
+__decorateClass([
+  n4({ type: String, reflect: true })
+], UwcDropdown.prototype, "variant", 2);
+__decorateClass([
+  n4({ type: String, reflect: true })
+], UwcDropdown.prototype, "size", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDropdown.prototype, "invalid", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDropdown.prototype, "fluid", 2);
+__decorateClass([
   r5()
 ], UwcDropdown.prototype, "_filterQuery", 2);
 __decorateClass([
@@ -11293,14 +12746,17 @@ __decorateClass([
   e5("#trigger-btn")
 ], UwcDropdown.prototype, "_triggerBtn", 2);
 __decorateClass([
+  e5("#editable-input")
+], UwcDropdown.prototype, "_editableInput", 2);
+__decorateClass([
   e5("#filter-input")
 ], UwcDropdown.prototype, "_filterInput", 2);
 __decorateClass([
   e5("#panel")
 ], UwcDropdown.prototype, "_panel", 2);
 __decorateClass([
-  e5("#options-list")
-], UwcDropdown.prototype, "_optionsList", 2);
+  e5(".options-scroll")
+], UwcDropdown.prototype, "_optionsScroll", 2);
 
 // node_modules/lit-html/directives/unsafe-html.js
 var e8 = class extends i5 {
@@ -11514,7 +12970,7 @@ var UwcIcon = class extends i4 {
     return b2`
       <div 
         class="${containerClass}" 
-        style=${o6(containerStyles)}
+        style=${o7(containerStyles)}
         role="img"
         aria-hidden="true"
         data-source="${this.isLocalIcon ? "local" : "remote"}"
@@ -11581,7 +13037,7 @@ __decorateClass([
 ], UwcIcon.prototype, "isLocalIcon", 2);
 
 // src/inputtext/styles.ts
-var styles_default14 = [
+var styles_default17 = [
   hostReset,
   i`
     :host {
@@ -11593,7 +13049,7 @@ var styles_default14 = [
     /* ── Wrapper ────────────────────────────────────────────────────────────── */
     .uwc-input {
       --_bg:        var(--uwc-input-bg,                ${surface});
-      --_border:    var(--uwc-input-border,            1px solid #d1d5db);
+      --_border:    var(--uwc-input-border,            1px solid ${borderControl});
       --_radius:    var(--uwc-input-radius,            ${radiusMd});
       --_color:     var(--uwc-input-color,             ${text});
       --_ph-color:  var(--uwc-input-placeholder-color, ${textMuted});
@@ -11672,6 +13128,117 @@ var styles_default14 = [
     /* Shrink native input padding when slot is present */
     :host([has-prefix]) input { padding-inline-start: var(--_icon-gap); }
     :host([has-suffix]) input { padding-inline-end:   var(--_icon-gap); }
+
+    /* ── Float label ─────────────────────────────────────────────────────────── */
+
+    /* Shared wrapper positioning context */
+    .uwc-input--float { position: relative; }
+
+    /* Shared label base — each variant overrides top / transform / background */
+    .uwc-input__label {
+      position:       absolute;
+      left:           calc(var(--_px) + 0.125rem);
+      line-height:    1;
+      white-space:    nowrap;
+      pointer-events: none;
+      padding-inline: 0.25rem;
+      transition:
+        top       ${durationBase} ${easingStandard},
+        font-size ${durationBase} ${easingStandard},
+        color     ${durationBase} ${easingStandard},
+        transform ${durationBase} ${easingStandard};
+    }
+
+    /* ── "over" (default): label floats fully ABOVE the input with gap ─── */
+    /* translateY(calc(-100% - 0.375rem)) lifts the label so its bottom edge
+       sits 0.375 rem above the top border, giving clear breathing room.      */
+    .uwc-input--float-over {
+      overflow:   visible;
+      margin-top: 1.5rem;   /* layout space for the label above the border */
+    }
+    .uwc-input--float-over .uwc-input__label {
+      top:        50%;
+      transform:  translateY(-50%);
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: transparent;
+    }
+    .uwc-input--float-over:focus-within .uwc-input__label,
+    .uwc-input--float-over input:not(:placeholder-shown) ~ .uwc-input__label {
+      top:       0;
+      transform: translateY(calc(-100% - 0.375rem));   /* gap above the border */
+      font-size: calc(var(--_font-size) * 0.85);
+      color:     var(--uwc-input-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+
+    /* ── "on": label sits ON (straddles) the upper border ───────────── */
+    /* top:0 + translateY(-50%) centres the label on the top border line.
+       overflow:visible + margin-top expose the half that protrudes above. */
+    .uwc-input--float-on {
+      overflow:   visible;
+      margin-top: 0.75rem;
+    }
+    .uwc-input--float-on .uwc-input__label {
+      top:        50%;
+      transform:  translateY(-50%);
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: var(--_bg);   /* masks the border line beneath the label */
+    }
+    .uwc-input--float-on:focus-within .uwc-input__label,
+    .uwc-input--float-on input:not(:placeholder-shown) ~ .uwc-input__label {
+      top:       0;
+      transform: translateY(-50%);   /* stays centred on top border */
+      font-size: calc(var(--_font-size) * 0.8);
+      color:     var(--uwc-input-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+    .uwc-input--float-on.uwc-input--filled .uwc-input__label {
+      background: var(--uwc-input-filled-bg, ${surfaceRaised});
+    }
+
+    /* ── "in": label floats to the interior top, never leaves the border ─ */
+    /* Extra input padding creates room so the small label and input text
+       never overlap. The label at rest centres in the lower text area.      */
+    .uwc-input--float-in input {
+      padding-top:    1.375rem;
+      padding-bottom: 0.3125rem;
+    }
+    .uwc-input--float-in .uwc-input__label {
+      top:            50%;
+      transform:      translateY(-50%);
+      font-size:      var(--_font-size);
+      color:          var(--_ph-color);
+      background:     transparent;
+      left:           var(--_px);   /* align with input text start */
+      padding-inline: 0;            /* no border-masking needed inside */
+    }
+    .uwc-input--float-in:focus-within .uwc-input__label,
+    .uwc-input--float-in input:not(:placeholder-shown) ~ .uwc-input__label {
+      top:            0.3125rem;   /* clearly inside, below the border */
+      transform:      none;
+      font-size:      calc(var(--_font-size) * 0.75);
+      color:          var(--uwc-input-label-active-color, var(--uwc-color-primary, ${primary}));
+      left:           var(--_px);
+      padding-inline: 0;
+    }
+
+    /* ── Invalid label color (all variants) ─────────────────────────────── */
+    .uwc-input--invalid .uwc-input__label,
+    .uwc-input--invalid:focus-within .uwc-input__label,
+    .uwc-input--invalid input:not(:placeholder-shown) ~ .uwc-input__label {
+      color: var(--uwc-color-danger, ${danger});
+    }
+
+    /* ── Prefix offset ───────────────────────────────────────────────────── */
+    :host([has-prefix]) .uwc-input__label {
+      left: calc(var(--_px) + var(--_icon-gap) + 1.25rem);
+    }
+    /* "in" variant: label aligns with input text, adjust for prefix */
+    :host([has-prefix]) .uwc-input--float-in .uwc-input__label,
+    :host([has-prefix]) .uwc-input--float-in:focus-within .uwc-input__label,
+    :host([has-prefix]) .uwc-input--float-in input:not(:placeholder-shown) ~ .uwc-input__label {
+      left: calc(var(--_icon-gap) + 1.25rem);
+    }
   `
 ];
 
@@ -11683,6 +13250,7 @@ var UwcInputText = class extends i4 {
     this.type = "text";
     this.variant = "outlined";
     this.size = "medium";
+    this.floatLabel = "over";
     this.disabled = false;
     this.readonly = false;
     this.invalid = false;
@@ -11723,13 +13291,17 @@ var UwcInputText = class extends i4 {
   }
   // ── Render ────────────────────────────────────────────────────────
   render() {
+    const floatMode = !!this.label;
     const classes = e7({
       "uwc-input": true,
       [`uwc-input--${this.variant}`]: true,
       [`uwc-input--${this.size}`]: this.size !== "medium",
       "uwc-input--invalid": this.invalid,
-      "uwc-input--disabled": this.disabled
+      "uwc-input--disabled": this.disabled,
+      "uwc-input--float": floatMode,
+      [`uwc-input--float-${this.floatLabel}`]: floatMode
     });
+    const placeholder = floatMode ? this.placeholder ?? " " : this.placeholder;
     return b2`
       <div part="wrapper" class=${classes}>
         ${this._hasPrefix ? b2`<span class="uwc-input__prefix"><slot name="prefix"></slot></span>` : A}
@@ -11737,10 +13309,10 @@ var UwcInputText = class extends i4 {
           part="input"
           type=${this.type}
           .value=${this.value}
-          placeholder=${o7(this.placeholder)}
-          name=${o7(this.name)}
-          autocomplete=${o7(this.autocomplete)}
-          maxlength=${o7(this.maxlength)}
+          placeholder=${o6(placeholder)}
+          name=${o6(this.name)}
+          autocomplete=${o6(this.autocomplete)}
+          maxlength=${o6(this.maxlength)}
           ?disabled=${this.disabled}
           ?readonly=${this.readonly}
           @input=${this._onInput}
@@ -11748,12 +13320,13 @@ var UwcInputText = class extends i4 {
           @focus=${() => this.dispatchEvent(new CustomEvent("uwc-focus", { bubbles: true, composed: true }))}
           @blur=${() => this.dispatchEvent(new CustomEvent("uwc-blur", { bubbles: true, composed: true }))}
         />
+        ${floatMode ? b2`<label class="uwc-input__label" part="label">${this.label}</label>` : A}
         ${this._hasSuffix ? b2`<span class="uwc-input__suffix"><slot name="suffix"></slot></span>` : A}
       </div>
     `;
   }
 };
-UwcInputText.styles = [styles_default14];
+UwcInputText.styles = [styles_default17];
 __decorateClass([
   n4()
 ], UwcInputText.prototype, "value", 2);
@@ -11779,6 +13352,12 @@ __decorateClass([
   n4({ reflect: true })
 ], UwcInputText.prototype, "size", 2);
 __decorateClass([
+  n4()
+], UwcInputText.prototype, "label", 2);
+__decorateClass([
+  n4({ attribute: "float-label", reflect: true })
+], UwcInputText.prototype, "floatLabel", 2);
+__decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcInputText.prototype, "disabled", 2);
 __decorateClass([
@@ -11798,7 +13377,7 @@ __decorateClass([
 ], UwcInputText.prototype, "_hasSuffix", 2);
 
 // src/listbox/styles.ts
-var styles_default15 = [
+var styles_default18 = [
   hostReset,
   i`
     :host {
@@ -11810,7 +13389,7 @@ var styles_default15 = [
     /* ── Container ──────────────────────────────────────────────────────────── */
     .uwc-lb {
       --_radius:      var(--uwc-listbox-radius,     ${radiusMd});
-      --_border:      var(--uwc-listbox-border,     1px solid #d1d5db);
+      --_border:      var(--uwc-listbox-border,     1px solid ${borderControl});
       --_bg:          var(--uwc-listbox-bg,         ${surface});
       --_item-height: var(--uwc-listbox-item-height,2.5rem);
       --_font-size:   var(--uwc-listbox-font-size,  ${fontSizeMd});
@@ -11831,7 +13410,7 @@ var styles_default15 = [
       display: flex;
       align-items: center;
       padding: 0.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid ${borderSubtle};
       gap: 0.375rem;
     }
     .uwc-lb__filter-input {
@@ -11842,7 +13421,7 @@ var styles_default15 = [
       font-family: inherit;
       color: ${text};
       background: transparent;
-      border: 1px solid #d1d5db;
+      border: 1px solid ${borderControl};
       border-radius: ${radiusSm};
       outline: none;
       transition: border-color ${durationBase}, box-shadow ${durationBase};
@@ -11862,7 +13441,7 @@ var styles_default15 = [
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid ${borderSubtle};
       font-weight: ${fontWeightSemibold};
       font-size: ${fontSizeSm};
       color: ${textSecondary};
@@ -11941,7 +13520,7 @@ var styles_default15 = [
       width: 1rem;
       height: 1rem;
       flex-shrink: 0;
-      border: 1px solid #d1d5db;
+      border: 1px solid ${borderControl};
       border-radius: ${radiusXs};
       display: flex;
       align-items: center;
@@ -12092,7 +13671,7 @@ var UwcListbox = class extends i4 {
     `;
   }
 };
-UwcListbox.styles = [styles_default15];
+UwcListbox.styles = [styles_default18];
 __decorateClass([
   n4({ type: Array })
 ], UwcListbox.prototype, "options", 2);
@@ -12134,7 +13713,7 @@ __decorateClass([
 ], UwcListbox.prototype, "_focusedIdx", 2);
 
 // src/menu/styles.ts
-var styles_default16 = [
+var styles_default19 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-menu-duration", durationDefault: "140ms" }),
   placementOrigins,
@@ -12415,7 +13994,7 @@ var UwcMenu = class extends i4 {
       "item--focused": isFocused,
       "item--danger": !!item.danger
     })}
-        style=${item.style ? o6(item.style) : ""}
+        style=${item.style ? o7(item.style) : ""}
         data-menu-index=${idx}
         role="none"
         @mouseenter=${() => this._handleItemMouseEnter(idx, item)}
@@ -12536,7 +14115,7 @@ var UwcMenu = class extends i4 {
       </div>`;
   }
 };
-UwcMenu.styles = [styles_default16];
+UwcMenu.styles = [styles_default19];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcMenu.prototype, "triggerId", 2);
@@ -12560,7 +14139,7 @@ __decorateClass([
 ], UwcMenu.prototype, "_focusedIndex", 2);
 
 // src/overlay/styles.ts
-var styles_default17 = [
+var styles_default20 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-overlay-duration", durationDefault: "160ms" }),
   placementOriginsExtended,
@@ -12693,7 +14272,7 @@ var UwcOverlay = class extends i4 {
       </div>`;
   }
 };
-UwcOverlay.styles = [styles_default17];
+UwcOverlay.styles = [styles_default20];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcOverlay.prototype, "triggerId", 2);
@@ -12720,7 +14299,7 @@ __decorateClass([
 ], UwcOverlay.prototype, "_backdrop", 2);
 
 // src/paginator/styles.ts
-var styles_default18 = [
+var styles_default21 = [
   hostReset,
   i`
     :host {
@@ -12801,7 +14380,7 @@ var styles_default18 = [
     }
     .uwc-pg__page--active {
       --_bg:    var(--uwc-paginator-active-bg,    var(--uwc-color-primary, ${primary}));
-      --_color: var(--uwc-paginator-active-color, #fff);
+      --_color: var(--uwc-paginator-active-color, ${colorWhite});
       border-color: var(--uwc-paginator-active-bg, var(--uwc-color-primary, ${primary}));
     }
     .uwc-pg__page--active:hover:not(:disabled) {
@@ -12837,7 +14416,7 @@ var styles_default18 = [
       height:        2.25rem;
       padding-inline: 0.5rem 1.5rem;
       padding-block: 0;
-      border:        1px solid rgba(0,0,0,0.15);
+      border:        1px solid ${borderControl};
       border-radius: var(--uwc-paginator-btn-radius, ${radiusMd});
       background:    ${surface} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 0.375rem center;
       color:         ${text};
@@ -12876,7 +14455,7 @@ var styles_default18 = [
       width:         3.5rem;
       height:        2.25rem;
       padding-inline: 0.5rem;
-      border:        1px solid rgba(0,0,0,0.15);
+      border:        1px solid ${borderControl};
       border-radius: var(--uwc-paginator-btn-radius, ${radiusMd});
       background:    ${surface};
       color:         ${text};
@@ -12897,7 +14476,7 @@ var styles_default18 = [
       height:        2.25rem;
       padding-inline: 0.5rem 1.5rem;
       padding-block: 0;
-      border:        1px solid rgba(0,0,0,0.15);
+      border:        1px solid ${borderControl};
       border-radius: var(--uwc-paginator-btn-radius, ${radiusMd});
       background:    ${surface} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 0.375rem center;
       color:         ${text};
@@ -13182,7 +14761,7 @@ var UwcPaginator = class extends i4 {
     return this.currentPageReportTemplate.replace("{currentPage}", String(cur + 1)).replace("{totalPages}", String(pc)).replace("{first}", String(first)).replace("{last}", String(last)).replace("{totalRecords}", String(this.totalRecords));
   }
 };
-UwcPaginator.styles = styles_default18;
+UwcPaginator.styles = styles_default21;
 __decorateClass([
   n4({ type: Number, reflect: true })
 ], UwcPaginator.prototype, "first", 2);
@@ -13227,7 +14806,7 @@ __decorateClass([
 ], UwcPaginator.prototype, "_jumpValue", 2);
 
 // src/popover/styles.ts
-var styles_default19 = [
+var styles_default22 = [
   hostReset,
   floatingPanel(".panel", { durationVar: "--uwc-popover-duration", durationDefault: "160ms" }),
   placementOrigins,
@@ -13425,7 +15004,7 @@ var UwcPopover = class extends i4 {
       </div>`;
   }
 };
-UwcPopover.styles = [styles_default19];
+UwcPopover.styles = [styles_default22];
 __decorateClass([
   n4({ type: String, attribute: "trigger-id" })
 ], UwcPopover.prototype, "triggerId", 2);
@@ -13458,7 +15037,7 @@ __decorateClass([
 ], UwcPopover.prototype, "_arrow", 2);
 
 // src/radiobutton/styles.ts
-var styles_default20 = [
+var styles_default23 = [
   hostReset,
   i`
     :host {
@@ -13479,7 +15058,7 @@ var styles_default20 = [
     .uwc-rb {
       --_size:        var(--uwc-radio-size,   1.125rem);
       --_dot-size:    calc(var(--_size) * 0.45);
-      --_border:      var(--uwc-radio-border, 1px solid #d1d5db);
+      --_border:      var(--uwc-radio-border, 1px solid ${borderControl});
       --_bg:          var(--uwc-radio-bg,     ${surface});
       --_color:       var(--uwc-radio-color,  var(--uwc-color-primary, ${primary}));
 
@@ -13586,8 +15165,8 @@ var UwcRadioButton = class extends i4 {
           <input
             type="radio"
             .checked=${this.checked}
-            value=${o7(this.value)}
-            name=${o7(this.name)}
+            value=${o6(this.value)}
+            name=${o6(this.name)}
             ?disabled=${this.disabled}
             @change=${this._onChange}
           />
@@ -13598,7 +15177,7 @@ var UwcRadioButton = class extends i4 {
     `;
   }
 };
-UwcRadioButton.styles = [styles_default20];
+UwcRadioButton.styles = [styles_default23];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcRadioButton.prototype, "checked", 2);
@@ -13622,7 +15201,7 @@ __decorateClass([
 ], UwcRadioButton.prototype, "variant", 2);
 
 // src/togglebutton/styles.ts
-var styles_default21 = [
+var styles_default24 = [
   hostReset,
   i`
     :host {
@@ -13633,7 +15212,7 @@ var styles_default21 = [
     /* ── Button ─────────────────────────────────────────────────────────────── */
     .uwc-tb {
       --_bg:        var(--uwc-togglebtn-bg,         ${surface});
-      --_border:    var(--uwc-togglebtn-border,      1px solid #d1d5db);
+      --_border:    var(--uwc-togglebtn-border,      1px solid ${borderControl});
       --_color:     var(--uwc-togglebtn-color,       ${text});
       --_radius:    var(--uwc-togglebtn-radius,      ${radiusMd});
       --_font-size: var(--uwc-togglebtn-font-size,   ${fontSizeMd});
@@ -13641,7 +15220,7 @@ var styles_default21 = [
       --_py:        var(--uwc-togglebtn-padding-y,   0.5rem);
       --_gap:       var(--uwc-togglebtn-gap,         0.375rem);
       --_active-bg: var(--uwc-togglebtn-active-bg,   var(--uwc-color-primary, ${primary}));
-      --_active-color: var(--uwc-togglebtn-active-color, #fff);
+      --_active-color: var(--uwc-togglebtn-active-color, ${colorWhite});
 
       position: relative;
       overflow: hidden;
@@ -13785,7 +15364,7 @@ var UwcToggleButton = class extends i4 {
         <input
           type="checkbox"
           .checked=${this.checked}
-          name=${o7(this.name)}
+          name=${o6(this.name)}
           ?disabled=${this.disabled}
           @change=${this._onChange}
         />
@@ -13795,7 +15374,7 @@ var UwcToggleButton = class extends i4 {
     `;
   }
 };
-UwcToggleButton.styles = [styles_default21];
+UwcToggleButton.styles = [styles_default24];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleButton.prototype, "checked", 2);
@@ -13825,7 +15404,7 @@ __decorateClass([
 ], UwcToggleButton.prototype, "disabled", 2);
 
 // src/toggleswitch/styles.ts
-var styles_default22 = [
+var styles_default25 = [
   hostReset,
   i`
     :host {
@@ -13846,7 +15425,7 @@ var styles_default22 = [
       --_width:    var(--uwc-switch-width,    2.75rem);
       --_height:   var(--uwc-switch-height,   1.5rem);
       --_radius:   var(--uwc-switch-radius,   ${radiusFull});
-      --_bg-off:   var(--uwc-switch-bg-off,   #d1d5db);
+      --_bg-off:   var(--uwc-switch-bg-off,   ${borderControl});
       --_bg-on:    var(--uwc-switch-bg-on,    var(--uwc-color-primary, ${primary}));
       --_color:    var(--uwc-switch-color,    var(--uwc-color-primary, ${primary}));
       --_dot-size: calc(var(--_height) - 0.25rem);
@@ -13888,7 +15467,7 @@ var styles_default22 = [
       width:         var(--_dot-size);
       height:        var(--_dot-size);
       border-radius: 50%;
-      background:    #fff;
+      background:    ${colorWhite};
       box-shadow:    0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.12);
       transition:    transform ${durationBase} ${easingStandard};
       pointer-events: none;
@@ -13949,7 +15528,7 @@ var UwcToggleSwitch = class extends i4 {
           <input
             type="checkbox"
             .checked=${this.checked}
-            name=${o7(this.name)}
+            name=${o6(this.name)}
             ?disabled=${this.disabled}
             @change=${this._onChange}
           />
@@ -13960,7 +15539,7 @@ var UwcToggleSwitch = class extends i4 {
     `;
   }
 };
-UwcToggleSwitch.styles = [styles_default22];
+UwcToggleSwitch.styles = [styles_default25];
 __decorateClass([
   n4({ type: Boolean, reflect: true })
 ], UwcToggleSwitch.prototype, "checked", 2);
@@ -13981,7 +15560,7 @@ __decorateClass([
 ], UwcToggleSwitch.prototype, "invalid", 2);
 
 // src/tooltip/styles.ts
-var styles_default23 = [
+var styles_default26 = [
   hostReset,
   floatingPanel(".panel", {
     scaleFrom: "scale(0.93)",
@@ -14201,7 +15780,7 @@ var UwcTooltip = class extends i4 {
       </div>`;
   }
 };
-UwcTooltip.styles = [styles_default23];
+UwcTooltip.styles = [styles_default26];
 __decorateClass([
   n4({ type: String })
 ], UwcTooltip.prototype, "triggerId", 2);
@@ -14240,6 +15819,9 @@ __decorateClass([
 ], UwcTooltip.prototype, "_arrow", 2);
 
 // src/index.ts
+customElements.define("uwc-rating", UwcRating);
+customElements.define("uwc-textarea", UwcTextarea);
+customElements.define("uwc-virtualscroller", UwcVirtualScroller);
 customElements.define("uwc-stepper", UwcStepper);
 customElements.define("uwc-stepper-panel", UwcStepperPanel);
 customElements.define("uwc-panel", UwcPanel);
@@ -14318,8 +15900,8 @@ lit-html/is-server.js:
    *)
 
 lit-html/directives/class-map.js:
-lit-html/directives/style-map.js:
 lit-html/directives/if-defined.js:
+lit-html/directives/style-map.js:
   (**
    * @license
    * Copyright 2018 Google LLC

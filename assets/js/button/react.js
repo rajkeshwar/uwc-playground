@@ -654,12 +654,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -740,7 +742,7 @@ var styles_default = [
     /* ── Base button ────────────────────────────────────────────────────────── */
     .uwc-btn {
       --_bg:         var(--uwc-btn-bg,        var(--uwc-color-primary,  ${primary}));
-      --_color:      var(--uwc-btn-color,     #fff);
+      --_color:      var(--uwc-btn-color,     ${colorWhite});
       --_border:     var(--uwc-btn-border,    transparent);
       --_radius:     var(--uwc-btn-radius,    var(--uwc-radius-md,     ${radiusMd}));
       --_shadow:     var(--uwc-btn-shadow,    none);
@@ -796,7 +798,7 @@ var styles_default = [
     .uwc-btn--warning   { --_bg: var(--uwc-color-warning,   ${warning}); --_color: var(--uwc-btn-warning-color, ${contrast}); }
     .uwc-btn--help      { --_bg: var(--uwc-color-help,      ${help});    }
     .uwc-btn--danger    { --_bg: var(--uwc-color-danger,    ${danger});  }
-    .uwc-btn--contrast  { --_bg: var(--uwc-color-contrast,  ${contrast}); --_color: #fff; }
+    .uwc-btn--contrast  { --_bg: var(--uwc-color-contrast,  ${contrast}); --_color: ${colorWhite}; }
 
     /* ── Sizes ──────────────────────────────────────────────────────────────── */
     .uwc-btn--small { --_font-size: var(--uwc-font-size-xs, ${fontSizeXs}); --_px: 0.625rem;  --_py: 0.3125rem; }
@@ -841,7 +843,7 @@ var styles_default = [
     /* ── Badge ──────────────────────────────────────────────────────────────── */
     .uwc-btn__badge {
       --_badge-bg:    var(--uwc-btn-badge-bg,    var(--uwc-color-danger, ${danger}));
-      --_badge-color: var(--uwc-btn-badge-color, #fff);
+      --_badge-color: var(--uwc-btn-badge-color, ${colorWhite});
       display: inline-flex;
       align-items: center;
       justify-content: center;

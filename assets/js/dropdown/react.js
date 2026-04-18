@@ -2,8 +2,8 @@ var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __decorateClass = (decorators, target, key, kind) => {
   var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
-  for (var i7 = decorators.length - 1, decorator; i7 >= 0; i7--)
-    if (decorator = decorators[i7])
+  for (var i8 = decorators.length - 1, decorator; i8 >= 0; i8--)
+    if (decorator = decorators[i8])
       result = (kind ? decorator(target, key, result) : decorator(result)) || result;
   if (kind && result) __defProp(target, key, result);
   return result;
@@ -19,8 +19,8 @@ var e = t.ShadowRoot && (void 0 === t.ShadyCSS || t.ShadyCSS.nativeShadow) && "a
 var s = /* @__PURE__ */ Symbol();
 var o = /* @__PURE__ */ new WeakMap();
 var n = class {
-  constructor(t5, e8, o6) {
-    if (this._$cssResult$ = true, o6 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+  constructor(t5, e8, o7) {
+    if (this._$cssResult$ = true, o7 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t5, this.t = e8;
   }
   get styleSheet() {
@@ -38,18 +38,18 @@ var n = class {
 };
 var r = (t5) => new n("string" == typeof t5 ? t5 : t5 + "", void 0, s);
 var i = (t5, ...e8) => {
-  const o6 = 1 === t5.length ? t5[0] : e8.reduce((e9, s5, o7) => e9 + ((t6) => {
+  const o7 = 1 === t5.length ? t5[0] : e8.reduce((e9, s5, o8) => e9 + ((t6) => {
     if (true === t6._$cssResult$) return t6.cssText;
     if ("number" == typeof t6) return t6;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + t6 + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(s5) + t5[o7 + 1], t5[0]);
-  return new n(o6, t5, s);
+  })(s5) + t5[o8 + 1], t5[0]);
+  return new n(o7, t5, s);
 };
-var S = (s5, o6) => {
-  if (e) s5.adoptedStyleSheets = o6.map((t5) => t5 instanceof CSSStyleSheet ? t5 : t5.styleSheet);
-  else for (const e8 of o6) {
-    const o7 = document.createElement("style"), n5 = t.litNonce;
-    void 0 !== n5 && o7.setAttribute("nonce", n5), o7.textContent = e8.cssText, s5.appendChild(o7);
+var S = (s5, o7) => {
+  if (e) s5.adoptedStyleSheets = o7.map((t5) => t5 instanceof CSSStyleSheet ? t5 : t5.styleSheet);
+  else for (const e8 of o7) {
+    const o8 = document.createElement("style"), n6 = t.litNonce;
+    void 0 !== n6 && o8.setAttribute("nonce", n6), o8.textContent = e8.cssText, s5.appendChild(o8);
   }
 };
 var c = e ? (t5) => t5 : (t5) => t5 instanceof CSSStyleSheet ? ((t6) => {
@@ -76,23 +76,23 @@ var u = { toAttribute(t5, s5) {
   }
   return t5;
 }, fromAttribute(t5, s5) {
-  let i7 = t5;
+  let i8 = t5;
   switch (s5) {
     case Boolean:
-      i7 = null !== t5;
+      i8 = null !== t5;
       break;
     case Number:
-      i7 = null === t5 ? null : Number(t5);
+      i8 = null === t5 ? null : Number(t5);
       break;
     case Object:
     case Array:
       try {
-        i7 = JSON.parse(t5);
+        i8 = JSON.parse(t5);
       } catch (t6) {
-        i7 = null;
+        i8 = null;
       }
   }
-  return i7;
+  return i8;
 } };
 var f = (t5, s5) => !i2(t5, s5);
 var b = { attribute: true, type: String, converter: u, reflect: false, useDefault: false, hasChanged: f };
@@ -106,11 +106,11 @@ var y = class extends HTMLElement {
   }
   static createProperty(t5, s5 = b) {
     if (s5.state && (s5.attribute = false), this._$Ei(), this.prototype.hasOwnProperty(t5) && ((s5 = Object.create(s5)).wrapped = true), this.elementProperties.set(t5, s5), !s5.noAccessor) {
-      const i7 = /* @__PURE__ */ Symbol(), h4 = this.getPropertyDescriptor(t5, i7, s5);
+      const i8 = /* @__PURE__ */ Symbol(), h4 = this.getPropertyDescriptor(t5, i8, s5);
       void 0 !== h4 && e2(this.prototype, t5, h4);
     }
   }
-  static getPropertyDescriptor(t5, s5, i7) {
+  static getPropertyDescriptor(t5, s5, i8) {
     const { get: e8, set: r7 } = h(this.prototype, t5) ?? { get() {
       return this[s5];
     }, set(t6) {
@@ -118,7 +118,7 @@ var y = class extends HTMLElement {
     } };
     return { get: e8, set(s6) {
       const h4 = e8?.call(this);
-      r7?.call(this, s6), this.requestUpdate(t5, h4, i7);
+      r7?.call(this, s6), this.requestUpdate(t5, h4, i8);
     }, configurable: true, enumerable: true };
   }
   static getPropertyOptions(t5) {
@@ -133,31 +133,31 @@ var y = class extends HTMLElement {
     if (this.hasOwnProperty(d("finalized"))) return;
     if (this.finalized = true, this._$Ei(), this.hasOwnProperty(d("properties"))) {
       const t6 = this.properties, s5 = [...r2(t6), ...o2(t6)];
-      for (const i7 of s5) this.createProperty(i7, t6[i7]);
+      for (const i8 of s5) this.createProperty(i8, t6[i8]);
     }
     const t5 = this[Symbol.metadata];
     if (null !== t5) {
       const s5 = litPropertyMetadata.get(t5);
-      if (void 0 !== s5) for (const [t6, i7] of s5) this.elementProperties.set(t6, i7);
+      if (void 0 !== s5) for (const [t6, i8] of s5) this.elementProperties.set(t6, i8);
     }
     this._$Eh = /* @__PURE__ */ new Map();
     for (const [t6, s5] of this.elementProperties) {
-      const i7 = this._$Eu(t6, s5);
-      void 0 !== i7 && this._$Eh.set(i7, t6);
+      const i8 = this._$Eu(t6, s5);
+      void 0 !== i8 && this._$Eh.set(i8, t6);
     }
     this.elementStyles = this.finalizeStyles(this.styles);
   }
   static finalizeStyles(s5) {
-    const i7 = [];
+    const i8 = [];
     if (Array.isArray(s5)) {
       const e8 = new Set(s5.flat(1 / 0).reverse());
-      for (const s6 of e8) i7.unshift(c(s6));
-    } else void 0 !== s5 && i7.push(c(s5));
-    return i7;
+      for (const s6 of e8) i8.unshift(c(s6));
+    } else void 0 !== s5 && i8.push(c(s5));
+    return i8;
   }
   static _$Eu(t5, s5) {
-    const i7 = s5.attribute;
-    return false === i7 ? void 0 : "string" == typeof i7 ? i7 : "string" == typeof t5 ? t5.toLowerCase() : void 0;
+    const i8 = s5.attribute;
+    return false === i8 ? void 0 : "string" == typeof i8 ? i8 : "string" == typeof t5 ? t5.toLowerCase() : void 0;
   }
   constructor() {
     super(), this._$Ep = void 0, this.isUpdatePending = false, this.hasUpdated = false, this._$Em = null, this._$Ev();
@@ -173,7 +173,7 @@ var y = class extends HTMLElement {
   }
   _$E_() {
     const t5 = /* @__PURE__ */ new Map(), s5 = this.constructor.elementProperties;
-    for (const i7 of s5.keys()) this.hasOwnProperty(i7) && (t5.set(i7, this[i7]), delete this[i7]);
+    for (const i8 of s5.keys()) this.hasOwnProperty(i8) && (t5.set(i8, this[i8]), delete this[i8]);
     t5.size > 0 && (this._$Ep = t5);
   }
   createRenderRoot() {
@@ -188,35 +188,35 @@ var y = class extends HTMLElement {
   disconnectedCallback() {
     this._$EO?.forEach((t5) => t5.hostDisconnected?.());
   }
-  attributeChangedCallback(t5, s5, i7) {
-    this._$AK(t5, i7);
+  attributeChangedCallback(t5, s5, i8) {
+    this._$AK(t5, i8);
   }
   _$ET(t5, s5) {
-    const i7 = this.constructor.elementProperties.get(t5), e8 = this.constructor._$Eu(t5, i7);
-    if (void 0 !== e8 && true === i7.reflect) {
-      const h4 = (void 0 !== i7.converter?.toAttribute ? i7.converter : u).toAttribute(s5, i7.type);
+    const i8 = this.constructor.elementProperties.get(t5), e8 = this.constructor._$Eu(t5, i8);
+    if (void 0 !== e8 && true === i8.reflect) {
+      const h4 = (void 0 !== i8.converter?.toAttribute ? i8.converter : u).toAttribute(s5, i8.type);
       this._$Em = t5, null == h4 ? this.removeAttribute(e8) : this.setAttribute(e8, h4), this._$Em = null;
     }
   }
   _$AK(t5, s5) {
-    const i7 = this.constructor, e8 = i7._$Eh.get(t5);
+    const i8 = this.constructor, e8 = i8._$Eh.get(t5);
     if (void 0 !== e8 && this._$Em !== e8) {
-      const t6 = i7.getPropertyOptions(e8), h4 = "function" == typeof t6.converter ? { fromAttribute: t6.converter } : void 0 !== t6.converter?.fromAttribute ? t6.converter : u;
+      const t6 = i8.getPropertyOptions(e8), h4 = "function" == typeof t6.converter ? { fromAttribute: t6.converter } : void 0 !== t6.converter?.fromAttribute ? t6.converter : u;
       this._$Em = e8;
       const r7 = h4.fromAttribute(s5, t6.type);
       this[e8] = r7 ?? this._$Ej?.get(e8) ?? r7, this._$Em = null;
     }
   }
-  requestUpdate(t5, s5, i7, e8 = false, h4) {
+  requestUpdate(t5, s5, i8, e8 = false, h4) {
     if (void 0 !== t5) {
       const r7 = this.constructor;
-      if (false === e8 && (h4 = this[t5]), i7 ?? (i7 = r7.getPropertyOptions(t5)), !((i7.hasChanged ?? f)(h4, s5) || i7.useDefault && i7.reflect && h4 === this._$Ej?.get(t5) && !this.hasAttribute(r7._$Eu(t5, i7)))) return;
-      this.C(t5, s5, i7);
+      if (false === e8 && (h4 = this[t5]), i8 ?? (i8 = r7.getPropertyOptions(t5)), !((i8.hasChanged ?? f)(h4, s5) || i8.useDefault && i8.reflect && h4 === this._$Ej?.get(t5) && !this.hasAttribute(r7._$Eu(t5, i8)))) return;
+      this.C(t5, s5, i8);
     }
     false === this.isUpdatePending && (this._$ES = this._$EP());
   }
-  C(t5, s5, { useDefault: i7, reflect: e8, wrapped: h4 }, r7) {
-    i7 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t5) && (this._$Ej.set(t5, r7 ?? s5 ?? this[t5]), true !== h4 || void 0 !== r7) || (this._$AL.has(t5) || (this.hasUpdated || i7 || (s5 = void 0), this._$AL.set(t5, s5)), true === e8 && this._$Em !== t5 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t5));
+  C(t5, s5, { useDefault: i8, reflect: e8, wrapped: h4 }, r7) {
+    i8 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t5) && (this._$Ej.set(t5, r7 ?? s5 ?? this[t5]), true !== h4 || void 0 !== r7) || (this._$AL.has(t5) || (this.hasUpdated || i8 || (s5 = void 0), this._$AL.set(t5, s5)), true === e8 && this._$Em !== t5 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t5));
   }
   async _$EP() {
     this.isUpdatePending = true;
@@ -239,9 +239,9 @@ var y = class extends HTMLElement {
         this._$Ep = void 0;
       }
       const t6 = this.constructor.elementProperties;
-      if (t6.size > 0) for (const [s6, i7] of t6) {
-        const { wrapped: t7 } = i7, e8 = this[s6];
-        true !== t7 || this._$AL.has(s6) || void 0 === e8 || this.C(s6, void 0, i7, e8);
+      if (t6.size > 0) for (const [s6, i8] of t6) {
+        const { wrapped: t7 } = i8, e8 = this[s6];
+        true !== t7 || this._$AL.has(s6) || void 0 === e8 || this.C(s6, void 0, i8, e8);
       }
     }
     let t5 = false;
@@ -303,7 +303,7 @@ var p2 = RegExp(`>|${f2}(?:([^\\s"'>=/]+)(${f2}*=${f2}*(?:[^
 var g = /'/g;
 var $ = /"/g;
 var y2 = /^(?:script|style|textarea|title)$/i;
-var x = (t5) => (i7, ...s5) => ({ _$litType$: t5, strings: i7, values: s5 });
+var x = (t5) => (i8, ...s5) => ({ _$litType$: t5, strings: i8, values: s5 });
 var b2 = x(1);
 var w = x(2);
 var T = x(3);
@@ -311,44 +311,44 @@ var E = /* @__PURE__ */ Symbol.for("lit-noChange");
 var A = /* @__PURE__ */ Symbol.for("lit-nothing");
 var C = /* @__PURE__ */ new WeakMap();
 var P = l2.createTreeWalker(l2, 129);
-function V(t5, i7) {
+function V(t5, i8) {
   if (!u2(t5) || !t5.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return void 0 !== e3 ? e3.createHTML(i7) : i7;
+  return void 0 !== e3 ? e3.createHTML(i8) : i8;
 }
-var N = (t5, i7) => {
+var N = (t5, i8) => {
   const s5 = t5.length - 1, e8 = [];
-  let n5, l4 = 2 === i7 ? "<svg>" : 3 === i7 ? "<math>" : "", c5 = v;
-  for (let i8 = 0; i8 < s5; i8++) {
-    const s6 = t5[i8];
+  let n6, l4 = 2 === i8 ? "<svg>" : 3 === i8 ? "<math>" : "", c5 = v;
+  for (let i9 = 0; i9 < s5; i9++) {
+    const s6 = t5[i9];
     let a3, u5, d3 = -1, f3 = 0;
-    for (; f3 < s6.length && (c5.lastIndex = f3, u5 = c5.exec(s6), null !== u5); ) f3 = c5.lastIndex, c5 === v ? "!--" === u5[1] ? c5 = _ : void 0 !== u5[1] ? c5 = m : void 0 !== u5[2] ? (y2.test(u5[2]) && (n5 = RegExp("</" + u5[2], "g")), c5 = p2) : void 0 !== u5[3] && (c5 = p2) : c5 === p2 ? ">" === u5[0] ? (c5 = n5 ?? v, d3 = -1) : void 0 === u5[1] ? d3 = -2 : (d3 = c5.lastIndex - u5[2].length, a3 = u5[1], c5 = void 0 === u5[3] ? p2 : '"' === u5[3] ? $ : g) : c5 === $ || c5 === g ? c5 = p2 : c5 === _ || c5 === m ? c5 = v : (c5 = p2, n5 = void 0);
-    const x2 = c5 === p2 && t5[i8 + 1].startsWith("/>") ? " " : "";
-    l4 += c5 === v ? s6 + r3 : d3 >= 0 ? (e8.push(a3), s6.slice(0, d3) + h2 + s6.slice(d3) + o3 + x2) : s6 + o3 + (-2 === d3 ? i8 : x2);
+    for (; f3 < s6.length && (c5.lastIndex = f3, u5 = c5.exec(s6), null !== u5); ) f3 = c5.lastIndex, c5 === v ? "!--" === u5[1] ? c5 = _ : void 0 !== u5[1] ? c5 = m : void 0 !== u5[2] ? (y2.test(u5[2]) && (n6 = RegExp("</" + u5[2], "g")), c5 = p2) : void 0 !== u5[3] && (c5 = p2) : c5 === p2 ? ">" === u5[0] ? (c5 = n6 ?? v, d3 = -1) : void 0 === u5[1] ? d3 = -2 : (d3 = c5.lastIndex - u5[2].length, a3 = u5[1], c5 = void 0 === u5[3] ? p2 : '"' === u5[3] ? $ : g) : c5 === $ || c5 === g ? c5 = p2 : c5 === _ || c5 === m ? c5 = v : (c5 = p2, n6 = void 0);
+    const x2 = c5 === p2 && t5[i9 + 1].startsWith("/>") ? " " : "";
+    l4 += c5 === v ? s6 + r3 : d3 >= 0 ? (e8.push(a3), s6.slice(0, d3) + h2 + s6.slice(d3) + o3 + x2) : s6 + o3 + (-2 === d3 ? i9 : x2);
   }
-  return [V(t5, l4 + (t5[s5] || "<?>") + (2 === i7 ? "</svg>" : 3 === i7 ? "</math>" : "")), e8];
+  return [V(t5, l4 + (t5[s5] || "<?>") + (2 === i8 ? "</svg>" : 3 === i8 ? "</math>" : "")), e8];
 };
 var S2 = class _S {
-  constructor({ strings: t5, _$litType$: i7 }, e8) {
+  constructor({ strings: t5, _$litType$: i8 }, e8) {
     let r7;
     this.parts = [];
     let l4 = 0, a3 = 0;
-    const u5 = t5.length - 1, d3 = this.parts, [f3, v3] = N(t5, i7);
-    if (this.el = _S.createElement(f3, e8), P.currentNode = this.el.content, 2 === i7 || 3 === i7) {
+    const u5 = t5.length - 1, d3 = this.parts, [f3, v3] = N(t5, i8);
+    if (this.el = _S.createElement(f3, e8), P.currentNode = this.el.content, 2 === i8 || 3 === i8) {
       const t6 = this.el.content.firstChild;
       t6.replaceWith(...t6.childNodes);
     }
     for (; null !== (r7 = P.nextNode()) && d3.length < u5; ) {
       if (1 === r7.nodeType) {
         if (r7.hasAttributes()) for (const t6 of r7.getAttributeNames()) if (t6.endsWith(h2)) {
-          const i8 = v3[a3++], s5 = r7.getAttribute(t6).split(o3), e9 = /([.?@])?(.*)/.exec(i8);
+          const i9 = v3[a3++], s5 = r7.getAttribute(t6).split(o3), e9 = /([.?@])?(.*)/.exec(i9);
           d3.push({ type: 1, index: l4, name: e9[2], strings: s5, ctor: "." === e9[1] ? I : "?" === e9[1] ? L : "@" === e9[1] ? z : H }), r7.removeAttribute(t6);
         } else t6.startsWith(o3) && (d3.push({ type: 6, index: l4 }), r7.removeAttribute(t6));
         if (y2.test(r7.tagName)) {
-          const t6 = r7.textContent.split(o3), i8 = t6.length - 1;
-          if (i8 > 0) {
+          const t6 = r7.textContent.split(o3), i9 = t6.length - 1;
+          if (i9 > 0) {
             r7.textContent = s2 ? s2.emptyScript : "";
-            for (let s5 = 0; s5 < i8; s5++) r7.append(t6[s5], c3()), P.nextNode(), d3.push({ type: 2, index: ++l4 });
-            r7.append(t6[i8], c3());
+            for (let s5 = 0; s5 < i9; s5++) r7.append(t6[s5], c3()), P.nextNode(), d3.push({ type: 2, index: ++l4 });
+            r7.append(t6[i9], c3());
           }
         }
       } else if (8 === r7.nodeType) if (r7.data === n3) d3.push({ type: 2, index: l4 });
@@ -359,20 +359,20 @@ var S2 = class _S {
       l4++;
     }
   }
-  static createElement(t5, i7) {
+  static createElement(t5, i8) {
     const s5 = l2.createElement("template");
     return s5.innerHTML = t5, s5;
   }
 };
-function M(t5, i7, s5 = t5, e8) {
-  if (i7 === E) return i7;
+function M(t5, i8, s5 = t5, e8) {
+  if (i8 === E) return i8;
   let h4 = void 0 !== e8 ? s5._$Co?.[e8] : s5._$Cl;
-  const o6 = a2(i7) ? void 0 : i7._$litDirective$;
-  return h4?.constructor !== o6 && (h4?._$AO?.(false), void 0 === o6 ? h4 = void 0 : (h4 = new o6(t5), h4._$AT(t5, s5, e8)), void 0 !== e8 ? (s5._$Co ?? (s5._$Co = []))[e8] = h4 : s5._$Cl = h4), void 0 !== h4 && (i7 = M(t5, h4._$AS(t5, i7.values), h4, e8)), i7;
+  const o7 = a2(i8) ? void 0 : i8._$litDirective$;
+  return h4?.constructor !== o7 && (h4?._$AO?.(false), void 0 === o7 ? h4 = void 0 : (h4 = new o7(t5), h4._$AT(t5, s5, e8)), void 0 !== e8 ? (s5._$Co ?? (s5._$Co = []))[e8] = h4 : s5._$Cl = h4), void 0 !== h4 && (i8 = M(t5, h4._$AS(t5, i8.values), h4, e8)), i8;
 }
 var R = class {
-  constructor(t5, i7) {
-    this._$AV = [], this._$AN = void 0, this._$AD = t5, this._$AM = i7;
+  constructor(t5, i8) {
+    this._$AV = [], this._$AN = void 0, this._$AD = t5, this._$AM = i8;
   }
   get parentNode() {
     return this._$AM.parentNode;
@@ -381,34 +381,34 @@ var R = class {
     return this._$AM._$AU;
   }
   u(t5) {
-    const { el: { content: i7 }, parts: s5 } = this._$AD, e8 = (t5?.creationScope ?? l2).importNode(i7, true);
+    const { el: { content: i8 }, parts: s5 } = this._$AD, e8 = (t5?.creationScope ?? l2).importNode(i8, true);
     P.currentNode = e8;
-    let h4 = P.nextNode(), o6 = 0, n5 = 0, r7 = s5[0];
+    let h4 = P.nextNode(), o7 = 0, n6 = 0, r7 = s5[0];
     for (; void 0 !== r7; ) {
-      if (o6 === r7.index) {
-        let i8;
-        2 === r7.type ? i8 = new k(h4, h4.nextSibling, this, t5) : 1 === r7.type ? i8 = new r7.ctor(h4, r7.name, r7.strings, this, t5) : 6 === r7.type && (i8 = new Z(h4, this, t5)), this._$AV.push(i8), r7 = s5[++n5];
+      if (o7 === r7.index) {
+        let i9;
+        2 === r7.type ? i9 = new k(h4, h4.nextSibling, this, t5) : 1 === r7.type ? i9 = new r7.ctor(h4, r7.name, r7.strings, this, t5) : 6 === r7.type && (i9 = new Z(h4, this, t5)), this._$AV.push(i9), r7 = s5[++n6];
       }
-      o6 !== r7?.index && (h4 = P.nextNode(), o6++);
+      o7 !== r7?.index && (h4 = P.nextNode(), o7++);
     }
     return P.currentNode = l2, e8;
   }
   p(t5) {
-    let i7 = 0;
-    for (const s5 of this._$AV) void 0 !== s5 && (void 0 !== s5.strings ? (s5._$AI(t5, s5, i7), i7 += s5.strings.length - 2) : s5._$AI(t5[i7])), i7++;
+    let i8 = 0;
+    for (const s5 of this._$AV) void 0 !== s5 && (void 0 !== s5.strings ? (s5._$AI(t5, s5, i8), i8 += s5.strings.length - 2) : s5._$AI(t5[i8])), i8++;
   }
 };
 var k = class _k {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
-  constructor(t5, i7, s5, e8) {
-    this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t5, this._$AB = i7, this._$AM = s5, this.options = e8, this._$Cv = e8?.isConnected ?? true;
+  constructor(t5, i8, s5, e8) {
+    this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t5, this._$AB = i8, this._$AM = s5, this.options = e8, this._$Cv = e8?.isConnected ?? true;
   }
   get parentNode() {
     let t5 = this._$AA.parentNode;
-    const i7 = this._$AM;
-    return void 0 !== i7 && 11 === t5?.nodeType && (t5 = i7.parentNode), t5;
+    const i8 = this._$AM;
+    return void 0 !== i8 && 11 === t5?.nodeType && (t5 = i8.parentNode), t5;
   }
   get startNode() {
     return this._$AA;
@@ -416,8 +416,8 @@ var k = class _k {
   get endNode() {
     return this._$AB;
   }
-  _$AI(t5, i7 = this) {
-    t5 = M(this, t5, i7), a2(t5) ? t5 === A || null == t5 || "" === t5 ? (this._$AH !== A && this._$AR(), this._$AH = A) : t5 !== this._$AH && t5 !== E && this._(t5) : void 0 !== t5._$litType$ ? this.$(t5) : void 0 !== t5.nodeType ? this.T(t5) : d2(t5) ? this.k(t5) : this._(t5);
+  _$AI(t5, i8 = this) {
+    t5 = M(this, t5, i8), a2(t5) ? t5 === A || null == t5 || "" === t5 ? (this._$AH !== A && this._$AR(), this._$AH = A) : t5 !== this._$AH && t5 !== E && this._(t5) : void 0 !== t5._$litType$ ? this.$(t5) : void 0 !== t5.nodeType ? this.T(t5) : d2(t5) ? this.k(t5) : this._(t5);
   }
   O(t5) {
     return this._$AA.parentNode.insertBefore(t5, this._$AB);
@@ -429,23 +429,23 @@ var k = class _k {
     this._$AH !== A && a2(this._$AH) ? this._$AA.nextSibling.data = t5 : this.T(l2.createTextNode(t5)), this._$AH = t5;
   }
   $(t5) {
-    const { values: i7, _$litType$: s5 } = t5, e8 = "number" == typeof s5 ? this._$AC(t5) : (void 0 === s5.el && (s5.el = S2.createElement(V(s5.h, s5.h[0]), this.options)), s5);
-    if (this._$AH?._$AD === e8) this._$AH.p(i7);
+    const { values: i8, _$litType$: s5 } = t5, e8 = "number" == typeof s5 ? this._$AC(t5) : (void 0 === s5.el && (s5.el = S2.createElement(V(s5.h, s5.h[0]), this.options)), s5);
+    if (this._$AH?._$AD === e8) this._$AH.p(i8);
     else {
       const t6 = new R(e8, this), s6 = t6.u(this.options);
-      t6.p(i7), this.T(s6), this._$AH = t6;
+      t6.p(i8), this.T(s6), this._$AH = t6;
     }
   }
   _$AC(t5) {
-    let i7 = C.get(t5.strings);
-    return void 0 === i7 && C.set(t5.strings, i7 = new S2(t5)), i7;
+    let i8 = C.get(t5.strings);
+    return void 0 === i8 && C.set(t5.strings, i8 = new S2(t5)), i8;
   }
   k(t5) {
     u2(this._$AH) || (this._$AH = [], this._$AR());
-    const i7 = this._$AH;
+    const i8 = this._$AH;
     let s5, e8 = 0;
-    for (const h4 of t5) e8 === i7.length ? i7.push(s5 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s5 = i7[e8], s5._$AI(h4), e8++;
-    e8 < i7.length && (this._$AR(s5 && s5._$AB.nextSibling, e8), i7.length = e8);
+    for (const h4 of t5) e8 === i8.length ? i8.push(s5 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s5 = i8[e8], s5._$AI(h4), e8++;
+    e8 < i8.length && (this._$AR(s5 && s5._$AB.nextSibling, e8), i8.length = e8);
   }
   _$AR(t5 = this._$AA.nextSibling, s5) {
     for (this._$AP?.(false, true, s5); t5 !== this._$AB; ) {
@@ -464,19 +464,19 @@ var H = class {
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(t5, i7, s5, e8, h4) {
-    this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t5, this.name = i7, this._$AM = e8, this.options = h4, s5.length > 2 || "" !== s5[0] || "" !== s5[1] ? (this._$AH = Array(s5.length - 1).fill(new String()), this.strings = s5) : this._$AH = A;
+  constructor(t5, i8, s5, e8, h4) {
+    this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t5, this.name = i8, this._$AM = e8, this.options = h4, s5.length > 2 || "" !== s5[0] || "" !== s5[1] ? (this._$AH = Array(s5.length - 1).fill(new String()), this.strings = s5) : this._$AH = A;
   }
-  _$AI(t5, i7 = this, s5, e8) {
+  _$AI(t5, i8 = this, s5, e8) {
     const h4 = this.strings;
-    let o6 = false;
-    if (void 0 === h4) t5 = M(this, t5, i7, 0), o6 = !a2(t5) || t5 !== this._$AH && t5 !== E, o6 && (this._$AH = t5);
+    let o7 = false;
+    if (void 0 === h4) t5 = M(this, t5, i8, 0), o7 = !a2(t5) || t5 !== this._$AH && t5 !== E, o7 && (this._$AH = t5);
     else {
       const e9 = t5;
-      let n5, r7;
-      for (t5 = h4[0], n5 = 0; n5 < h4.length - 1; n5++) r7 = M(this, e9[s5 + n5], i7, n5), r7 === E && (r7 = this._$AH[n5]), o6 || (o6 = !a2(r7) || r7 !== this._$AH[n5]), r7 === A ? t5 = A : t5 !== A && (t5 += (r7 ?? "") + h4[n5 + 1]), this._$AH[n5] = r7;
+      let n6, r7;
+      for (t5 = h4[0], n6 = 0; n6 < h4.length - 1; n6++) r7 = M(this, e9[s5 + n6], i8, n6), r7 === E && (r7 = this._$AH[n6]), o7 || (o7 = !a2(r7) || r7 !== this._$AH[n6]), r7 === A ? t5 = A : t5 !== A && (t5 += (r7 ?? "") + h4[n6 + 1]), this._$AH[n6] = r7;
     }
-    o6 && !e8 && this.j(t5);
+    o7 && !e8 && this.j(t5);
   }
   j(t5) {
     t5 === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t5 ?? "");
@@ -499,11 +499,11 @@ var L = class extends H {
   }
 };
 var z = class extends H {
-  constructor(t5, i7, s5, e8, h4) {
-    super(t5, i7, s5, e8, h4), this.type = 5;
+  constructor(t5, i8, s5, e8, h4) {
+    super(t5, i8, s5, e8, h4), this.type = 5;
   }
-  _$AI(t5, i7 = this) {
-    if ((t5 = M(this, t5, i7, 0) ?? A) === E) return;
+  _$AI(t5, i8 = this) {
+    if ((t5 = M(this, t5, i8, 0) ?? A) === E) return;
     const s5 = this._$AH, e8 = t5 === A && s5 !== A || t5.capture !== s5.capture || t5.once !== s5.once || t5.passive !== s5.passive, h4 = t5 !== A && (s5 === A || e8);
     e8 && this.element.removeEventListener(this.name, this, s5), h4 && this.element.addEventListener(this.name, this, t5), this._$AH = t5;
   }
@@ -512,8 +512,8 @@ var z = class extends H {
   }
 };
 var Z = class {
-  constructor(t5, i7, s5) {
-    this.element = t5, this.type = 6, this._$AN = void 0, this._$AM = i7, this.options = s5;
+  constructor(t5, i8, s5) {
+    this.element = t5, this.type = 6, this._$AN = void 0, this._$AM = i8, this.options = s5;
   }
   get _$AU() {
     return this._$AM._$AU;
@@ -525,12 +525,12 @@ var Z = class {
 var j = { M: h2, P: o3, A: n3, C: 1, L: N, R, D: d2, V: M, I: k, H, N: L, U: z, B: I, F: Z };
 var B = t2.litHtmlPolyfillSupport;
 B?.(S2, k), (t2.litHtmlVersions ?? (t2.litHtmlVersions = [])).push("3.3.2");
-var D = (t5, i7, s5) => {
-  const e8 = s5?.renderBefore ?? i7;
+var D = (t5, i8, s5) => {
+  const e8 = s5?.renderBefore ?? i8;
   let h4 = e8._$litPart$;
   if (void 0 === h4) {
     const t6 = s5?.renderBefore ?? null;
-    e8._$litPart$ = h4 = new k(i7.insertBefore(c3(), t6), t6, void 0, s5 ?? {});
+    e8._$litPart$ = h4 = new k(i8.insertBefore(c3(), t6), t6, void 0, s5 ?? {});
   }
   return h4._$AI(t5), h4;
 };
@@ -578,12 +578,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -690,18 +692,26 @@ var styles_default = [
   placementOrigins,
   i`
     :host { display: inline-block; }
+    :host([fluid]) { width: 100%; }
 
-    /* ── Trigger ────────────────────────────────────────────────────────────── */
+    /* ── Root wrapper (trigger + float label) ───────────────────────────────── */
+    .dd-root {
+      position: relative;
+      display:  inline-flex;
+      width:    100%;
+    }
+
+    /* ── Trigger (shared base) ──────────────────────────────────────────────── */
     .trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      width: 100%;
-      padding: ${space2} ${space3};
+      display:       inline-flex;
+      align-items:   center;
+      gap:           6px;
+      width:         100%;
+      padding:       ${space2} ${space3};
       font-family:   var(--uwc-font-family, inherit);
       font-size:     var(--uwc-dd-trigger-font-size, ${fontSizeSm});
       background:    var(--uwc-dd-trigger-bg,     ${surface});
-      border:        var(--uwc-dd-trigger-border, 1px solid #d0cfc9);
+      border:        var(--uwc-dd-trigger-border, 1px solid ${borderControl});
       border-radius: var(--uwc-dd-trigger-radius, ${radiusLg});
       color:         var(--uwc-dd-trigger-color,  ${text});
       cursor:        pointer;
@@ -709,89 +719,188 @@ var styles_default = [
       user-select:   none;
       min-width:     140px;
       transition:    border-color ${durationBase}, box-shadow ${durationBase};
+      box-sizing:    border-box;
     }
-    .trigger:hover:not(:disabled) {
-      border-color: color-mix(in oklab, var(--uwc-dd-trigger-border, #d0cfc9) 80%, #000);
+    .trigger:hover:not([disabled]):not(:disabled) {
+      border-color: color-mix(in oklab, var(--uwc-color-primary, ${primary}) 40%, ${borderControl});
     }
     .trigger:focus-visible {
-      outline: none;
+      outline:      none;
       border-color: var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary}));
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary})) 20%, transparent);
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-primary, ${primary}) 20%, transparent);
     }
-    .trigger:disabled {
-      background: var(--uwc-dd-trigger-disabled-bg, #f5f5f0);
-      color:      var(--uwc-text-disabled, ${textDisabled});
+    .trigger:disabled,
+    .trigger[aria-disabled="true"] {
+      background: var(--uwc-dd-trigger-disabled-bg, ${surfaceRaised});
+      color:      ${textDisabled};
       cursor:     not-allowed;
+      pointer-events: none;
     }
     .trigger--open {
       border-color: var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary}));
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--uwc-dd-trigger-focus-border, var(--uwc-color-primary, ${primary})) 20%, transparent);
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-primary, ${primary}) 20%, transparent);
     }
 
+    /* Editable trigger — div wrapper holding an <input> */
+    .trigger--editable { padding: 0; cursor: text; }
+    .editable-input {
+      flex:        1;
+      min-width:   0;
+      padding:     ${space2} ${space3};
+      border:      none;
+      outline:     none;
+      background:  transparent;
+      font-family: var(--uwc-font-family, inherit);
+      font-size:   inherit;
+      color:       inherit;
+      cursor:      text;
+    }
+    .trigger--editable .trigger-actions { padding-right: ${space2}; }
+
+    /* ── Sizes ──────────────────────────────────────────────────────────────── */
+    :host([size="sm"]) .trigger {
+      padding:   0.25rem 0.625rem;
+      font-size: ${fontSizeXs};
+      min-height: 1.875rem;
+    }
+    :host([size="sm"]) .editable-input { padding: 0.25rem 0.625rem; }
+
+    :host([size="lg"]) .trigger {
+      padding:   0.5rem 1rem;
+      font-size: ${fontSizeMd};
+      min-height: 2.75rem;
+    }
+    :host([size="lg"]) .editable-input { padding: 0.5rem 1rem; }
+
+    /* ── Filled variant ─────────────────────────────────────────────────────── */
+    :host([variant="filled"]) .trigger {
+      background:   var(--uwc-dd-filled-bg, ${surfaceRaised});
+      border-color: transparent;
+    }
+    :host([variant="filled"]) .trigger:hover:not([disabled]):not(:disabled) {
+      background: color-mix(in oklab, ${surfaceRaised} 80%, #000);
+    }
+    :host([variant="filled"]) .trigger--open {
+      border-color: var(--uwc-color-primary, ${primary});
+      background:   var(--uwc-dd-filled-bg, ${surfaceRaised});
+    }
+
+    /* ── Invalid state ──────────────────────────────────────────────────────── */
+    :host([invalid]) .trigger {
+      border-color: var(--uwc-color-danger, ${danger});
+    }
+    :host([invalid]) .trigger--open,
+    :host([invalid]) .trigger:focus-visible {
+      border-color: var(--uwc-color-danger, ${danger});
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-danger, ${danger}) 20%, transparent);
+    }
+
+    /* ── Float label ────────────────────────────────────────────────────────── */
+    .float-label {
+      position:       absolute;
+      left:           calc(${space3} + 1px);
+      top:            50%;
+      transform:      translateY(-50%);
+      font-size:      ${fontSizeSm};
+      color:          ${textMuted};
+      pointer-events: none;
+      transition:     top 0.18s ease, font-size 0.18s ease, color 0.18s ease, padding 0.18s ease;
+      white-space:    nowrap;
+    }
+
+    /* "over" — label always rendered above the trigger */
+    :host([float-label="over"]) .float-label {
+      top:       0;
+      transform: translateY(-100%);
+      font-size: ${fontSizeXs};
+      padding:   0 2px;
+      color:     var(--uwc-color-primary, ${primary});
+    }
+    :host([float-label="over"]) .dd-root { margin-top: 1.25rem; }
+
+    /* "in" — label starts inside, floats up when active */
+    :host([float-label="in"]) .float-label.float-label--active,
+    /* "on" — same motion but label sits on the border */
+    :host([float-label="on"]) .float-label.float-label--active {
+      top:       0;
+      transform: translateY(-50%);
+      font-size: ${fontSizeXs};
+      color:     var(--uwc-color-primary, ${primary});
+    }
+    :host([float-label="on"]) .float-label {
+      background: var(--uwc-dd-trigger-bg, ${surface});
+      padding:    0 4px;
+    }
+    /* hide the native placeholder text while the in-label is inside */
+    :host([float-label="in"]) .trigger--empty .is-placeholder,
+    :host([float-label="in"]) .trigger--empty .editable-input::placeholder {
+      color: transparent;
+    }
+
+    /* ── Trigger label / placeholder ────────────────────────────────────────── */
     .trigger-label {
-      flex: 1;
-      overflow: hidden;
+      flex:          1;
+      overflow:      hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space:   nowrap;
     }
     .trigger-label.is-placeholder { color: var(--uwc-dd-trigger-placeholder, ${textMuted}); }
 
     .trigger-actions { display: flex; align-items: center; gap: ${space1}; flex-shrink: 0; }
 
     /* ── Caret ──────────────────────────────────────────────────────────────── */
-    .caret { color: ${textMuted}; transition: transform 160ms ease; }
+    .caret { color: ${textMuted}; transition: transform 160ms ease; flex-shrink: 0; }
     .caret--open { transform: rotate(180deg); }
 
     /* ── Clear button ───────────────────────────────────────────────────────── */
     .clear-btn {
-      font-size: ${fontSizeXs};
-      color: ${textMuted};
-      cursor: pointer;
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
+      display:         flex;
+      align-items:     center;
       justify-content: center;
-      border-radius: ${radiusFull};
-      transition: background ${durationFast}, color ${durationFast};
+      width:           18px;
+      height:          18px;
+      color:           ${textMuted};
+      cursor:          pointer;
+      border-radius:   ${radiusFull};
+      transition:      background ${durationFast}, color ${durationFast};
     }
     .clear-btn:hover { background: ${hoverBg}; color: ${text}; }
 
     /* ── Loading spinner ────────────────────────────────────────────────────── */
     .loading-icon {
-      display: block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid #ddd;
+      display:       block;
+      width:         14px;
+      height:        14px;
+      border:        2px solid ${borderControl};
       border-top-color: var(--uwc-color-primary, ${primary});
       border-radius: ${radiusFull};
-      animation: dd-spin 600ms linear infinite;
+      animation:     dd-spin 600ms linear infinite;
+      flex-shrink:   0;
     }
     @keyframes dd-spin { to { transform: rotate(360deg); } }
 
     /* ── Chips (multi-select) ───────────────────────────────────────────────── */
     .chips-wrapper { display: flex; flex-wrap: wrap; gap: ${space1}; flex: 1; min-width: 0; }
     .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: ${space1};
-      padding: 2px 6px 2px 8px;
-      background:    var(--uwc-dd-chip-bg,    #ebe8e1);
-      color:         var(--uwc-dd-chip-color, #444);
-      border-radius: var(--uwc-radius-sm, ${radiusSm});
+      display:       inline-flex;
+      align-items:   center;
+      gap:           ${space1};
+      padding:       2px 6px 2px 8px;
+      background:    var(--uwc-dd-chip-bg,    ${borderSubtle});
+      color:         var(--uwc-dd-chip-color, ${textSecondary});
+      border-radius: ${radiusSm};
       font-size:     ${fontSizeXs};
     }
     .chip--overflow { background: ${borderSubtle}; color: ${textSecondary}; padding: 2px 8px; }
-
     .chip-remove {
-      font-size: ${fontSizeSm};
+      font-size:   ${fontSizeSm};
       line-height: 1;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: ${textMuted};
-      padding: 0 2px;
-      transition: color ${durationFast};
+      background:  none;
+      border:      none;
+      cursor:      pointer;
+      color:       ${textMuted};
+      padding:     0 2px;
+      transition:  color ${durationFast};
     }
     .chip-remove:hover { color: ${text}; }
 
@@ -806,36 +915,68 @@ var styles_default = [
       overflow:      hidden;
     }
 
+    /* ── Panel header / footer slots ────────────────────────────────────────── */
+    .panel-header {
+      padding:       ${space2} ${space3};
+      border-bottom: 1px solid ${borderSubtle};
+      flex-shrink:   0;
+    }
+    .panel-footer {
+      padding:    ${space2} ${space3};
+      border-top: 1px solid ${borderSubtle};
+      flex-shrink:0;
+      font-size:  ${fontSizeXs};
+      color:      ${textMuted};
+    }
+
     /* ── Filter input ───────────────────────────────────────────────────────── */
     .filter-wrapper {
-      display: flex;
-      align-items: center;
-      gap: ${space2};
-      padding: ${space2} ${space3};
+      display:       flex;
+      align-items:   center;
+      gap:           ${space2};
+      padding:       ${space2} ${space3};
       border-bottom: 1px solid ${borderSubtle};
     }
     .filter-icon  { color: ${textDisabled}; flex-shrink: 0; }
     .filter-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-family: var(--uwc-font-family, inherit);
-      font-size:   ${fontSizeXs};
-      color:       ${text};
-      background:  transparent;
+      flex:       1;
+      border:     none;
+      outline:    none;
+      font-family:var(--uwc-font-family, inherit);
+      font-size:  ${fontSizeXs};
+      color:      ${text};
+      background: transparent;
     }
     .filter-input::placeholder { color: ${textDisabled}; }
 
-    /* ── Options list ───────────────────────────────────────────────────────── */
-    .options-wrapper { overflow-y: auto; max-height: var(--uwc-dd-max-height, 220px); }
-    .options-list    { list-style: none; margin: 0; padding: ${space1} 0; }
+    /* ── Options wrapper ────────────────────────────────────────────────────── */
+    .options-wrapper {
+      overflow-y: auto;
+      /* max-height set via inline style (scrollHeight prop) for non-virtual */
+    }
+
+    /* ── Standard options list ──────────────────────────────────────────────── */
+    .options-list { list-style: none; margin: 0; padding: ${space1} 0; }
+
+    /* ── Virtual options scroll container ───────────────────────────────────── */
+    .options-scroll {
+      overflow-anchor: none;
+      scrollbar-width: thin;
+      scrollbar-color: ${borderControl} transparent;
+    }
+    .options-scroll::-webkit-scrollbar        { width: 6px; }
+    .options-scroll::-webkit-scrollbar-track  { background: transparent; }
+    .options-scroll::-webkit-scrollbar-thumb  {
+      background:    ${borderControl};
+      border-radius: ${radiusFull};
+    }
 
     /* ── Group header ───────────────────────────────────────────────────────── */
     .group-header {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: ${space2} 13px 4px;
+      display:        flex;
+      align-items:    center;
+      gap:            7px;
+      padding:        ${space2} 13px 4px;
       font-size:      ${fontSizeXs};
       font-weight:    ${fontWeightBold};
       letter-spacing: 0.08em;
@@ -846,73 +987,86 @@ var styles_default = [
 
     /* ── Option ─────────────────────────────────────────────────────────────── */
     .option {
-      display: flex;
+      display:     flex;
       align-items: center;
-      gap: 9px;
-      padding: ${space2} 13px;
-      font-size:  ${fontSizeSm};
-      color:      ${text};
-      cursor:     pointer;
-      list-style: none;
-      transition: background ${durationFast};
+      gap:         9px;
+      padding:     0 13px;
+      font-size:   ${fontSizeSm};
+      color:       ${text};
+      cursor:      pointer;
+      list-style:  none;
+      transition:  background ${durationFast};
+      min-height:  2.375rem;  /* fallback for non-virtual */
     }
     .option:hover,
-    .option--highlighted { background: var(--uwc-dd-option-hover-bg, ${hoverBg}); }
+    .option--highlighted        { background: var(--uwc-dd-option-hover-bg, ${hoverBg}); }
     .option--selected {
-      background:  var(--uwc-dd-option-selected-bg,    rgba(99,102,241,0.08));
+      background:  var(--uwc-dd-option-selected-bg,    ${selectedBg});
       color:       var(--uwc-dd-option-selected-color, var(--uwc-color-primary, ${primary}));
       font-weight: ${fontWeightMedium};
     }
     .option--selected.option--highlighted {
       background: color-mix(in oklab, var(--uwc-color-primary, ${primary}) 15%, transparent);
     }
-    .option--disabled { color: var(--uwc-dd-option-disabled-color, ${textDisabled}); cursor: not-allowed; }
-    .option--disabled:hover { background: transparent; }
+    .option--disabled           { color: ${textDisabled}; cursor: not-allowed; }
+    .option--disabled:hover     { background: transparent; }
 
     .opt-icon  { width: 18px; text-align: center; flex-shrink: 0; }
     .opt-label { flex: 1; }
     .opt-badge {
-      font-size: ${fontSizeXs};
-      padding: 1px 6px;
+      font-size:     ${fontSizeXs};
+      padding:       1px 6px;
       border-radius: ${radiusFull};
-      background: ${borderSubtle};
-      color: ${textSecondary};
+      background:    ${borderSubtle};
+      color:         ${textSecondary};
     }
-    .opt-check { color: var(--uwc-color-primary, ${primary}); margin-left: auto; }
+    .opt-check {
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      color:           var(--uwc-color-primary, ${primary});
+      margin-left:     auto;
+      flex-shrink:     0;
+    }
 
     /* ── Empty state ────────────────────────────────────────────────────────── */
-    .empty { padding: 20px ${space4}; text-align: center; font-size: ${fontSizeXs}; color: ${textDisabled}; }
+    .empty {
+      padding:    20px ${space4};
+      text-align: center;
+      font-size:  ${fontSizeXs};
+      color:      ${textDisabled};
+    }
   `
 ];
 
 // node_modules/@lit/reactive-element/decorators/property.js
 var o5 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
 var r4 = (t5 = o5, e8, r7) => {
-  const { kind: n5, metadata: i7 } = r7;
-  let s5 = globalThis.litPropertyMetadata.get(i7);
-  if (void 0 === s5 && globalThis.litPropertyMetadata.set(i7, s5 = /* @__PURE__ */ new Map()), "setter" === n5 && ((t5 = Object.create(t5)).wrapped = true), s5.set(r7.name, t5), "accessor" === n5) {
-    const { name: o6 } = r7;
+  const { kind: n6, metadata: i8 } = r7;
+  let s5 = globalThis.litPropertyMetadata.get(i8);
+  if (void 0 === s5 && globalThis.litPropertyMetadata.set(i8, s5 = /* @__PURE__ */ new Map()), "setter" === n6 && ((t5 = Object.create(t5)).wrapped = true), s5.set(r7.name, t5), "accessor" === n6) {
+    const { name: o7 } = r7;
     return { set(r8) {
-      const n6 = e8.get.call(this);
-      e8.set.call(this, r8), this.requestUpdate(o6, n6, t5, true, r8);
+      const n7 = e8.get.call(this);
+      e8.set.call(this, r8), this.requestUpdate(o7, n7, t5, true, r8);
     }, init(e9) {
-      return void 0 !== e9 && this.C(o6, void 0, t5, e9), e9;
+      return void 0 !== e9 && this.C(o7, void 0, t5, e9), e9;
     } };
   }
-  if ("setter" === n5) {
-    const { name: o6 } = r7;
+  if ("setter" === n6) {
+    const { name: o7 } = r7;
     return function(r8) {
-      const n6 = this[o6];
-      e8.call(this, r8), this.requestUpdate(o6, n6, t5, true, r8);
+      const n7 = this[o7];
+      e8.call(this, r8), this.requestUpdate(o7, n7, t5, true, r8);
     };
   }
-  throw Error("Unsupported decorator location: " + n5);
+  throw Error("Unsupported decorator location: " + n6);
 };
 function n4(t5) {
-  return (e8, o6) => "object" == typeof o6 ? r4(t5, e8, o6) : ((t6, e9, o7) => {
-    const r7 = e9.hasOwnProperty(o7);
-    return e9.constructor.createProperty(o7, t6), r7 ? Object.getOwnPropertyDescriptor(e9, o7) : void 0;
-  })(t5, e8, o6);
+  return (e8, o7) => "object" == typeof o7 ? r4(t5, e8, o7) : ((t6, e9, o8) => {
+    const r7 = e9.hasOwnProperty(o8);
+    return e9.constructor.createProperty(o8, t6), r7 ? Object.getOwnPropertyDescriptor(e9, o8) : void 0;
+  })(t5, e8, o7);
 }
 
 // node_modules/@lit/reactive-element/decorators/state.js
@@ -925,10 +1079,10 @@ var e4 = (e8, t5, c5) => (c5.configurable = true, c5.enumerable = true, Reflect.
 
 // node_modules/@lit/reactive-element/decorators/query.js
 function e5(e8, r7) {
-  return (n5, s5, i7) => {
-    const o6 = (t5) => t5.renderRoot?.querySelector(e8) ?? null;
+  return (n6, s5, i8) => {
+    const o7 = (t5) => t5.renderRoot?.querySelector(e8) ?? null;
     if (r7) {
-      const { get: e9, set: r8 } = "object" == typeof s5 ? n5 : i7 ?? /* @__PURE__ */ (() => {
+      const { get: e9, set: r8 } = "object" == typeof s5 ? n6 : i8 ?? /* @__PURE__ */ (() => {
         const t5 = /* @__PURE__ */ Symbol();
         return { get() {
           return this[t5];
@@ -936,13 +1090,13 @@ function e5(e8, r7) {
           this[t5] = e10;
         } };
       })();
-      return e4(n5, s5, { get() {
+      return e4(n6, s5, { get() {
         let t5 = e9.call(this);
-        return void 0 === t5 && (t5 = o6(this), (null !== t5 || this.hasUpdated) && r8.call(this, t5)), t5;
+        return void 0 === t5 && (t5 = o7(this), (null !== t5 || this.hasUpdated) && r8.call(this, t5)), t5;
       } });
     }
-    return e4(n5, s5, { get() {
-      return o6(this);
+    return e4(n6, s5, { get() {
+      return o7(this);
     } });
   };
 }
@@ -956,8 +1110,8 @@ var i5 = class {
   get _$AU() {
     return this._$AM._$AU;
   }
-  _$AT(t5, e8, i7) {
-    this._$Ct = t5, this._$AM = e8, this._$Ci = i7;
+  _$AT(t5, e8, i8) {
+    this._$Ct = t5, this._$AM = e8, this._$Ci = i8;
   }
   _$AS(t5, e8) {
     return this.update(t5, e8);
@@ -969,36 +1123,36 @@ var i5 = class {
 
 // node_modules/lit-html/directive-helpers.js
 var { I: t4 } = j;
-var i6 = (o6) => o6;
-var r6 = (o6) => void 0 === o6.strings;
+var i6 = (o7) => o7;
+var r6 = (o7) => void 0 === o7.strings;
 var s4 = () => document.createComment("");
-var v2 = (o6, n5, e8) => {
-  const l4 = o6._$AA.parentNode, d3 = void 0 === n5 ? o6._$AB : n5._$AA;
+var v2 = (o7, n6, e8) => {
+  const l4 = o7._$AA.parentNode, d3 = void 0 === n6 ? o7._$AB : n6._$AA;
   if (void 0 === e8) {
-    const i7 = l4.insertBefore(s4(), d3), n6 = l4.insertBefore(s4(), d3);
-    e8 = new t4(i7, n6, o6, o6.options);
+    const i8 = l4.insertBefore(s4(), d3), n7 = l4.insertBefore(s4(), d3);
+    e8 = new t4(i8, n7, o7, o7.options);
   } else {
-    const t5 = e8._$AB.nextSibling, n6 = e8._$AM, c5 = n6 !== o6;
+    const t5 = e8._$AB.nextSibling, n7 = e8._$AM, c5 = n7 !== o7;
     if (c5) {
       let t6;
-      e8._$AQ?.(o6), e8._$AM = o6, void 0 !== e8._$AP && (t6 = o6._$AU) !== n6._$AU && e8._$AP(t6);
+      e8._$AQ?.(o7), e8._$AM = o7, void 0 !== e8._$AP && (t6 = o7._$AU) !== n7._$AU && e8._$AP(t6);
     }
     if (t5 !== d3 || c5) {
-      let o7 = e8._$AA;
-      for (; o7 !== t5; ) {
-        const t6 = i6(o7).nextSibling;
-        i6(l4).insertBefore(o7, d3), o7 = t6;
+      let o8 = e8._$AA;
+      for (; o8 !== t5; ) {
+        const t6 = i6(o8).nextSibling;
+        i6(l4).insertBefore(o8, d3), o8 = t6;
       }
     }
   }
   return e8;
 };
-var u3 = (o6, t5, i7 = o6) => (o6._$AI(t5, i7), o6);
+var u3 = (o7, t5, i8 = o7) => (o7._$AI(t5, i8), o7);
 var m2 = {};
-var p3 = (o6, t5 = m2) => o6._$AH = t5;
-var M2 = (o6) => o6._$AH;
-var h3 = (o6) => {
-  o6._$AR(), o6._$AA.remove();
+var p3 = (o7, t5 = m2) => o7._$AH = t5;
+var M2 = (o7) => o7._$AH;
+var h3 = (o7) => {
+  o7._$AR(), o7._$AA.remove();
 };
 
 // node_modules/lit-html/directives/repeat.js
@@ -1014,10 +1168,10 @@ var c4 = e6(class extends i5 {
   dt(e8, s5, t5) {
     let r7;
     void 0 === t5 ? t5 = s5 : void 0 !== s5 && (r7 = s5);
-    const l4 = [], o6 = [];
-    let i7 = 0;
-    for (const s6 of e8) l4[i7] = r7 ? r7(s6, i7) : i7, o6[i7] = t5(s6, i7), i7++;
-    return { values: o6, keys: l4 };
+    const l4 = [], o7 = [];
+    let i8 = 0;
+    for (const s6 of e8) l4[i8] = r7 ? r7(s6, i8) : i8, o7[i8] = t5(s6, i8), i8++;
+    return { values: o7, keys: l4 };
   }
   render(e8, s5, t5) {
     return this.dt(e8, s5, t5).values;
@@ -1062,17 +1216,46 @@ var e7 = e6(class extends i5 {
   render(t5) {
     return " " + Object.keys(t5).filter((s5) => t5[s5]).join(" ") + " ";
   }
-  update(s5, [i7]) {
+  update(s5, [i8]) {
     if (void 0 === this.st) {
       this.st = /* @__PURE__ */ new Set(), void 0 !== s5.strings && (this.nt = new Set(s5.strings.join(" ").split(/\s/).filter((t5) => "" !== t5)));
-      for (const t5 in i7) i7[t5] && !this.nt?.has(t5) && this.st.add(t5);
-      return this.render(i7);
+      for (const t5 in i8) i8[t5] && !this.nt?.has(t5) && this.st.add(t5);
+      return this.render(i8);
     }
     const r7 = s5.element.classList;
-    for (const t5 of this.st) t5 in i7 || (r7.remove(t5), this.st.delete(t5));
-    for (const t5 in i7) {
-      const s6 = !!i7[t5];
+    for (const t5 of this.st) t5 in i8 || (r7.remove(t5), this.st.delete(t5));
+    for (const t5 in i8) {
+      const s6 = !!i8[t5];
       s6 === this.st.has(t5) || this.nt?.has(t5) || (s6 ? (r7.add(t5), this.st.add(t5)) : (r7.remove(t5), this.st.delete(t5)));
+    }
+    return E;
+  }
+});
+
+// node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i7 = " !" + n5;
+var o6 = e6(class extends i5 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t3.ATTRIBUTE || "style" !== t5.name || t5.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return Object.keys(t5).reduce((e8, r7) => {
+      const s5 = t5[r7];
+      return null == s5 ? e8 : e8 + `${r7 = r7.includes("-") ? r7 : r7.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s5};`;
+    }, "");
+  }
+  update(e8, [r7]) {
+    const { style: s5 } = e8.element;
+    if (void 0 === this.ft) return this.ft = new Set(Object.keys(r7)), this.render(r7);
+    for (const t5 of this.ft) null == r7[t5] && (this.ft.delete(t5), t5.includes("-") ? s5.removeProperty(t5) : s5[t5] = null);
+    for (const t5 in r7) {
+      const e9 = r7[t5];
+      if (null != e9) {
+        this.ft.add(t5);
+        const r8 = "string" == typeof e9 && e9.endsWith(i7);
+        t5.includes("-") || r8 ? s5.setProperty(t5, r8 ? e9.slice(0, -11) : e9, r8 ? n5 : "") : s5[t5] = e9;
+      }
     }
     return E;
   }
@@ -1087,15 +1270,15 @@ var l3 = e6(class extends i5 {
   render(r7) {
     return r7;
   }
-  update(i7, [t5]) {
+  update(i8, [t5]) {
     if (t5 === E || t5 === A) return t5;
-    const o6 = i7.element, l4 = i7.name;
-    if (i7.type === t3.PROPERTY) {
-      if (t5 === o6[l4]) return E;
-    } else if (i7.type === t3.BOOLEAN_ATTRIBUTE) {
-      if (!!t5 === o6.hasAttribute(l4)) return E;
-    } else if (i7.type === t3.ATTRIBUTE && o6.getAttribute(l4) === t5 + "") return E;
-    return p3(i7), t5;
+    const o7 = i8.element, l4 = i8.name;
+    if (i8.type === t3.PROPERTY) {
+      if (t5 === o7[l4]) return E;
+    } else if (i8.type === t3.BOOLEAN_ATTRIBUTE) {
+      if (!!t5 === o7.hasAttribute(l4)) return E;
+    } else if (i8.type === t3.ATTRIBUTE && o7.getAttribute(l4) === t5 + "") return E;
+    return p3(i8), t5;
   }
 });
 
@@ -1366,6 +1549,168 @@ var PlacementController = class {
   }
 };
 
+// src/utils/virtual-scroll.controller.ts
+var VirtualScrollController = class {
+  // ── Construction ─────────────────────────────────────────────────
+  constructor(host, opts = {}) {
+    // ── State ─────────────────────────────────────────────────────────
+    this._items = [];
+    this._scrollTop = 0;
+    this._containerHeight = 0;
+    this._scrollEl = null;
+    this._resizeObs = null;
+    this._lastRange = { first: 0, last: 0 };
+    // ── Private ───────────────────────────────────────────────────────
+    /** Arrow function preserves `this` for removeEventListener identity. */
+    this._onScroll = () => {
+      if (!this._scrollEl) return;
+      this._scrollTop = this._scrollEl.scrollTop;
+      const r7 = this.range;
+      const changed = r7.first !== this._lastRange.first || r7.last !== this._lastRange.last;
+      if (changed) {
+        this._lastRange = r7;
+        this._onRangeChange?.(r7);
+        this.host.requestUpdate();
+      }
+    };
+    this.host = host;
+    this._itemSize = opts.itemSize ?? 48;
+    this._buffer = opts.buffer ?? 4;
+    this._onRangeChange = opts.onRangeChange ?? null;
+    host.addController(this);
+  }
+  // ── Reactive controller lifecycle ─────────────────────────────────
+  /** Intentionally empty — wiring is deferred to `attach()`. */
+  hostConnected() {
+  }
+  hostDisconnected() {
+    this.detach();
+  }
+  // ── Public API ────────────────────────────────────────────────────
+  /** Replace the items array and request a host re-render. */
+  setItems(items) {
+    this._items = items;
+    if (this._scrollEl) {
+      this._scrollTop = Math.min(this._scrollTop, this.totalHeight);
+    }
+    this.host.requestUpdate();
+  }
+  /** Update estimated item height and request a re-render. */
+  setItemSize(px) {
+    this._itemSize = px;
+    this.host.requestUpdate();
+  }
+  /** Update render buffer size. */
+  setBuffer(n6) {
+    this._buffer = n6;
+    this.host.requestUpdate();
+  }
+  // ── Derived state (read-only) ─────────────────────────────────────
+  get items() {
+    return this._items;
+  }
+  get totalCount() {
+    return this._items.length;
+  }
+  get itemSize() {
+    return this._itemSize;
+  }
+  /** Total pixel height the full (un-windowed) list would occupy. */
+  get totalHeight() {
+    return this._items.length * this._itemSize;
+  }
+  /** The index range currently rendered (first inclusive, last exclusive). */
+  get range() {
+    const safeHeight = this._containerHeight > 0 ? this._containerHeight : 400;
+    const first = Math.max(
+      0,
+      Math.floor(this._scrollTop / this._itemSize) - this._buffer
+    );
+    const visibleCount = Math.ceil(safeHeight / this._itemSize);
+    const last = Math.min(
+      this._items.length,
+      first + visibleCount + this._buffer * 2
+    );
+    return { first, last };
+  }
+  /** Items currently in the render window with their absolute indices. */
+  get visibleItems() {
+    const { first, last } = this.range;
+    return this._items.slice(first, last).map((item, i8) => ({
+      item,
+      index: first + i8
+    }));
+  }
+  /** Pixel height of the empty spacer placed BEFORE the rendered items. */
+  get paddingBefore() {
+    return this.range.first * this._itemSize;
+  }
+  /** Pixel height of the empty spacer placed AFTER the rendered items. */
+  get paddingAfter() {
+    return (this._items.length - this.range.last) * this._itemSize;
+  }
+  /** Current scroll offset of the attached container (px). */
+  get scrollTop() {
+    return this._scrollTop;
+  }
+  // ── Scroll control ────────────────────────────────────────────────
+  /**
+   * Scroll so that the item at `index` is visible.
+   * Defaults to 'auto' (instant) so UI interactions feel immediate;
+   * pass 'smooth' for animated transitions.
+   */
+  scrollToIndex(index, behavior = "auto") {
+    if (!this._scrollEl) return;
+    const top = Math.max(0, Math.min(index * this._itemSize, this.totalHeight));
+    this._scrollEl.scrollTo({ top, behavior });
+  }
+  /** Scroll to the very beginning of the list. */
+  scrollToTop(behavior = "auto") {
+    this._scrollEl?.scrollTo({ top: 0, behavior });
+  }
+  /** Scroll to the very end of the list. */
+  scrollToBottom(behavior = "auto") {
+    this._scrollEl?.scrollTo({ top: this.totalHeight, behavior });
+  }
+  // ── Container wiring ──────────────────────────────────────────────
+  /**
+   * Attach the controller to a DOM scroll container.
+   *
+   * Call from the host's `firstUpdated()` once the shadow DOM is ready.
+   * If called multiple times, the previous container is automatically
+   * detached first.
+   */
+  attach(scrollEl) {
+    this.detach();
+    this._scrollEl = scrollEl;
+    this._containerHeight = scrollEl.clientHeight;
+    this._scrollTop = scrollEl.scrollTop;
+    scrollEl.addEventListener("scroll", this._onScroll, { passive: true });
+    this._resizeObs = new ResizeObserver((entries) => {
+      const h4 = entries[0]?.contentRect.height ?? 0;
+      if (h4 !== this._containerHeight) {
+        this._containerHeight = h4;
+        this.host.requestUpdate();
+      }
+    });
+    this._resizeObs.observe(scrollEl);
+  }
+  /**
+   * Remove scroll listeners and observer.
+   * Called automatically when the host disconnects.
+   */
+  detach() {
+    if (this._scrollEl) {
+      this._scrollEl.removeEventListener("scroll", this._onScroll);
+      this._scrollEl = null;
+    }
+    this._resizeObs?.disconnect();
+    this._resizeObs = null;
+    this._scrollTop = 0;
+    this._containerHeight = 0;
+  }
+};
+
 // src/dropdown/index.ts
 var UwcDropdown = class extends i4 {
   constructor() {
@@ -1385,17 +1730,32 @@ var UwcDropdown = class extends i4 {
     this.autoDisplayFirst = false;
     this.emptyMessage = "No results found.";
     this.maxSelectedLabels = 3;
+    this.virtual = false;
+    this.itemSize = 38;
+    this.editable = false;
+    this.label = "";
+    this.floatLabel = null;
+    this.variant = "outlined";
+    this.size = "md";
+    this.invalid = false;
+    this.fluid = false;
     this._filterQuery = "";
     this._highlightIdx = -1;
     this._focusWithin = false;
     this._onDropdownKeydown = this._handleDropdownKeydown.bind(this);
-    // ── Controller ───────────────────────────────────────────────────
+    // ── Virtual scroll controller ───────────────────────────────────────────────
+    // Always instantiated; only attached to a DOM element when virtual=true.
+    this._vs = new VirtualScrollController(this, {
+      onRangeChange: () => {
+      }
+    });
+    // ── Placement controller ────────────────────────────────────────────────────
     this._pc = new PlacementController(this, {
       getPanelEl: () => this._panel,
-      // Dropdown renders its own trigger; setTriggerElement() called from firstUpdated
       onTriggerFound: (el) => {
         const onClick = (e8) => {
           e8.stopPropagation();
+          if (this.editable && e8.target.closest("#editable-input")) return;
           this._pc.toggle();
         };
         const onKeydown = (e8) => {
@@ -1421,63 +1781,62 @@ var UwcDropdown = class extends i4 {
         document.addEventListener("keydown", this._onDropdownKeydown);
         emit(this, "uwc-show");
         requestAnimationFrame(() => {
-          if (this.filter) this._filterInput?.focus();
+          if (this.editable) {
+            this._editableInput?.focus();
+            this._editableInput?.select();
+          } else if (this.filter) {
+            this._filterInput?.focus();
+          }
           this._scrollToHighlighted();
+          if (this.virtual && this._optionsScroll) {
+            this._vs.attach(this._optionsScroll);
+            this._vs.setItems(this._filteredOptions());
+          }
         });
       },
       afterHide: () => {
         document.removeEventListener("keydown", this._onDropdownKeydown);
         this._highlightIdx = -1;
         emit(this, "uwc-hide");
-        this._triggerBtn?.focus();
+        if (this.editable) this.requestUpdate();
+        if (!this.editable) this._triggerBtn?.focus();
       }
     });
   }
-  // ── Lifecycle ────────────────────────────────────────────────────
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
   firstUpdated() {
     this._pc.setTriggerElement(this._triggerBtn);
     if (this.autoDisplayFirst && !this._hasValue() && this.options.length) {
-      const first = this.options.find((o6) => !o6.group && !o6.disabled);
+      const first = this.options.find((o7) => !o7.group && !o7.disabled);
       if (first) this._selectOption(first, void 0, { silent: true });
     }
   }
   updated(changed) {
     super.updated(changed);
     this._pc.updated(changed, null, null);
-    if (changed.has("_highlightIdx")) {
-      this._scrollToHighlighted();
+    if (changed.has("_highlightIdx")) this._scrollToHighlighted();
+    if (this.virtual && this._pc.open && this._optionsScroll) {
+      if (changed.has("options") || changed.has("_filterQuery")) {
+        this._vs.setItems(this._filteredOptions());
+      }
     }
   }
-  // ── Value helpers ────────────────────────────────────────────────
+  // ── Value helpers ──────────────────────────────────────────────────────────
   _hasValue() {
     if (this.multiple) return Array.isArray(this.value) && this.value.length > 0;
     return this.value !== null && this.value !== void 0;
   }
   _isSelected(opt) {
-    if (this.multiple) {
-      return Array.isArray(this.value) && this.value.includes(opt.value);
-    }
+    if (this.multiple) return Array.isArray(this.value) && this.value.includes(opt.value);
     return this.value === opt.value;
   }
   _indexOfSelectedValue() {
     if (!this._hasValue()) return -1;
-    const visible = this._filteredOptions();
     if (this.multiple) return 0;
-    return visible.findIndex((o6) => !o6.group && o6.value === this.value);
-  }
-  // ── Options helpers ──────────────────────────────────────────────
-  _filteredOptions() {
-    if (!this._filterQuery) return this.options;
-    const q = this._filterQuery.toLowerCase();
-    return this.options.filter(
-      (o6) => o6.group !== void 0 || o6.label.toLowerCase().includes(q)
-    );
-  }
-  _selectableOptions() {
-    return this._filteredOptions().filter((o6) => !o6.group && !o6.disabled);
+    return this._selectableOptions().findIndex((o7) => o7.value === this.value);
   }
   _labelForValue(val) {
-    return this.options.find((o6) => o6.value === val)?.label ?? String(val);
+    return this.options.find((o7) => o7.value === val)?.label ?? String(val);
   }
   _triggerLabel() {
     if (!this._hasValue()) return "";
@@ -1488,7 +1847,18 @@ var UwcDropdown = class extends i4 {
     }
     return this._labelForValue(this.value);
   }
-  // ── Selection ────────────────────────────────────────────────────
+  // ── Options helpers ────────────────────────────────────────────────────────
+  _filteredOptions() {
+    if (!this._filterQuery) return this.options;
+    const q = this._filterQuery.toLowerCase();
+    return this.options.filter(
+      (o7) => o7.group !== void 0 || o7.label.toLowerCase().includes(q)
+    );
+  }
+  _selectableOptions() {
+    return this._filteredOptions().filter((o7) => !o7.group && !o7.disabled);
+  }
+  // ── Selection ──────────────────────────────────────────────────────────────
   _selectOption(opt, e8, { silent = false } = {}) {
     if (opt.disabled || opt.group) return;
     let newValue;
@@ -1515,8 +1885,7 @@ var UwcDropdown = class extends i4 {
   _removeChip(val, e8) {
     e8.stopPropagation();
     if (!this.multiple || !Array.isArray(this.value)) return;
-    const prev = this.value;
-    this.value = prev.filter((v3) => v3 !== val);
+    this.value = this.value.filter((v3) => v3 !== val);
     emit(this, "uwc-change", {
       value: this.value,
       label: this._labelForValue(val)
@@ -1527,18 +1896,22 @@ var UwcDropdown = class extends i4 {
     const prev = this.value;
     this.value = this.multiple ? [] : null;
     emit(this, "uwc-clear", { previousValue: prev });
-    emit(this, "uwc-change", {
-      value: this.value,
-      label: ""
-    });
+    emit(this, "uwc-change", { value: this.value, label: "" });
   }
-  // ── Filter ───────────────────────────────────────────────────────
+  // ── Filter ─────────────────────────────────────────────────────────────────
   _handleFilterInput(e8) {
     this._filterQuery = e8.target.value;
     this._highlightIdx = 0;
     emit(this, "uwc-filter", { query: this._filterQuery, originalEvent: e8 });
   }
-  // ── Keyboard navigation ──────────────────────────────────────────
+  _handleEditableInput(e8) {
+    const val = e8.target.value;
+    this._filterQuery = val;
+    this._highlightIdx = 0;
+    if (!this._pc.open) this._pc.show();
+    emit(this, "uwc-filter", { query: val, originalEvent: e8 });
+  }
+  // ── Keyboard navigation ────────────────────────────────────────────────────
   _handleDropdownKeydown(e8) {
     const opts = this._selectableOptions();
     if (!opts.length) return;
@@ -1561,7 +1934,7 @@ var UwcDropdown = class extends i4 {
         break;
       case "Enter":
       case " ":
-        if (e8.key === " " && this.filter) break;
+        if (e8.key === " " && (this.filter || this.editable)) break;
         e8.preventDefault();
         if (this._highlightIdx >= 0 && opts[this._highlightIdx]) {
           this._selectOption(opts[this._highlightIdx], e8);
@@ -1574,17 +1947,22 @@ var UwcDropdown = class extends i4 {
   }
   _scrollToHighlighted() {
     requestAnimationFrame(() => {
-      const list = this._optionsList;
-      const item = list?.querySelector('[data-highlighted="true"]');
+      if (this.virtual) {
+        if (this._highlightIdx < 0) return;
+        const targetOpt = this._selectableOptions()[this._highlightIdx];
+        const filtIdx = targetOpt ? this._filteredOptions().indexOf(targetOpt) : -1;
+        if (filtIdx >= 0) this._vs.scrollToIndex(filtIdx, "auto");
+        return;
+      }
+      const item = this.shadowRoot?.querySelector('[data-highlighted="true"]');
       item?.scrollIntoView({ block: "nearest" });
     });
   }
-  // ── Render helpers ────────────────────────────────────────────────
+  // ── Render helpers ─────────────────────────────────────────────────────────
   _renderChips() {
     if (!this.multiple || !Array.isArray(this.value)) return b2``;
-    const selected = this.value;
-    const visible = selected.slice(0, this.maxSelectedLabels);
-    const overflow = selected.length - visible.length;
+    const visible = this.value.slice(0, this.maxSelectedLabels);
+    const overflow = this.value.length - visible.length;
     return b2`
       <div class="chips-wrapper">
         ${visible.map((val) => b2`
@@ -1601,7 +1979,22 @@ var UwcDropdown = class extends i4 {
         ${overflow > 0 ? b2`<span class="chip chip--overflow">+${overflow}</span>` : A}
       </div>`;
   }
-  _renderOptions() {
+  /** Renders the option row content (icon / label / badge / check). */
+  _renderOptionContent(opt, isSelected) {
+    return b2`
+      ${opt.icon ? b2`<span class="opt-icon">${opt.icon}</span>` : A}
+      <span class="opt-label">${opt.label}</span>
+      ${opt.badge ? b2`<span class="opt-badge">${opt.badge}</span>` : A}
+      ${isSelected ? b2`<span class="opt-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>` : A}
+    `;
+  }
+  /** Standard (non-virtual) options list. */
+  _renderOptionsStandard() {
     const filtered = this._filteredOptions();
     const selectable = this._selectableOptions();
     if (!filtered.length) {
@@ -1617,7 +2010,7 @@ var UwcDropdown = class extends i4 {
         ${c4(
       filtered,
       (opt) => String(opt.value ?? opt.group ?? opt.label),
-      (opt) => {
+      (opt, absIdx) => {
         if (opt.group !== void 0) {
           return b2`
                 <li part="group-header" class="group-header" role="presentation">
@@ -1627,18 +2020,18 @@ var UwcDropdown = class extends i4 {
         }
         const selIdx = selectable.indexOf(opt);
         const isHighlit = selIdx === this._highlightIdx;
-        const isSelected = this._isSelected(opt);
+        const isSel = this._isSelected(opt);
         return b2`
               <li
                 part="option"
                 role="option"
                 id="opt-${String(opt.value)}"
-                aria-selected=${isSelected}
+                aria-selected=${isSel}
                 aria-disabled=${opt.disabled ?? false}
                 data-highlighted=${isHighlit}
                 class=${e7({
           "option": true,
-          "option--selected": isSelected,
+          "option--selected": isSel,
           "option--highlighted": isHighlit,
           "option--disabled": !!opt.disabled
         })}
@@ -1650,71 +2043,226 @@ var UwcDropdown = class extends i4 {
           if (!opt.disabled) this._highlightIdx = selIdx;
         }}
               >
-                ${opt.icon ? b2`<span class="opt-icon">${opt.icon}</span>` : A}
-                <span class="opt-label">${opt.label}</span>
-                ${opt.badge ? b2`<span class="opt-badge">${opt.badge}</span>` : A}
-                ${isSelected ? b2`<span class="opt-check" aria-hidden="true">✓</span>` : A}
+                ${this.renderOption ? this.renderOption(opt, absIdx) : this._renderOptionContent(opt, isSel)}
               </li>`;
       }
     )}
       </ul>`;
   }
-  // ── Render ───────────────────────────────────────────────────────
+  /** Virtually-scrolled options list using VirtualScrollController. */
+  _renderOptionsVirtual() {
+    const filtered = this._filteredOptions();
+    const selectable = this._selectableOptions();
+    if (!filtered.length) {
+      return b2`<div part="empty" class="empty">${this.emptyMessage}</div>`;
+    }
+    const h4 = `${this.scrollHeight}px`;
+    return b2`
+      <div
+        class="options-scroll"
+        style=${o6({
+      height: h4,
+      overflowY: "auto",
+      overflowAnchor: "none",
+      position: "relative"
+    })}
+        role="listbox"
+        aria-multiselectable=${this.multiple}
+      >
+        <div
+          style=${o6({ height: `${this._vs.paddingBefore}px` })}
+          aria-hidden="true"
+        ></div>
+
+        ${this._vs.visibleItems.map(({ item: opt, index: absIdx }) => {
+      if (opt.group !== void 0) {
+        return b2`
+              <div
+                part="group-header"
+                class="group-header"
+                role="presentation"
+                style=${o6({ height: `${this.itemSize}px`, boxSizing: "border-box" })}
+              >
+                ${opt.icon ? b2`<span class="opt-icon">${opt.icon}</span>` : A}
+                <span>${opt.group || opt.label}</span>
+              </div>`;
+      }
+      const selIdx = selectable.indexOf(opt);
+      const isHighlit = selIdx === this._highlightIdx;
+      const isSel = this._isSelected(opt);
+      return b2`
+            <div
+              part="option"
+              role="option"
+              id="opt-${String(opt.value)}"
+              aria-selected=${isSel}
+              aria-disabled=${opt.disabled ?? false}
+              data-highlighted=${isHighlit}
+              class=${e7({
+        "option": true,
+        "option--selected": isSel,
+        "option--highlighted": isHighlit,
+        "option--disabled": !!opt.disabled
+      })}
+              style=${o6({ height: `${this.itemSize}px`, boxSizing: "border-box" })}
+              title=${opt.title ?? ""}
+              @click=${(e8) => {
+        if (!opt.disabled) this._selectOption(opt, e8);
+      }}
+              @mouseenter=${() => {
+        if (!opt.disabled) this._highlightIdx = selIdx;
+      }}
+            >
+              ${this.renderOption ? this.renderOption(opt, absIdx) : this._renderOptionContent(opt, isSel)}
+            </div>`;
+    })}
+
+        <div
+          style=${o6({ height: `${this._vs.paddingAfter}px` })}
+          aria-hidden="true"
+        ></div>
+      </div>`;
+  }
+  _renderFilterInput() {
+    return b2`
+      <div class="filter-wrapper">
+        <svg class="filter-icon" width="14" height="14" viewBox="0 0 14 14"
+             fill="none" aria-hidden="true">
+          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round"/>
+        </svg>
+        <input
+          id="filter-input"
+          part="filter-input"
+          type="text"
+          class="filter-input"
+          placeholder=${this.filterPlaceholder}
+          .value=${l3(this._filterQuery)}
+          autocomplete="off"
+          @input=${this._handleFilterInput}
+          @keydown=${(e8) => {
+      if (["ArrowUp", "ArrowDown"].includes(e8.key)) e8.preventDefault();
+    }}
+        />
+      </div>`;
+  }
+  _renderTriggerActions(open) {
+    const showClearBtn = this.showClear && this._hasValue() && !this.disabled && !this.loading;
+    return b2`
+      <span class="trigger-actions">
+        ${showClearBtn ? b2`
+          <span
+            part="clear-btn"
+            class="clear-btn"
+            role="button"
+            tabindex="-1"
+            aria-label="Clear"
+            @click=${this._clear}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round"/>
+            </svg>
+          </span>` : A}
+
+        ${this.loading ? b2`<span part="loading-icon" class="loading-icon" aria-hidden="true"></span>` : b2`
+            <svg part="caret" class="caret ${open ? "caret--open" : ""}"
+                 width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>`}
+      </span>`;
+  }
+  // ── Render ─────────────────────────────────────────────────────────────────
   render() {
     const open = this._pc.open;
     const hasValue = this._hasValue();
     const label = this._triggerLabel();
-    const showClearBtn = this.showClear && hasValue && !this.disabled && !this.loading;
-    return b2`
-      <button
-        id="trigger-btn"
-        part="trigger"
-        type="button"
-        class=${e7({
+    const floatActive = hasValue || open;
+    const triggerClasses = e7({
       "trigger": true,
       "trigger--open": open,
       "trigger--loading": this.loading,
-      "trigger--empty": !hasValue
-    })}
-        ?disabled=${this.disabled || this.loading}
-        aria-expanded=${open}
-        aria-controls="panel"
-        aria-label=${label || this.placeholder}
-        @focus=${() => {
+      "trigger--empty": !hasValue,
+      "trigger--has-value": hasValue,
+      "trigger--editable": this.editable
+    });
+    const triggerEl = this.editable ? b2`
+          <div
+            id="trigger-btn"
+            part="trigger"
+            role="combobox"
+            class=${triggerClasses}
+            aria-expanded=${open}
+            aria-controls="panel"
+            aria-haspopup="listbox"
+          >
+            <input
+              id="editable-input"
+              class="editable-input"
+              type="text"
+              autocomplete="off"
+              .value=${l3(open ? this._filterQuery : label)}
+              placeholder=${this.placeholder}
+              ?disabled=${this.disabled || this.loading}
+              aria-label=${label || this.placeholder}
+              @input=${this._handleEditableInput}
+              @focus=${() => {
       this._focusWithin = true;
+      if (!this._pc.open) this._pc.show();
       emit(this, "uwc-focus");
     }}
-        @blur=${() => {
+              @blur=${() => {
       this._focusWithin = false;
       emit(this, "uwc-blur");
     }}
-      >
-        ${this.multiple && hasValue ? this._renderChips() : b2`<span part="label" class="trigger-label ${!hasValue ? "is-placeholder" : ""}">
-                   ${hasValue ? label : this.placeholder}
-                 </span>`}
-
-        <span class="trigger-actions">
-          ${showClearBtn ? b2`
-            <span
-              part="clear-btn"
-              class="clear-btn"
-              role="button"
-              tabindex="-1"
-              aria-label="Clear"
-              @click=${this._clear}
-            >✕</span>` : A}
-
-          ${this.loading ? b2`<span part="loading-icon" class="loading-icon" aria-hidden="true"></span>` : b2`<svg
-                part="caret"
-                class="caret ${open ? "caret--open" : ""}"
-                width="12" height="12" viewBox="0 0 12 12" fill="none"
-                aria-hidden="true">
-                <path d="M2 4l4 4 4-4"
-                  stroke="currentColor" stroke-width="1.5"
-                  stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>`}
-        </span>
-      </button>
+              @keydown=${(e8) => {
+      if ((e8.key === "ArrowDown" || e8.key === "Enter") && !this._pc.open) {
+        e8.preventDefault();
+        this._pc.show();
+      }
+    }}
+            />
+            ${this._renderTriggerActions(open)}
+          </div>` : b2`
+          <button
+            id="trigger-btn"
+            part="trigger"
+            type="button"
+            class=${triggerClasses}
+            ?disabled=${this.disabled || this.loading}
+            aria-expanded=${open}
+            aria-controls="panel"
+            aria-label=${label || this.placeholder}
+            @focus=${() => {
+      this._focusWithin = true;
+      emit(this, "uwc-focus");
+    }}
+            @blur=${() => {
+      this._focusWithin = false;
+      emit(this, "uwc-blur");
+    }}
+          >
+            ${this.multiple && hasValue ? this._renderChips() : b2`<span part="label" class="trigger-label ${!hasValue ? "is-placeholder" : ""}">
+                       ${hasValue ? label : this.placeholder}
+                     </span>`}
+            ${this._renderTriggerActions(open)}
+          </button>`;
+    const floatLabelEl = this.floatLabel && this.label ? b2`<label
+               class=${e7({
+      "float-label": true,
+      "float-label--active": floatActive
+    })}
+               aria-hidden="true"
+             >${this.label}</label>` : A;
+    const hasSlotHeader = !!this.querySelector('[slot="header"]');
+    const hasSlotFooter = !!this.querySelector('[slot="footer"]');
+    return b2`
+      <div class="dd-root">
+        ${triggerEl}
+        ${floatLabelEl}
+      </div>
 
       <div
         id="panel"
@@ -1722,30 +2270,17 @@ var UwcDropdown = class extends i4 {
         popover="manual"
         class="panel ${open ? "is-open" : ""}"
         data-placement=${this.placement}
-        style="--scroll-height: ${this.scrollHeight}"
         aria-label="Options"
       >
-        ${this.filter ? b2`
-          <div class="filter-wrapper">
-            <span class="filter-icon" aria-hidden="true">🔍</span>
-            <input
-              id="filter-input"
-              part="filter-input"
-              type="text"
-              class="filter-input"
-              placeholder=${this.filterPlaceholder}
-              .value=${l3(this._filterQuery)}
-              autocomplete="off"
-              @input=${this._handleFilterInput}
-              @keydown=${(e8) => {
-      if (["ArrowUp", "ArrowDown"].includes(e8.key)) e8.preventDefault();
-    }}
-            />
-          </div>` : A}
+        ${hasSlotHeader ? b2`<div class="panel-header"><slot name="header"></slot></div>` : A}
 
-        <div class="options-wrapper">
-          ${this._renderOptions()}
+        ${this.filter && !this.editable ? this._renderFilterInput() : A}
+
+        <div class="options-wrapper" style=${!this.virtual ? o6({ maxHeight: `${this.scrollHeight}px` }) : ""}>
+          ${this.virtual ? this._renderOptionsVirtual() : this._renderOptionsStandard()}
         </div>
+
+        ${hasSlotFooter ? b2`<div class="panel-footer"><slot name="footer"></slot></div>` : A}
       </div>`;
   }
 };
@@ -1796,6 +2331,33 @@ __decorateClass([
   n4({ type: Number, attribute: "max-selected-labels" })
 ], UwcDropdown.prototype, "maxSelectedLabels", 2);
 __decorateClass([
+  n4({ type: Boolean })
+], UwcDropdown.prototype, "virtual", 2);
+__decorateClass([
+  n4({ type: Number, attribute: "item-size" })
+], UwcDropdown.prototype, "itemSize", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], UwcDropdown.prototype, "editable", 2);
+__decorateClass([
+  n4({ type: String })
+], UwcDropdown.prototype, "label", 2);
+__decorateClass([
+  n4({ type: String, attribute: "float-label", reflect: true })
+], UwcDropdown.prototype, "floatLabel", 2);
+__decorateClass([
+  n4({ type: String, reflect: true })
+], UwcDropdown.prototype, "variant", 2);
+__decorateClass([
+  n4({ type: String, reflect: true })
+], UwcDropdown.prototype, "size", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDropdown.prototype, "invalid", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true })
+], UwcDropdown.prototype, "fluid", 2);
+__decorateClass([
   r5()
 ], UwcDropdown.prototype, "_filterQuery", 2);
 __decorateClass([
@@ -1808,14 +2370,17 @@ __decorateClass([
   e5("#trigger-btn")
 ], UwcDropdown.prototype, "_triggerBtn", 2);
 __decorateClass([
+  e5("#editable-input")
+], UwcDropdown.prototype, "_editableInput", 2);
+__decorateClass([
   e5("#filter-input")
 ], UwcDropdown.prototype, "_filterInput", 2);
 __decorateClass([
   e5("#panel")
 ], UwcDropdown.prototype, "_panel", 2);
 __decorateClass([
-  e5("#options-list")
-], UwcDropdown.prototype, "_optionsList", 2);
+  e5(".options-scroll")
+], UwcDropdown.prototype, "_optionsScroll", 2);
 
 // src/dropdown/react.ts
 var UwcDropdown2 = createComponent({
@@ -1887,6 +2452,7 @@ lit-html/directives/live.js:
    *)
 
 lit-html/directives/class-map.js:
+lit-html/directives/style-map.js:
   (**
    * @license
    * Copyright 2018 Google LLC

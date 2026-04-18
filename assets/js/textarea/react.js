@@ -9,9 +9,9 @@ var __decorateClass = (decorators, target, key, kind) => {
   return result;
 };
 
-// src/panel/react.ts
-import React from "react";
+// src/textarea/react.ts
 import { createComponent } from "@lit/react";
+import React from "react";
 
 // node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
@@ -19,16 +19,16 @@ var e = t.ShadowRoot && (void 0 === t.ShadyCSS || t.ShadyCSS.nativeShadow) && "a
 var s = /* @__PURE__ */ Symbol();
 var o = /* @__PURE__ */ new WeakMap();
 var n = class {
-  constructor(t4, e8, o6) {
-    if (this._$cssResult$ = true, o6 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
-    this.cssText = t4, this.t = e8;
+  constructor(t4, e7, o7) {
+    if (this._$cssResult$ = true, o7 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    this.cssText = t4, this.t = e7;
   }
   get styleSheet() {
     let t4 = this.o;
     const s4 = this.t;
     if (e && void 0 === t4) {
-      const e8 = void 0 !== s4 && 1 === s4.length;
-      e8 && (t4 = o.get(s4)), void 0 === t4 && ((this.o = t4 = new CSSStyleSheet()).replaceSync(this.cssText), e8 && o.set(s4, t4));
+      const e7 = void 0 !== s4 && 1 === s4.length;
+      e7 && (t4 = o.get(s4)), void 0 === t4 && ((this.o = t4 = new CSSStyleSheet()).replaceSync(this.cssText), e7 && o.set(s4, t4));
     }
     return t4;
   }
@@ -37,25 +37,25 @@ var n = class {
   }
 };
 var r = (t4) => new n("string" == typeof t4 ? t4 : t4 + "", void 0, s);
-var i = (t4, ...e8) => {
-  const o6 = 1 === t4.length ? t4[0] : e8.reduce((e9, s4, o7) => e9 + ((t5) => {
+var i = (t4, ...e7) => {
+  const o7 = 1 === t4.length ? t4[0] : e7.reduce((e8, s4, o8) => e8 + ((t5) => {
     if (true === t5._$cssResult$) return t5.cssText;
     if ("number" == typeof t5) return t5;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + t5 + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(s4) + t4[o7 + 1], t4[0]);
-  return new n(o6, t4, s);
+  })(s4) + t4[o8 + 1], t4[0]);
+  return new n(o7, t4, s);
 };
-var S = (s4, o6) => {
-  if (e) s4.adoptedStyleSheets = o6.map((t4) => t4 instanceof CSSStyleSheet ? t4 : t4.styleSheet);
-  else for (const e8 of o6) {
-    const o7 = document.createElement("style"), n5 = t.litNonce;
-    void 0 !== n5 && o7.setAttribute("nonce", n5), o7.textContent = e8.cssText, s4.appendChild(o7);
+var S = (s4, o7) => {
+  if (e) s4.adoptedStyleSheets = o7.map((t4) => t4 instanceof CSSStyleSheet ? t4 : t4.styleSheet);
+  else for (const e7 of o7) {
+    const o8 = document.createElement("style"), n5 = t.litNonce;
+    void 0 !== n5 && o8.setAttribute("nonce", n5), o8.textContent = e7.cssText, s4.appendChild(o8);
   }
 };
 var c = e ? (t4) => t4 : (t4) => t4 instanceof CSSStyleSheet ? ((t5) => {
-  let e8 = "";
-  for (const s4 of t5.cssRules) e8 += s4.cssText;
-  return r(e8);
+  let e7 = "";
+  for (const s4 of t5.cssRules) e7 += s4.cssText;
+  return r(e7);
 })(t4) : t4;
 
 // node_modules/@lit/reactive-element/reactive-element.js
@@ -111,13 +111,13 @@ var y = class extends HTMLElement {
     }
   }
   static getPropertyDescriptor(t4, s4, i6) {
-    const { get: e8, set: r6 } = h(this.prototype, t4) ?? { get() {
+    const { get: e7, set: r6 } = h(this.prototype, t4) ?? { get() {
       return this[s4];
     }, set(t5) {
       this[s4] = t5;
     } };
-    return { get: e8, set(s5) {
-      const h3 = e8?.call(this);
+    return { get: e7, set(s5) {
+      const h3 = e7?.call(this);
       r6?.call(this, s5), this.requestUpdate(t4, h3, i6);
     }, configurable: true, enumerable: true };
   }
@@ -150,8 +150,8 @@ var y = class extends HTMLElement {
   static finalizeStyles(s4) {
     const i6 = [];
     if (Array.isArray(s4)) {
-      const e8 = new Set(s4.flat(1 / 0).reverse());
-      for (const s5 of e8) i6.unshift(c(s5));
+      const e7 = new Set(s4.flat(1 / 0).reverse());
+      for (const s5 of e7) i6.unshift(c(s5));
     } else void 0 !== s4 && i6.push(c(s4));
     return i6;
   }
@@ -192,31 +192,31 @@ var y = class extends HTMLElement {
     this._$AK(t4, i6);
   }
   _$ET(t4, s4) {
-    const i6 = this.constructor.elementProperties.get(t4), e8 = this.constructor._$Eu(t4, i6);
-    if (void 0 !== e8 && true === i6.reflect) {
+    const i6 = this.constructor.elementProperties.get(t4), e7 = this.constructor._$Eu(t4, i6);
+    if (void 0 !== e7 && true === i6.reflect) {
       const h3 = (void 0 !== i6.converter?.toAttribute ? i6.converter : u).toAttribute(s4, i6.type);
-      this._$Em = t4, null == h3 ? this.removeAttribute(e8) : this.setAttribute(e8, h3), this._$Em = null;
+      this._$Em = t4, null == h3 ? this.removeAttribute(e7) : this.setAttribute(e7, h3), this._$Em = null;
     }
   }
   _$AK(t4, s4) {
-    const i6 = this.constructor, e8 = i6._$Eh.get(t4);
-    if (void 0 !== e8 && this._$Em !== e8) {
-      const t5 = i6.getPropertyOptions(e8), h3 = "function" == typeof t5.converter ? { fromAttribute: t5.converter } : void 0 !== t5.converter?.fromAttribute ? t5.converter : u;
-      this._$Em = e8;
+    const i6 = this.constructor, e7 = i6._$Eh.get(t4);
+    if (void 0 !== e7 && this._$Em !== e7) {
+      const t5 = i6.getPropertyOptions(e7), h3 = "function" == typeof t5.converter ? { fromAttribute: t5.converter } : void 0 !== t5.converter?.fromAttribute ? t5.converter : u;
+      this._$Em = e7;
       const r6 = h3.fromAttribute(s4, t5.type);
-      this[e8] = r6 ?? this._$Ej?.get(e8) ?? r6, this._$Em = null;
+      this[e7] = r6 ?? this._$Ej?.get(e7) ?? r6, this._$Em = null;
     }
   }
-  requestUpdate(t4, s4, i6, e8 = false, h3) {
+  requestUpdate(t4, s4, i6, e7 = false, h3) {
     if (void 0 !== t4) {
       const r6 = this.constructor;
-      if (false === e8 && (h3 = this[t4]), i6 ?? (i6 = r6.getPropertyOptions(t4)), !((i6.hasChanged ?? f)(h3, s4) || i6.useDefault && i6.reflect && h3 === this._$Ej?.get(t4) && !this.hasAttribute(r6._$Eu(t4, i6)))) return;
+      if (false === e7 && (h3 = this[t4]), i6 ?? (i6 = r6.getPropertyOptions(t4)), !((i6.hasChanged ?? f)(h3, s4) || i6.useDefault && i6.reflect && h3 === this._$Ej?.get(t4) && !this.hasAttribute(r6._$Eu(t4, i6)))) return;
       this.C(t4, s4, i6);
     }
     false === this.isUpdatePending && (this._$ES = this._$EP());
   }
-  C(t4, s4, { useDefault: i6, reflect: e8, wrapped: h3 }, r6) {
-    i6 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t4) && (this._$Ej.set(t4, r6 ?? s4 ?? this[t4]), true !== h3 || void 0 !== r6) || (this._$AL.has(t4) || (this.hasUpdated || i6 || (s4 = void 0), this._$AL.set(t4, s4)), true === e8 && this._$Em !== t4 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t4));
+  C(t4, s4, { useDefault: i6, reflect: e7, wrapped: h3 }, r6) {
+    i6 && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(t4) && (this._$Ej.set(t4, r6 ?? s4 ?? this[t4]), true !== h3 || void 0 !== r6) || (this._$AL.has(t4) || (this.hasUpdated || i6 || (s4 = void 0), this._$AL.set(t4, s4)), true === e7 && this._$Em !== t4 && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(t4));
   }
   async _$EP() {
     this.isUpdatePending = true;
@@ -240,8 +240,8 @@ var y = class extends HTMLElement {
       }
       const t5 = this.constructor.elementProperties;
       if (t5.size > 0) for (const [s5, i6] of t5) {
-        const { wrapped: t6 } = i6, e8 = this[s5];
-        true !== t6 || this._$AL.has(s5) || void 0 === e8 || this.C(s5, void 0, i6, e8);
+        const { wrapped: t6 } = i6, e7 = this[s5];
+        true !== t6 || this._$AL.has(s5) || void 0 === e7 || this.C(s5, void 0, i6, e7);
       }
     }
     let t4 = false;
@@ -316,32 +316,32 @@ function V(t4, i6) {
   return void 0 !== e3 ? e3.createHTML(i6) : i6;
 }
 var N = (t4, i6) => {
-  const s4 = t4.length - 1, e8 = [];
+  const s4 = t4.length - 1, e7 = [];
   let n5, l3 = 2 === i6 ? "<svg>" : 3 === i6 ? "<math>" : "", c4 = v;
   for (let i7 = 0; i7 < s4; i7++) {
     const s5 = t4[i7];
     let a3, u3, d3 = -1, f3 = 0;
     for (; f3 < s5.length && (c4.lastIndex = f3, u3 = c4.exec(s5), null !== u3); ) f3 = c4.lastIndex, c4 === v ? "!--" === u3[1] ? c4 = _ : void 0 !== u3[1] ? c4 = m : void 0 !== u3[2] ? (y2.test(u3[2]) && (n5 = RegExp("</" + u3[2], "g")), c4 = p2) : void 0 !== u3[3] && (c4 = p2) : c4 === p2 ? ">" === u3[0] ? (c4 = n5 ?? v, d3 = -1) : void 0 === u3[1] ? d3 = -2 : (d3 = c4.lastIndex - u3[2].length, a3 = u3[1], c4 = void 0 === u3[3] ? p2 : '"' === u3[3] ? $ : g) : c4 === $ || c4 === g ? c4 = p2 : c4 === _ || c4 === m ? c4 = v : (c4 = p2, n5 = void 0);
     const x2 = c4 === p2 && t4[i7 + 1].startsWith("/>") ? " " : "";
-    l3 += c4 === v ? s5 + r3 : d3 >= 0 ? (e8.push(a3), s5.slice(0, d3) + h2 + s5.slice(d3) + o3 + x2) : s5 + o3 + (-2 === d3 ? i7 : x2);
+    l3 += c4 === v ? s5 + r3 : d3 >= 0 ? (e7.push(a3), s5.slice(0, d3) + h2 + s5.slice(d3) + o3 + x2) : s5 + o3 + (-2 === d3 ? i7 : x2);
   }
-  return [V(t4, l3 + (t4[s4] || "<?>") + (2 === i6 ? "</svg>" : 3 === i6 ? "</math>" : "")), e8];
+  return [V(t4, l3 + (t4[s4] || "<?>") + (2 === i6 ? "</svg>" : 3 === i6 ? "</math>" : "")), e7];
 };
 var S2 = class _S {
-  constructor({ strings: t4, _$litType$: i6 }, e8) {
+  constructor({ strings: t4, _$litType$: i6 }, e7) {
     let r6;
     this.parts = [];
     let l3 = 0, a3 = 0;
     const u3 = t4.length - 1, d3 = this.parts, [f3, v2] = N(t4, i6);
-    if (this.el = _S.createElement(f3, e8), P.currentNode = this.el.content, 2 === i6 || 3 === i6) {
+    if (this.el = _S.createElement(f3, e7), P.currentNode = this.el.content, 2 === i6 || 3 === i6) {
       const t5 = this.el.content.firstChild;
       t5.replaceWith(...t5.childNodes);
     }
     for (; null !== (r6 = P.nextNode()) && d3.length < u3; ) {
       if (1 === r6.nodeType) {
         if (r6.hasAttributes()) for (const t5 of r6.getAttributeNames()) if (t5.endsWith(h2)) {
-          const i7 = v2[a3++], s4 = r6.getAttribute(t5).split(o3), e9 = /([.?@])?(.*)/.exec(i7);
-          d3.push({ type: 1, index: l3, name: e9[2], strings: s4, ctor: "." === e9[1] ? I : "?" === e9[1] ? L : "@" === e9[1] ? z : H }), r6.removeAttribute(t5);
+          const i7 = v2[a3++], s4 = r6.getAttribute(t5).split(o3), e8 = /([.?@])?(.*)/.exec(i7);
+          d3.push({ type: 1, index: l3, name: e8[2], strings: s4, ctor: "." === e8[1] ? I : "?" === e8[1] ? L : "@" === e8[1] ? z : H }), r6.removeAttribute(t5);
         } else t5.startsWith(o3) && (d3.push({ type: 6, index: l3 }), r6.removeAttribute(t5));
         if (y2.test(r6.tagName)) {
           const t5 = r6.textContent.split(o3), i7 = t5.length - 1;
@@ -364,11 +364,11 @@ var S2 = class _S {
     return s4.innerHTML = t4, s4;
   }
 };
-function M(t4, i6, s4 = t4, e8) {
+function M(t4, i6, s4 = t4, e7) {
   if (i6 === E) return i6;
-  let h3 = void 0 !== e8 ? s4._$Co?.[e8] : s4._$Cl;
-  const o6 = a2(i6) ? void 0 : i6._$litDirective$;
-  return h3?.constructor !== o6 && (h3?._$AO?.(false), void 0 === o6 ? h3 = void 0 : (h3 = new o6(t4), h3._$AT(t4, s4, e8)), void 0 !== e8 ? (s4._$Co ?? (s4._$Co = []))[e8] = h3 : s4._$Cl = h3), void 0 !== h3 && (i6 = M(t4, h3._$AS(t4, i6.values), h3, e8)), i6;
+  let h3 = void 0 !== e7 ? s4._$Co?.[e7] : s4._$Cl;
+  const o7 = a2(i6) ? void 0 : i6._$litDirective$;
+  return h3?.constructor !== o7 && (h3?._$AO?.(false), void 0 === o7 ? h3 = void 0 : (h3 = new o7(t4), h3._$AT(t4, s4, e7)), void 0 !== e7 ? (s4._$Co ?? (s4._$Co = []))[e7] = h3 : s4._$Cl = h3), void 0 !== h3 && (i6 = M(t4, h3._$AS(t4, i6.values), h3, e7)), i6;
 }
 var R = class {
   constructor(t4, i6) {
@@ -381,17 +381,17 @@ var R = class {
     return this._$AM._$AU;
   }
   u(t4) {
-    const { el: { content: i6 }, parts: s4 } = this._$AD, e8 = (t4?.creationScope ?? l2).importNode(i6, true);
-    P.currentNode = e8;
-    let h3 = P.nextNode(), o6 = 0, n5 = 0, r6 = s4[0];
+    const { el: { content: i6 }, parts: s4 } = this._$AD, e7 = (t4?.creationScope ?? l2).importNode(i6, true);
+    P.currentNode = e7;
+    let h3 = P.nextNode(), o7 = 0, n5 = 0, r6 = s4[0];
     for (; void 0 !== r6; ) {
-      if (o6 === r6.index) {
+      if (o7 === r6.index) {
         let i7;
         2 === r6.type ? i7 = new k(h3, h3.nextSibling, this, t4) : 1 === r6.type ? i7 = new r6.ctor(h3, r6.name, r6.strings, this, t4) : 6 === r6.type && (i7 = new Z(h3, this, t4)), this._$AV.push(i7), r6 = s4[++n5];
       }
-      o6 !== r6?.index && (h3 = P.nextNode(), o6++);
+      o7 !== r6?.index && (h3 = P.nextNode(), o7++);
     }
-    return P.currentNode = l2, e8;
+    return P.currentNode = l2, e7;
   }
   p(t4) {
     let i6 = 0;
@@ -402,8 +402,8 @@ var k = class _k {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
-  constructor(t4, i6, s4, e8) {
-    this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t4, this._$AB = i6, this._$AM = s4, this.options = e8, this._$Cv = e8?.isConnected ?? true;
+  constructor(t4, i6, s4, e7) {
+    this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t4, this._$AB = i6, this._$AM = s4, this.options = e7, this._$Cv = e7?.isConnected ?? true;
   }
   get parentNode() {
     let t4 = this._$AA.parentNode;
@@ -429,10 +429,10 @@ var k = class _k {
     this._$AH !== A && a2(this._$AH) ? this._$AA.nextSibling.data = t4 : this.T(l2.createTextNode(t4)), this._$AH = t4;
   }
   $(t4) {
-    const { values: i6, _$litType$: s4 } = t4, e8 = "number" == typeof s4 ? this._$AC(t4) : (void 0 === s4.el && (s4.el = S2.createElement(V(s4.h, s4.h[0]), this.options)), s4);
-    if (this._$AH?._$AD === e8) this._$AH.p(i6);
+    const { values: i6, _$litType$: s4 } = t4, e7 = "number" == typeof s4 ? this._$AC(t4) : (void 0 === s4.el && (s4.el = S2.createElement(V(s4.h, s4.h[0]), this.options)), s4);
+    if (this._$AH?._$AD === e7) this._$AH.p(i6);
     else {
-      const t5 = new R(e8, this), s5 = t5.u(this.options);
+      const t5 = new R(e7, this), s5 = t5.u(this.options);
       t5.p(i6), this.T(s5), this._$AH = t5;
     }
   }
@@ -443,9 +443,9 @@ var k = class _k {
   k(t4) {
     u2(this._$AH) || (this._$AH = [], this._$AR());
     const i6 = this._$AH;
-    let s4, e8 = 0;
-    for (const h3 of t4) e8 === i6.length ? i6.push(s4 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s4 = i6[e8], s4._$AI(h3), e8++;
-    e8 < i6.length && (this._$AR(s4 && s4._$AB.nextSibling, e8), i6.length = e8);
+    let s4, e7 = 0;
+    for (const h3 of t4) e7 === i6.length ? i6.push(s4 = new _k(this.O(c3()), this.O(c3()), this, this.options)) : s4 = i6[e7], s4._$AI(h3), e7++;
+    e7 < i6.length && (this._$AR(s4 && s4._$AB.nextSibling, e7), i6.length = e7);
   }
   _$AR(t4 = this._$AA.nextSibling, s4) {
     for (this._$AP?.(false, true, s4); t4 !== this._$AB; ) {
@@ -464,19 +464,19 @@ var H = class {
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(t4, i6, s4, e8, h3) {
-    this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t4, this.name = i6, this._$AM = e8, this.options = h3, s4.length > 2 || "" !== s4[0] || "" !== s4[1] ? (this._$AH = Array(s4.length - 1).fill(new String()), this.strings = s4) : this._$AH = A;
+  constructor(t4, i6, s4, e7, h3) {
+    this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t4, this.name = i6, this._$AM = e7, this.options = h3, s4.length > 2 || "" !== s4[0] || "" !== s4[1] ? (this._$AH = Array(s4.length - 1).fill(new String()), this.strings = s4) : this._$AH = A;
   }
-  _$AI(t4, i6 = this, s4, e8) {
+  _$AI(t4, i6 = this, s4, e7) {
     const h3 = this.strings;
-    let o6 = false;
-    if (void 0 === h3) t4 = M(this, t4, i6, 0), o6 = !a2(t4) || t4 !== this._$AH && t4 !== E, o6 && (this._$AH = t4);
+    let o7 = false;
+    if (void 0 === h3) t4 = M(this, t4, i6, 0), o7 = !a2(t4) || t4 !== this._$AH && t4 !== E, o7 && (this._$AH = t4);
     else {
-      const e9 = t4;
+      const e8 = t4;
       let n5, r6;
-      for (t4 = h3[0], n5 = 0; n5 < h3.length - 1; n5++) r6 = M(this, e9[s4 + n5], i6, n5), r6 === E && (r6 = this._$AH[n5]), o6 || (o6 = !a2(r6) || r6 !== this._$AH[n5]), r6 === A ? t4 = A : t4 !== A && (t4 += (r6 ?? "") + h3[n5 + 1]), this._$AH[n5] = r6;
+      for (t4 = h3[0], n5 = 0; n5 < h3.length - 1; n5++) r6 = M(this, e8[s4 + n5], i6, n5), r6 === E && (r6 = this._$AH[n5]), o7 || (o7 = !a2(r6) || r6 !== this._$AH[n5]), r6 === A ? t4 = A : t4 !== A && (t4 += (r6 ?? "") + h3[n5 + 1]), this._$AH[n5] = r6;
     }
-    o6 && !e8 && this.j(t4);
+    o7 && !e7 && this.j(t4);
   }
   j(t4) {
     t4 === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t4 ?? "");
@@ -499,13 +499,13 @@ var L = class extends H {
   }
 };
 var z = class extends H {
-  constructor(t4, i6, s4, e8, h3) {
-    super(t4, i6, s4, e8, h3), this.type = 5;
+  constructor(t4, i6, s4, e7, h3) {
+    super(t4, i6, s4, e7, h3), this.type = 5;
   }
   _$AI(t4, i6 = this) {
     if ((t4 = M(this, t4, i6, 0) ?? A) === E) return;
-    const s4 = this._$AH, e8 = t4 === A && s4 !== A || t4.capture !== s4.capture || t4.once !== s4.once || t4.passive !== s4.passive, h3 = t4 !== A && (s4 === A || e8);
-    e8 && this.element.removeEventListener(this.name, this, s4), h3 && this.element.addEventListener(this.name, this, t4), this._$AH = t4;
+    const s4 = this._$AH, e7 = t4 === A && s4 !== A || t4.capture !== s4.capture || t4.once !== s4.once || t4.passive !== s4.passive, h3 = t4 !== A && (s4 === A || e7);
+    e7 && this.element.removeEventListener(this.name, this, s4), h3 && this.element.addEventListener(this.name, this, t4), this._$AH = t4;
   }
   handleEvent(t4) {
     "function" == typeof this._$AH ? this._$AH.call(this.options?.host ?? this.element, t4) : this._$AH.handleEvent(t4);
@@ -525,11 +525,11 @@ var Z = class {
 var B = t2.litHtmlPolyfillSupport;
 B?.(S2, k), (t2.litHtmlVersions ?? (t2.litHtmlVersions = [])).push("3.3.2");
 var D = (t4, i6, s4) => {
-  const e8 = s4?.renderBefore ?? i6;
-  let h3 = e8._$litPart$;
+  const e7 = s4?.renderBefore ?? i6;
+  let h3 = e7._$litPart$;
   if (void 0 === h3) {
     const t5 = s4?.renderBefore ?? null;
-    e8._$litPart$ = h3 = new k(i6.insertBefore(c3(), t5), t5, void 0, s4 ?? {});
+    e7._$litPart$ = h3 = new k(i6.insertBefore(c3(), t5), t5, void 0, s4 ?? {});
   }
   return h3._$AI(t4), h3;
 };
@@ -566,32 +566,32 @@ o4?.({ LitElement: i4 });
 
 // node_modules/@lit/reactive-element/decorators/property.js
 var o5 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
-var r4 = (t4 = o5, e8, r6) => {
+var r4 = (t4 = o5, e7, r6) => {
   const { kind: n5, metadata: i6 } = r6;
   let s4 = globalThis.litPropertyMetadata.get(i6);
   if (void 0 === s4 && globalThis.litPropertyMetadata.set(i6, s4 = /* @__PURE__ */ new Map()), "setter" === n5 && ((t4 = Object.create(t4)).wrapped = true), s4.set(r6.name, t4), "accessor" === n5) {
-    const { name: o6 } = r6;
+    const { name: o7 } = r6;
     return { set(r7) {
-      const n6 = e8.get.call(this);
-      e8.set.call(this, r7), this.requestUpdate(o6, n6, t4, true, r7);
-    }, init(e9) {
-      return void 0 !== e9 && this.C(o6, void 0, t4, e9), e9;
+      const n6 = e7.get.call(this);
+      e7.set.call(this, r7), this.requestUpdate(o7, n6, t4, true, r7);
+    }, init(e8) {
+      return void 0 !== e8 && this.C(o7, void 0, t4, e8), e8;
     } };
   }
   if ("setter" === n5) {
-    const { name: o6 } = r6;
+    const { name: o7 } = r6;
     return function(r7) {
-      const n6 = this[o6];
-      e8.call(this, r7), this.requestUpdate(o6, n6, t4, true, r7);
+      const n6 = this[o7];
+      e7.call(this, r7), this.requestUpdate(o7, n6, t4, true, r7);
     };
   }
   throw Error("Unsupported decorator location: " + n5);
 };
 function n4(t4) {
-  return (e8, o6) => "object" == typeof o6 ? r4(t4, e8, o6) : ((t5, e9, o7) => {
-    const r6 = e9.hasOwnProperty(o7);
-    return e9.constructor.createProperty(o7, t5), r6 ? Object.getOwnPropertyDescriptor(e9, o7) : void 0;
-  })(t4, e8, o6);
+  return (e7, o7) => "object" == typeof o7 ? r4(t4, e7, o7) : ((t5, e8, o8) => {
+    const r6 = e8.hasOwnProperty(o8);
+    return e8.constructor.createProperty(o8, t5), r6 ? Object.getOwnPropertyDescriptor(e8, o8) : void 0;
+  })(t4, e7, o7);
 }
 
 // node_modules/@lit/reactive-element/decorators/state.js
@@ -599,55 +599,28 @@ function r5(r6) {
   return n4({ ...r6, state: true, attribute: false });
 }
 
-// node_modules/@lit/reactive-element/decorators/base.js
-var e4 = (e8, t4, c4) => (c4.configurable = true, c4.enumerable = true, Reflect.decorate && "object" != typeof t4 && Object.defineProperty(e8, t4, c4), c4);
-
-// node_modules/@lit/reactive-element/decorators/query.js
-function e5(e8, r6) {
-  return (n5, s4, i6) => {
-    const o6 = (t4) => t4.renderRoot?.querySelector(e8) ?? null;
-    if (r6) {
-      const { get: e9, set: r7 } = "object" == typeof s4 ? n5 : i6 ?? /* @__PURE__ */ (() => {
-        const t4 = /* @__PURE__ */ Symbol();
-        return { get() {
-          return this[t4];
-        }, set(e10) {
-          this[t4] = e10;
-        } };
-      })();
-      return e4(n5, s4, { get() {
-        let t4 = e9.call(this);
-        return void 0 === t4 && (t4 = o6(this), (null !== t4 || this.hasUpdated) && r7.call(this, t4)), t4;
-      } });
-    }
-    return e4(n5, s4, { get() {
-      return o6(this);
-    } });
-  };
-}
-
 // node_modules/lit-html/directive.js
 var t3 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
-var e6 = (t4) => (...e8) => ({ _$litDirective$: t4, values: e8 });
+var e5 = (t4) => (...e7) => ({ _$litDirective$: t4, values: e7 });
 var i5 = class {
   constructor(t4) {
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  _$AT(t4, e8, i6) {
-    this._$Ct = t4, this._$AM = e8, this._$Ci = i6;
+  _$AT(t4, e7, i6) {
+    this._$Ct = t4, this._$AM = e7, this._$Ci = i6;
   }
-  _$AS(t4, e8) {
-    return this.update(t4, e8);
+  _$AS(t4, e7) {
+    return this.update(t4, e7);
   }
-  update(t4, e8) {
-    return this.render(...e8);
+  update(t4, e7) {
+    return this.render(...e7);
   }
 };
 
 // node_modules/lit-html/directives/class-map.js
-var e7 = e6(class extends i5 {
+var e6 = e5(class extends i5 {
   constructor(t4) {
     if (super(t4), t4.type !== t3.ATTRIBUTE || "class" !== t4.name || t4.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -670,17 +643,8 @@ var e7 = e6(class extends i5 {
   }
 });
 
-// src/utils/dom.utils.ts
-function emit(host, name, detail, opts = {}) {
-  const event = new CustomEvent(name, {
-    detail,
-    bubbles: true,
-    composed: true,
-    ...opts
-  });
-  host.dispatchEvent(event);
-  return event;
-}
+// node_modules/lit-html/directives/if-defined.js
+var o6 = (o7) => o7 ?? A;
 
 // src/styles/tokens.ts
 var primary = r("#6366f1");
@@ -768,353 +732,371 @@ var placementOriginsExtended = i`
   [data-placement="right-end"]   { transform-origin: left bottom;  }
 `;
 
-// src/panel/styles.ts
+// src/textarea/styles.ts
 var styles_default = [
   hostReset,
   i`
-    /* ── Host ───────────────────────────────────────────────────────── */
     :host {
-      display: block;
-      border:        var(--uwc-panel-border,  1px solid ${border});
-      border-radius: var(--uwc-panel-radius,  ${radiusLg});
-      background:    var(--uwc-panel-bg,      ${surface});
-      box-shadow:    var(--uwc-panel-shadow,  ${shadowSm});
-      overflow:      hidden;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    :host([fluid]) { display: block; width: 100%; }
+
+    /* ── Wrapper ─────────────────────────────────────────────────────── */
+    .uwc-textarea {
+      --_bg:        var(--uwc-textarea-bg,                ${surface});
+      --_border:    var(--uwc-textarea-border,            1px solid ${borderControl});
+      --_radius:    var(--uwc-textarea-radius,            ${radiusMd});
+      --_color:     var(--uwc-textarea-color,             ${text});
+      --_ph-color:  var(--uwc-textarea-placeholder-color, ${textMuted});
+      --_font-size: var(--uwc-textarea-font-size,         ${fontSizeMd});
+      --_px:        var(--uwc-textarea-padding-x,         0.75rem);
+      --_py:        var(--uwc-textarea-padding-y,         0.5rem);
+
+      display:       block;
+      width:         100%;
+      background:    var(--_bg);
+      border:        var(--_border);
+      border-radius: var(--_radius);
+      transition:    border-color ${durationBase}, box-shadow ${durationBase};
     }
 
-    /* ── Header ─────────────────────────────────────────────────────── */
-    .uwc-panel__header {
+    .uwc-textarea:focus-within {
+      border-color: var(--uwc-color-primary, ${primary});
+      box-shadow:   0 0 0 3px color-mix(in oklab, var(--uwc-color-primary, ${primary}) 20%, transparent);
+    }
+
+    /* ── Variants ────────────────────────────────────────────────────── */
+    .uwc-textarea--filled {
+      --_bg: var(--uwc-textarea-filled-bg, ${surfaceRaised});
+      border-color: transparent;
+    }
+    .uwc-textarea--filled:focus-within {
+      --_bg: var(--uwc-textarea-bg, ${surface});
+      border-color: var(--uwc-color-primary, ${primary});
+    }
+
+    /* ── Invalid ─────────────────────────────────────────────────────── */
+    .uwc-textarea--invalid {
+      border-color: var(--uwc-color-danger, ${danger}) !important;
+    }
+    .uwc-textarea--invalid:focus-within {
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--uwc-color-danger, ${danger}) 20%, transparent);
+    }
+
+    /* ── Sizes ───────────────────────────────────────────────────────── */
+    .uwc-textarea--small { --_font-size: ${fontSizeXs}; --_px: 0.5rem;  --_py: 0.3125rem; }
+    .uwc-textarea--large { --_font-size: ${fontSizeLg}; --_px: 1rem;    --_py: 0.6875rem; }
+
+    /* ── Disabled ────────────────────────────────────────────────────── */
+    .uwc-textarea--disabled { pointer-events: none; opacity: 0.6; }
+
+    /* ── Native textarea ─────────────────────────────────────────────── */
+    textarea {
+      display:     block;
+      width:       100%;
+      min-width:   0;
+      padding:     var(--_py) var(--_px);
+      font-family: var(--uwc-font-family, inherit);
+      font-size:   var(--_font-size);
+      line-height: 1.5;
+      color:       var(--_color);
+      background:  transparent;
+      border:      none;
+      outline:     none;
+      box-sizing:  border-box;
+      resize:      var(--uwc-textarea-resize, vertical);
+    }
+
+    /* Resize variants */
+    :host([resize="none"])       textarea { resize: none; }
+    :host([resize="both"])       textarea { resize: both; }
+    :host([resize="horizontal"]) textarea { resize: horizontal; }
+    :host([resize="vertical"])   textarea { resize: vertical; }
+    :host([auto-resize])         textarea { resize: none; overflow: hidden; }
+
+    textarea::placeholder { color: var(--_ph-color); }
+    textarea:disabled      { cursor: not-allowed; }
+
+    /* ── Character count bar ─────────────────────────────────────────── */
+    .uwc-textarea__footer {
       display:         flex;
-      align-items:     center;
-      gap:             ${space2};
-      padding:         var(--uwc-panel-header-padding, ${space3} ${space5});
-      background:      var(--uwc-panel-header-bg,      transparent);
-      border-bottom:   var(--uwc-panel-header-border,  1px solid ${border});
-      color:           var(--uwc-panel-header-color,   ${text});
-      font-size:       var(--uwc-panel-header-font-size, ${fontSizeLg});
-      font-weight:     var(--uwc-panel-header-font-weight, ${fontWeightSemibold});
-      line-height:     1.4;
-      min-height:      3rem;
+      justify-content: flex-end;
+      padding:         0.25rem var(--_px) 0.3125rem;
+      border-top:      1px solid var(--uwc-textarea-footer-border, ${borderSubtle});
     }
 
-    /* When collapsed, header has no bottom border (content is hidden) */
-    :host([collapsed]) .uwc-panel__header {
-      border-bottom-color: transparent;
+    .uwc-textarea__count {
+      font-size:  ${fontSizeXs};
+      color:      var(--uwc-textarea-count-color, ${textMuted});
+      font-variant-numeric: tabular-nums;
     }
 
-    /* ── Header icon ─────────────────────────────────────────────────── */
-    .uwc-panel__header-icon {
-      display:         inline-flex;
-      align-items:     center;
-      flex-shrink:     0;
-      color:           var(--uwc-panel-icon-color, ${primary});
+    .uwc-textarea__count--warn {
+      color: var(--uwc-color-danger, ${danger});
     }
 
-    /* ── Header title ────────────────────────────────────────────────── */
-    .uwc-panel__title {
-      flex:          1;
-      min-width:     0;
-      overflow:      hidden;
-      text-overflow: ellipsis;
-      white-space:   nowrap;
-    }
+    /* ── Float label ─────────────────────────────────────────────────── */
+    .uwc-textarea--float { position: relative; }
 
-    /* ── Header icons slot (custom actions) ──────────────────────────── */
-    .uwc-panel__header-actions {
-      display:     inline-flex;
-      align-items: center;
-      gap:         ${space1};
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-
-    /* ── Toggle button ───────────────────────────────────────────────── */
-    .uwc-panel__toggler {
-      display:          inline-flex;
-      align-items:      center;
-      justify-content:  center;
-      width:            1.75rem;
-      height:           1.75rem;
-      border-radius:    ${radiusFull};
-      border:           1px solid ${border};
-      background:       transparent;
-      color:            var(--uwc-panel-toggler-color, ${textSecondary});
-      cursor:           pointer;
-      padding:          0;
-      flex-shrink:      0;
+    .uwc-textarea__label {
+      position:       absolute;
+      left:           calc(var(--_px) + 0.125rem);
+      line-height:    1;
+      white-space:    nowrap;
+      pointer-events: none;
+      padding-inline: 0.25rem;
       transition:
-        background    ${durationBase},
-        border-color  ${durationBase},
-        color         ${durationBase};
+        top       ${durationBase} ${easingStandard},
+        font-size ${durationBase} ${easingStandard},
+        color     ${durationBase} ${easingStandard},
+        transform ${durationBase} ${easingStandard};
     }
 
-    .uwc-panel__toggler:hover {
-      background:    ${hoverBg};
-      border-color:  var(--uwc-color-primary, ${primary});
-      color:         var(--uwc-color-primary, ${primary});
+    /* Over (default) */
+    .uwc-textarea--float-over {
+      overflow:   visible;
+      margin-top: 1.5rem;
+    }
+    .uwc-textarea--float-over .uwc-textarea__label {
+      top:        0.6rem;
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: transparent;
+      transform:  none;
+    }
+    .uwc-textarea--float-over:focus-within .uwc-textarea__label,
+    .uwc-textarea--float-over textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      top:       0;
+      transform: translateY(calc(-100% - 0.375rem));
+      font-size: calc(var(--_font-size) * 0.85);
+      color:     var(--uwc-textarea-label-active-color, var(--uwc-color-primary, ${primary}));
     }
 
-    .uwc-panel__toggler:focus-visible {
-      outline:        2px solid var(--uwc-color-primary, ${primary});
-      outline-offset: 2px;
+    /* On */
+    .uwc-textarea--float-on {
+      overflow:   visible;
+      margin-top: 0.75rem;
+    }
+    .uwc-textarea--float-on .uwc-textarea__label {
+      top:        0.6rem;
+      font-size:  var(--_font-size);
+      color:      var(--_ph-color);
+      background: var(--_bg);
+      transform:  none;
+    }
+    .uwc-textarea--float-on:focus-within .uwc-textarea__label,
+    .uwc-textarea--float-on textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      top:       0;
+      transform: translateY(-50%);
+      font-size: calc(var(--_font-size) * 0.8);
+      color:     var(--uwc-textarea-label-active-color, var(--uwc-color-primary, ${primary}));
+    }
+    .uwc-textarea--float-on.uwc-textarea--filled .uwc-textarea__label {
+      background: var(--uwc-textarea-filled-bg, ${surfaceRaised});
     }
 
-    /* Chevron rotation — open state */
-    .uwc-panel__toggler-icon {
-      display:    inline-flex;
-      transform:  rotate(0deg);
-      transition: transform 250ms ease;
+    /* In */
+    .uwc-textarea--float-in textarea {
+      padding-top: 1.5rem;
+    }
+    .uwc-textarea--float-in .uwc-textarea__label {
+      top:            0.6rem;
+      font-size:      var(--_font-size);
+      color:          var(--_ph-color);
+      background:     transparent;
+      left:           var(--_px);
+      padding-inline: 0;
+      transform:      none;
+    }
+    .uwc-textarea--float-in:focus-within .uwc-textarea__label,
+    .uwc-textarea--float-in textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      top:            0.3125rem;
+      transform:      none;
+      font-size:      calc(var(--_font-size) * 0.75);
+      color:          var(--uwc-textarea-label-active-color, var(--uwc-color-primary, ${primary}));
+      left:           var(--_px);
+      padding-inline: 0;
     }
 
-    :host(:not([collapsed])) .uwc-panel__toggler-icon {
-      transform: rotate(180deg);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .uwc-panel__toggler-icon { transition: none; }
-      .uwc-panel__toggler      { transition: none; }
-    }
-
-    /* ── Content wrapper (WAAPI animated) ───────────────────────────── */
-    .uwc-panel__content-wrap {
-      /* Height animated by JS; overflow applied inline during animation */
-    }
-
-    /* ── Content body ────────────────────────────────────────────────── */
-    .uwc-panel__content {
-      padding:    var(--uwc-panel-content-padding, ${space4} ${space5});
-      color:      var(--uwc-panel-content-color,   ${text});
-      font-size:  var(--uwc-panel-content-font-size, ${fontSizeMd});
-      line-height: 1.6;
-    }
-
-    /* ── Footer ─────────────────────────────────────────────────────── */
-    .uwc-panel__footer {
-      padding:      var(--uwc-panel-footer-padding, ${space3} ${space5});
-      background:   var(--uwc-panel-footer-bg,      transparent);
-      border-top:   var(--uwc-panel-footer-border,  1px solid ${border});
-      font-size:    ${fontSizeMd};
-      color:        ${textSecondary};
-    }
-
-    /* Footer hidden when slot is empty */
-    .uwc-panel__footer--hidden {
-      display: none;
-    }
-
-    /* ── No-header mode ──────────────────────────────────────────────── */
-    :host([no-header]) .uwc-panel__header {
-      display: none;
+    /* Invalid label */
+    .uwc-textarea--invalid .uwc-textarea__label,
+    .uwc-textarea--invalid:focus-within .uwc-textarea__label,
+    .uwc-textarea--invalid textarea:not(:placeholder-shown) ~ .uwc-textarea__label {
+      color: var(--uwc-color-danger, ${danger});
     }
   `
 ];
 
-// src/panel/index.ts
-var UwcPanel = class extends i4 {
+// src/textarea/index.ts
+var UwcTextarea = class extends i4 {
   constructor() {
     super(...arguments);
-    this.header = "";
-    this.toggleable = false;
-    this.collapsed = false;
-    this.noHeader = false;
-    this._hasFooter = false;
+    this.value = "";
+    this.rows = 4;
+    this.variant = "outlined";
+    this.size = "medium";
+    this.resize = "vertical";
+    this.floatLabel = "over";
+    this.disabled = false;
+    this.readonly = false;
+    this.invalid = false;
+    this.fluid = false;
+    this.autoResize = false;
+    this.showCount = false;
+    this._charCount = 0;
   }
-  // ── Lifecycle ──────────────────────────────────────────────────────────────
   firstUpdated() {
-    if (this._wrap && this.collapsed) {
-      this._wrap.style.height = "0px";
-      this._wrap.style.overflow = "hidden";
-    }
+    this._charCount = this.value?.length ?? 0;
+    if (this.autoResize) this._doAutoResize();
   }
-  updated(changed) {
-    super.updated(changed);
-    if (!changed.has("collapsed") || !this._wrap) return;
-    if (this.collapsed) {
-      this._animateClose();
-    } else {
-      this._animateOpen();
-    }
+  // ── Handlers ─────────────────────────────────────────────────────
+  _onInput(e7) {
+    const ta = e7.target;
+    this.value = ta.value;
+    this._charCount = ta.value.length;
+    if (this.autoResize) this._doAutoResize();
+    this.dispatchEvent(new CustomEvent("uwc-input", {
+      bubbles: true,
+      composed: true,
+      detail: { value: this.value, originalEvent: e7 }
+    }));
   }
-  // ── WAAPI animations ───────────────────────────────────────────────────────
-  _animateOpen() {
-    const wrap = this._wrap;
-    if (!wrap) return;
-    const fromHeight = this._currentAnimation ? wrap.getBoundingClientRect().height : 0;
-    this._currentAnimation?.cancel();
-    this._currentAnimation = void 0;
-    wrap.style.removeProperty("height");
-    wrap.style.removeProperty("overflow");
-    const toHeight = wrap.scrollHeight;
-    const anim = wrap.animate(
-      [
-        { height: `${fromHeight}px`, overflow: "hidden" },
-        { height: `${toHeight}px`, overflow: "hidden" }
-      ],
-      { duration: this._duration(), easing: "ease", fill: "both" }
-    );
-    this._currentAnimation = anim;
-    anim.addEventListener("finish", () => {
-      if (this._currentAnimation !== anim) return;
-      anim.cancel();
-      wrap.style.removeProperty("height");
-      wrap.style.removeProperty("overflow");
-      this._currentAnimation = void 0;
-      emit(this, "uwc-expand");
-    }, { once: true });
+  _onChange(e7) {
+    const ta = e7.target;
+    this.value = ta.value;
+    this.dispatchEvent(new CustomEvent("uwc-change", {
+      bubbles: true,
+      composed: true,
+      detail: { value: this.value, originalEvent: e7 }
+    }));
   }
-  _animateClose() {
-    const wrap = this._wrap;
-    if (!wrap) return;
-    const fromHeight = wrap.getBoundingClientRect().height;
-    this._currentAnimation?.cancel();
-    this._currentAnimation = void 0;
-    const anim = wrap.animate(
-      [
-        { height: `${fromHeight}px`, overflow: "hidden" },
-        { height: "0px", overflow: "hidden" }
-      ],
-      { duration: this._duration(), easing: "ease", fill: "both" }
-    );
-    this._currentAnimation = anim;
-    anim.addEventListener("finish", () => {
-      if (this._currentAnimation !== anim) return;
-      anim.cancel();
-      wrap.style.height = "0px";
-      wrap.style.overflow = "hidden";
-      this._currentAnimation = void 0;
-      emit(this, "uwc-collapse");
-    }, { once: true });
+  _doAutoResize() {
+    const ta = this.shadowRoot?.querySelector("textarea");
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${ta.scrollHeight}px`;
   }
-  _duration() {
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250;
-  }
-  // ── Handlers ───────────────────────────────────────────────────────────────
-  _onToggle() {
-    this.collapsed = !this.collapsed;
-    emit(this, "uwc-toggle", { collapsed: this.collapsed });
-  }
-  _onFooterSlotChange(e8) {
-    const slot = e8.target;
-    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
-  }
-  // ── Public API ─────────────────────────────────────────────────────────────
-  /** Expand the panel. No-op if already expanded. */
-  expand() {
-    if (!this.collapsed) return;
-    this.collapsed = false;
-    emit(this, "uwc-toggle", { collapsed: false });
-  }
-  /** Collapse the panel. No-op if already collapsed. */
-  collapse() {
-    if (this.collapsed) return;
-    this.collapsed = true;
-    emit(this, "uwc-toggle", { collapsed: true });
-  }
-  /** Toggle the panel open/closed. */
-  toggle() {
-    this._onToggle();
-  }
-  // ── Render helpers ─────────────────────────────────────────────────────────
-  _renderHeader() {
-    return b2`
-      <div part="header" class="uwc-panel__header">
-        ${this.icon ? b2`
-          <span part="header-icon" class="uwc-panel__header-icon" aria-hidden="true">
-            <uwc-icon name=${this.icon} size="18px"></uwc-icon>
-          </span>
-        ` : A}
-
-        <slot name="header">
-          <span part="title" class="uwc-panel__title">${this.header}</span>
-        </slot>
-
-        <span part="actions" class="uwc-panel__header-actions">
-          <slot name="icons"></slot>
-        </span>
-
-        ${this.toggleable ? b2`
-          <button
-            type="button"
-            part="toggler"
-            class="uwc-panel__toggler"
-            aria-label=${this.collapsed ? "Expand panel" : "Collapse panel"}
-            aria-expanded=${!this.collapsed ? "true" : "false"}
-            aria-controls="uwc-panel-content"
-            @click=${this._onToggle}
-          >
-            <span class="uwc-panel__toggler-icon" aria-hidden="true">
-              <uwc-icon name="chevron-down" size="14px"></uwc-icon>
-            </span>
-          </button>
-        ` : A}
-      </div>
-    `;
-  }
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────
   render() {
+    const floatMode = !!this.label;
+    const classes = e6({
+      "uwc-textarea": true,
+      [`uwc-textarea--${this.variant}`]: true,
+      [`uwc-textarea--${this.size}`]: this.size !== "medium",
+      "uwc-textarea--invalid": this.invalid,
+      "uwc-textarea--disabled": this.disabled,
+      "uwc-textarea--float": floatMode,
+      [`uwc-textarea--float-${this.floatLabel}`]: floatMode
+    });
+    const placeholder = floatMode ? this.placeholder ?? " " : this.placeholder;
+    const showFooter = this.showCount && this.maxlength !== void 0;
+    const nearLimit = this.maxlength !== void 0 && this._charCount >= this.maxlength * 0.9;
     return b2`
-      <div part="panel" class="uwc-panel">
-        ${!this.noHeader ? this._renderHeader() : A}
-
-        <div
-          part="content-wrap"
-          class="uwc-panel__content-wrap"
-          id="uwc-panel-content"
-          role="region"
-          aria-labelledby="uwc-panel-header-title"
-        >
-          <div part="content" class="uwc-panel__content">
-            <slot></slot>
+      <div part="wrapper" class=${classes}>
+        <textarea
+          part="textarea"
+          .value=${this.value}
+          rows=${this.rows}
+          cols=${o6(this.cols)}
+          placeholder=${o6(placeholder)}
+          name=${o6(this.name)}
+          autocomplete=${o6(this.autocomplete)}
+          maxlength=${o6(this.maxlength)}
+          ?disabled=${this.disabled}
+          ?readonly=${this.readonly}
+          aria-invalid=${this.invalid}
+          aria-multiline="true"
+          @input=${this._onInput}
+          @change=${this._onChange}
+          @focus=${() => this.dispatchEvent(new CustomEvent("uwc-focus", { bubbles: true, composed: true }))}
+          @blur=${() => this.dispatchEvent(new CustomEvent("uwc-blur", { bubbles: true, composed: true }))}
+        ></textarea>
+        ${floatMode ? b2`<label class="uwc-textarea__label" part="label">${this.label}</label>` : A}
+        ${showFooter ? b2`
+          <div part="footer" class="uwc-textarea__footer">
+            <span part="count" class="uwc-textarea__count${nearLimit ? " uwc-textarea__count--warn" : ""}">
+              ${this._charCount} / ${this.maxlength}
+            </span>
           </div>
-        </div>
-
-        <div
-          part="footer"
-          class=${e7({ "uwc-panel__footer": true, "uwc-panel__footer--hidden": !this._hasFooter })}
-        >
-          <slot name="footer" @slotchange=${this._onFooterSlotChange}></slot>
-        </div>
+        ` : A}
       </div>
     `;
   }
 };
-UwcPanel.styles = styles_default;
+UwcTextarea.styles = [styles_default];
 __decorateClass([
   n4()
-], UwcPanel.prototype, "header", 2);
+], UwcTextarea.prototype, "value", 2);
 __decorateClass([
   n4()
-], UwcPanel.prototype, "icon", 2);
+], UwcTextarea.prototype, "placeholder", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcTextarea.prototype, "rows", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcTextarea.prototype, "cols", 2);
+__decorateClass([
+  n4({ type: Number })
+], UwcTextarea.prototype, "maxlength", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "name", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "autocomplete", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcTextarea.prototype, "variant", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcTextarea.prototype, "size", 2);
+__decorateClass([
+  n4({ reflect: true })
+], UwcTextarea.prototype, "resize", 2);
+__decorateClass([
+  n4()
+], UwcTextarea.prototype, "label", 2);
+__decorateClass([
+  n4({ attribute: "float-label", reflect: true })
+], UwcTextarea.prototype, "floatLabel", 2);
 __decorateClass([
   n4({ type: Boolean, reflect: true })
-], UwcPanel.prototype, "toggleable", 2);
+], UwcTextarea.prototype, "disabled", 2);
 __decorateClass([
   n4({ type: Boolean, reflect: true })
-], UwcPanel.prototype, "collapsed", 2);
+], UwcTextarea.prototype, "readonly", 2);
 __decorateClass([
-  n4({ type: Boolean, reflect: true, attribute: "no-header" })
-], UwcPanel.prototype, "noHeader", 2);
+  n4({ type: Boolean, reflect: true })
+], UwcTextarea.prototype, "invalid", 2);
 __decorateClass([
-  e5(".uwc-panel__content-wrap")
-], UwcPanel.prototype, "_wrap", 2);
+  n4({ type: Boolean, reflect: true })
+], UwcTextarea.prototype, "fluid", 2);
+__decorateClass([
+  n4({ type: Boolean, reflect: true, attribute: "auto-resize" })
+], UwcTextarea.prototype, "autoResize", 2);
+__decorateClass([
+  n4({ type: Boolean, attribute: "show-count" })
+], UwcTextarea.prototype, "showCount", 2);
 __decorateClass([
   r5()
-], UwcPanel.prototype, "_hasFooter", 2);
+], UwcTextarea.prototype, "_charCount", 2);
 
-// src/panel/react.ts
-var UwcPanelReact = createComponent({
+// src/textarea/react.ts
+var UwcTextarea2 = createComponent({
+  tagName: "uwc-textarea",
+  elementClass: UwcTextarea,
   react: React,
-  tagName: "uwc-panel",
-  elementClass: UwcPanel,
   events: {
-    onUwcToggle: "uwc-toggle",
-    onUwcCollapse: "uwc-collapse",
-    onUwcExpand: "uwc-expand"
+    onUwcInput: "uwc-input",
+    onUwcChange: "uwc-change",
+    onUwcFocus: "uwc-focus",
+    onUwcBlur: "uwc-blur"
   }
 });
 export {
-  UwcPanelReact as UwcPanel,
-  UwcPanelReact
+  UwcTextarea2 as UwcTextarea
 };
 /*! Bundled license information:
 
@@ -1159,6 +1141,7 @@ lit-html/is-server.js:
    *)
 
 lit-html/directives/class-map.js:
+lit-html/directives/if-defined.js:
   (**
    * @license
    * Copyright 2018 Google LLC

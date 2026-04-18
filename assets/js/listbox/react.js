@@ -743,12 +743,14 @@ var surface = r("#ffffff");
 var surfaceRaised = r("#f9f8f5");
 var border = r("rgba(0,0,0,0.09)");
 var borderSubtle = r("rgba(0,0,0,0.06)");
+var borderControl = r("rgba(0,0,0,0.20)");
 var text = r("#111111");
 var textSecondary = r("#64748b");
 var textMuted = r("#9ca3af");
 var textDisabled = r("#bbbbbb");
 var hoverBg = r("rgba(0,0,0,0.04)");
 var selectedBg = r("rgba(99,102,241,0.08)");
+var colorWhite = r("#ffffff");
 var radiusXs = r("2px");
 var radiusSm = r("4px");
 var radiusMd = r("6px");
@@ -827,7 +829,7 @@ var styles_default = [
     /* ── Container ──────────────────────────────────────────────────────────── */
     .uwc-lb {
       --_radius:      var(--uwc-listbox-radius,     ${radiusMd});
-      --_border:      var(--uwc-listbox-border,     1px solid #d1d5db);
+      --_border:      var(--uwc-listbox-border,     1px solid ${borderControl});
       --_bg:          var(--uwc-listbox-bg,         ${surface});
       --_item-height: var(--uwc-listbox-item-height,2.5rem);
       --_font-size:   var(--uwc-listbox-font-size,  ${fontSizeMd});
@@ -848,7 +850,7 @@ var styles_default = [
       display: flex;
       align-items: center;
       padding: 0.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid ${borderSubtle};
       gap: 0.375rem;
     }
     .uwc-lb__filter-input {
@@ -859,7 +861,7 @@ var styles_default = [
       font-family: inherit;
       color: ${text};
       background: transparent;
-      border: 1px solid #d1d5db;
+      border: 1px solid ${borderControl};
       border-radius: ${radiusSm};
       outline: none;
       transition: border-color ${durationBase}, box-shadow ${durationBase};
@@ -879,7 +881,7 @@ var styles_default = [
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid ${borderSubtle};
       font-weight: ${fontWeightSemibold};
       font-size: ${fontSizeSm};
       color: ${textSecondary};
@@ -958,7 +960,7 @@ var styles_default = [
       width: 1rem;
       height: 1rem;
       flex-shrink: 0;
-      border: 1px solid #d1d5db;
+      border: 1px solid ${borderControl};
       border-radius: ${radiusXs};
       display: flex;
       align-items: center;
