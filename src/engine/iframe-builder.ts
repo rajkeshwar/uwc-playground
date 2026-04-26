@@ -53,20 +53,11 @@ export const CONSOLE_INTERCEPTOR = `
 
 /**
  * Bundle loader script — injected into every iframe.
- * Reads __UWC_BUNDLE_URL__ from localStorage and appends it as a module script.
+ * Always loads @uwckit/components from the CDN.
  */
 export const BUNDLE_LOADER = `
-<script>
-(function() {
-  var __UWC_BUNDLE_URL__ = localStorage.getItem('__UWC_BUNDLE_URL__');
-  var s = document.createElement('script');
-  s.type = 'module';
-  s.src = __UWC_BUNDLE_URL__ === null 
-    ? '/assets/js/uwc.bundle.js' 
-    : __UWC_BUNDLE_URL__ + '/js/uwc.bundle.js';
-  document.head.appendChild(s);
-})();
-<\/script>`;
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uwckit/components/dist/themes/index.css"/>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@uwckit/components/dist/index.js"><\/script>`;
 
 /**
  * Wraps user JS in a blob URL dynamic import pattern.
